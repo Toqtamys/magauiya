@@ -1,0 +1,217 @@
+<title>Magauiya: ver. inner peace 1.0 C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Лабораторный инструмент: слева — загрузка и параметры, справа — результаты.
+   Акцент — фиолетовые «чернила» сетки камеры Маклера; классы ВОЗ — своя семантическая палитра. */
+:root{
+  --paper:#f5f5f8; --panel:#ffffff; --ink:#1c1a2b; --muted:#68657a; --line:#e2e0ea; --soft:#efedf6;
+  --accent:#4a2f9e; --accent-ink:#ffffff; --accent-soft:#ebe6fb;
+  --a:#2b8a3e; --b:#d99a00; --c:#1971c2; --d:#c2255c; --x:#9a98a6;
+  --low:#c92a2a; --low-bg:#fff0f0; --ok:#2b8a3e;
+  --cat:#e9a15b; --cat-dark:#b9692c; --cat-belly:#fbe3c4; --scope:#3d3a52; --scope-light:#8f8ba8;
+  --f-ui:"Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-num:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#121119; --panel:#1b1a25; --ink:#ecebf4; --muted:#a19eb4; --line:#2e2c3c; --soft:#22202e;
+  --accent:#a48cff; --accent-ink:#17142a; --accent-soft:#2a2445;
+  --a:#51cf66; --b:#fcc419; --c:#4dabf7; --d:#f06595; --x:#7d7a8c;
+  --low:#ff8787; --low-bg:#3a1f25; --ok:#69db7c; --scope:#c9c5e0; --scope-light:#7d7998; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121119; --panel:#1b1a25; --ink:#ecebf4; --muted:#a19eb4; --line:#2e2c3c; --soft:#22202e;
+  --accent:#a48cff; --accent-ink:#17142a; --accent-soft:#2a2445;
+  --a:#51cf66; --b:#fcc419; --c:#4dabf7; --d:#f06595; --x:#7d7a8c;
+  --low:#ff8787; --low-bg:#3a1f25; --ok:#69db7c; --scope:#c9c5e0; --scope-light:#7d7998; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{font:15px/1.5 var(--f-ui);margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:22px 64px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand svg{width:84px;height:70px;flex:none}
+.brand h1{font-size:23px;font-weight:700;margin:0;letter-spacing:-.3px;line-height:1.15}
+.brand h1 .ver{display:block;font-size:13px;font-weight:500;color:var(--accent);letter-spacing:.02em}
+header p{margin:0;color:var(--muted);font-size:13.5px;flex:1 1 320px;min-width:0}
+.langs{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-left:auto}
+.langs button{font:inherit;font-size:13px;font-weight:600;border:0;background:var(--panel);color:var(--muted);padding:6px 11px;cursor:pointer}
+.langs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.pct{margin-top:16px}
+.pct h4{font-size:14px;margin:0 0 4px}
+.pct p.lead{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.gauge{display:block;width:100%;max-width:170px;height:18px}
+.concl{margin-top:14px;padding:12px 14px;border-radius:8px;background:var(--soft);font-size:13.5px}
+.concl b{display:block;margin-bottom:3px}
+.concl.warn{background:var(--low-bg)}
+.concl small{display:block;color:var(--muted);margin-top:6px;font-size:12px}
+footer.contact{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13.5px;color:var(--muted)}
+footer.contact .mail{font-family:var(--f-num);color:var(--ink);user-select:all}
+
+.layout{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:900px){.side{position:static}}
+h2{font-size:15px;font-weight:600;margin:0 0 12px}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 8px}
+/* зона загрузки — сетка 10×10 как в камере Маклера */
+.drop{display:block;position:relative;border:1.5px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;
+  background-color:var(--soft);
+  background-image:linear-gradient(color-mix(in srgb,var(--accent) 14%,transparent) 1.5px,transparent 1.5px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 14%,transparent) 1.5px,transparent 1.5px);
+  background-size:22px 22px;background-position:-1px -1px;transition:border-color .15s,background-color .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background-color:var(--accent-soft)}
+.drop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.drop strong{display:block;font-size:15px;margin-bottom:2px}
+.drop small{color:var(--muted)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.files{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.file{border:1px solid var(--line);border-radius:8px;padding:9px 10px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center;font-size:13.5px}
+.file .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.file .st{font-size:12px;color:var(--muted);grid-column:1/-1;display:flex;gap:8px;align-items:center}
+.file .vol{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.file .vol input{width:62px;padding:3px 6px;font-size:12.5px}
+.prog{height:4px;border-radius:2px;background:var(--line);overflow:hidden;flex:1}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.rm{border:0;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px}
+.rm:hover{color:var(--ink);background:var(--soft)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+.form label.full{grid-column:1/-1}
+input[type=number],input[type=text],select{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:7px 9px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hint{font-size:12px;color:var(--muted);margin:8px 0 0}
+.btn{font:inherit;font-weight:600;font-size:14.5px;border:0;border-radius:8px;padding:11px 16px;background:var(--accent);color:var(--accent-ink);cursor:pointer;width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line);width:auto;padding:7px 12px;font-size:13px}
+.btn.ghost:hover{background:var(--accent-soft)}
+.status{font-size:13px;color:var(--muted);min-height:1.4em;margin-top:8px}
+.status.err{color:var(--low)}
+/* результаты */
+.results{display:flex;flex-direction:column;gap:18px;min-width:0}
+.sumhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sumhead h2{margin:0}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+thead th{font-size:12px;color:var(--muted);font-weight:600}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+th.num{font-family:var(--f-ui)}
+td.low{color:var(--low);background:var(--low-bg);font-weight:600}
+.legend-note{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.card h3{font-size:15.5px;font-weight:600;margin:0;word-break:break-all}
+.pill{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.pill.warn{background:var(--low-bg);color:var(--low)}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:22px;align-items:end;margin:14px 0 16px}
+@media (max-width:640px){.hero{grid-template-columns:minmax(0,1fr)}}
+.big{font-family:var(--f-num);font-size:40px;font-weight:500;letter-spacing:-1px;line-height:1.1}
+.big small{font-family:var(--f-ui);font-size:15px;color:var(--muted);letter-spacing:0;font-weight:500}
+.sub{font-size:13px;color:var(--muted)}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:14px 0 9px;background:var(--line)}
+.bar span{display:block;height:100%}
+.keys{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px}
+.keys i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.keys b{font-family:var(--f-num);font-weight:500}
+.hist svg{display:block;width:100%;height:auto;color:var(--muted)}
+.player{position:relative;border-radius:8px;overflow:hidden;background:#000;margin:4px 0 14px;max-width:100%}
+.player video,.player canvas{display:block;width:100%;height:auto}
+.player canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ptools{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px}
+.ptools label{display:flex;gap:6px;align-items:center;cursor:pointer}
+details{margin-top:12px}
+details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
+.kv th{width:200px;color:var(--muted);font-weight:500;font-size:13px}
+.kv td{font-size:13.5px}
+.note{font-size:12.5px;color:var(--muted);line-height:1.55}
+.note p{margin:0 0 8px}
+.empty{padding:28px 20px;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+    <svg viewBox="0 0 132 110" role="img" aria-label="Толстый кот смотрит в микроскоп">
+      <!-- микроскоп -->
+      <rect x="84" y="98" width="42" height="8" rx="3" fill="var(--scope)"/>
+      <rect x="110" y="44" width="8" height="56" rx="3" fill="var(--scope)"/>
+      <rect x="86" y="74" width="30" height="5" rx="2" fill="var(--scope-light)"/>
+      <circle cx="97" cy="80" r="3" fill="var(--accent)"/>
+      <g transform="rotate(-28 100 52)">
+        <rect x="90" y="30" width="13" height="40" rx="4" fill="var(--scope)"/>
+        <rect x="93" y="68" width="7" height="8" rx="2" fill="var(--scope-light)"/>
+        <rect x="88" y="22" width="17" height="10" rx="3" fill="var(--scope)"/>
+      </g>
+      <path d="M118 52 q-8 -6 -16 -2" stroke="var(--scope)" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <!-- хвост -->
+      <path d="M14 92 q-14 -6 -6 -22 q5 -9 13 -4" stroke="var(--cat-dark)" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <!-- тело -->
+      <ellipse cx="42" cy="80" rx="33" ry="27" fill="var(--cat)"/>
+      <ellipse cx="50" cy="88" rx="17" ry="15" fill="var(--cat-belly)"/>
+      <path d="M22 66 q5 4 3 10 M30 58 q5 5 2 11 M16 78 q6 3 5 9" stroke="var(--cat-dark)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- лапы -->
+      <ellipse cx="36" cy="104" rx="9" ry="5" fill="var(--cat)"/>
+      <ellipse cx="60" cy="104" rx="9" ry="5" fill="var(--cat)"/>
+      <ellipse cx="72" cy="78" rx="7" ry="5" fill="var(--cat)" transform="rotate(-30 72 78)"/>
+      <!-- голова -->
+      <circle cx="68" cy="46" r="20" fill="var(--cat)"/>
+      <path d="M52 36 l-3 -17 l13 10 z" fill="var(--cat)"/><path d="M53 33 l-2 -9 l7 6 z" fill="var(--cat-belly)"/>
+      <path d="M70 27 l9 -13 l3 16 z" fill="var(--cat)"/>
+      <path d="M58 33 q3 5 0 9 M65 28 q2 4 0 7" stroke="var(--cat-dark)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="70" cy="55" rx="10" ry="7" fill="var(--cat-belly)"/>
+      <!-- прищуренный глаз и глаз у окуляра -->
+      <path d="M60 46 q3 2 6 0" stroke="var(--ink)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="79" cy="42" r="2.2" fill="var(--ink)"/>
+      <path d="M68 54 l3 2 l3 -2" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M60 55 h-9 M60 58 l-8 2 M80 56 h7" stroke="var(--cat-dark)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+      <h1>Magauiya<span class="ver">ver. inner peace 1.0 C</span></h1>
+    </div>
+    <p data-i18n="tagline"></p>
+    <div class="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="kk">Қаз</button><button type="button" data-lang="ru">Рус</button><button type="button" data-lang="en">Eng</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <section class="panel" aria-labelledby="h-files">
+        <p class="eyebrow" id="h-files" data-i18n="stepVideo"></p>
+        <label class="drop" id="drop" tabindex="0">
+          <input type="file" id="fileInput" accept="video/*,.mp4,.mov,.m4v" multiple data-i18n-aria="dropTitle">
+          <strong data-i18n="dropTitle"></strong>
+          <small data-i18n="dropSub"></small>
+        </label>
+        <div class="files" id="files"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-set">
+        <p class="eyebrow" id="h-set" data-i18n="stepChamber"></p>
+        <div class="form">
+          <label><span data-i18n="depth"></span><input type="number" id="depth" value="10" min="1" step="1"></label>
+          <label><span data-i18n="pitch"></span><input type="number" id="pitch" value="100" min="1" step="1"></label>
+          <label><span data-i18n="dilution"></span><input type="number" id="dilution" value="1" min="1" step="0.5"></label>
+          <label><span data-i18n="umpx"></span><input type="text" id="umpx" data-i18n-ph="umpxPh" inputmode="decimal"></label>
+        </div>
+        <p class="hint" data-i18n="chamberHint"></p>
+      </section>
+
+      <section class="panel">
+        <button class="btn" id="run" disabled></button>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </section>
+    </aside>
+
+    <main class="results" id="results"></main>
+  </div>
+  <footer class="contact">
+    <span><span data-i18n="feedback"></span>:</span> <b>Alikhan Magauiya</b>
+    <a class="mail" href="mailto:orda.ezhenid@gmail.com">orda.ezhenid@gmail.com</a>
+    <button class="btn ghost" id="copyMail" type="button" data-i18n="copyEmail"></button>
+    <span id="mailStatus" class="status" role="status" aria-live="polite"></span>
+  </footer>
+</div>

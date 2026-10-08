@@ -1,0 +1,13 @@
+# Видео и результаты пациентов не публикуются
+*.mp4
+*.avi
+*.mov
+*.mkv
+results/
+SpermCASA_results/
+*_result.json
+*.npz
+# Python
+__pycache__/
+*.pyc
+.venv/
