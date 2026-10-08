@@ -12,10 +12,11 @@ app="(() => {\n'use strict';\n"+open('head.js').read()+i18n+fmt+open('pipeline.j
 offline = '--offline' in sys.argv
 mp4tag = '<script>\n'+open('mp4box.all.min.js').read().replace('</script','<\\/script')+'\n</script>' if offline else '<script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.3/dist/mp4box.all.min.js"></script>'
 html=body+'\n'+mp4tag+'\n<script id="core">\n'+core+'\n</script>\n<script id="model" type="application/json">'+model+'</script>\n<script>\n'+app+'</script>\n'
-if offline:
+if True:
     html='<!doctype html>\n<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n</head><body>\n'+html+'</body></html>\n'
+if offline:
     open('Magauiya.html','w').write(html)
 else:
-    open('magauiya.html','w').write(html)
+    open('index.html','w').write(html)
 pass
 print(len(html)//1024,'KB')
