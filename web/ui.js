@@ -1,5 +1,5 @@
 // ------------------------------------------------------------------ интерфейс
-const APP_NAME = 'Magauiya', APP_VER = 'ver. inner peace 1.0 C';
+const APP_NAME = 'Magauiya', APP_VER = 'ver. inner peace 1.1 C';
 const CONTACT = { name: 'Alikhan Magauiya', email: 'orda.ezhenid@gmail.com' };
 const items = []; let running = false, uid = 0;
 const filesEl = $('#files'), runBtn = $('#run'), statusEl = $('#status');

@@ -1,4 +1,4 @@
-# Magauiya: ver. inner peace 1.0 C
+# Magauiya: ver. inner peace 1.1 C
 
 **RU** · [KZ](#қазақша) · [EN](#english)
 
