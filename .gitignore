@@ -3,7 +3,7 @@
 *.avi
 *.mov
 *.mkv
-results/
+python/results/
 SpermCASA_results/
 *_result.json
 *.npz
