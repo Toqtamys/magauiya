@@ -1,0 +1,65 @@
+import { L } from '@/lib/i18n';
+import type { Tool } from '../types';
+
+const SELF = { authors: 'BOPASI Platform', license: 'MIT', mode: 'browser' as const, action: 'calc' as const, repo: 'https://github.com/Toqtamys/magauiya/tree/main/platform/tools/calculators' };
+
+export const REPRODUCTION: Tool[] = [
+  {
+    ...SELF, id: 'due-date', section: 'reproduction', featured: true, interactive: 'duedate',
+    name: 'Срок родов · ЭКО / ПЭ / естественный цикл',
+    tags: ['due date', 'IVF', 'FET', 'gestational age'],
+    tagline: L('Дата родов и текущий срок по ПДМ, дате зачатия или переносу эмбриона 3/5/6 суток.', 'СЕК, ұрықтану күні немесе 3/5/6 тәуліктік эмбрионды тасымалдау бойынша босану күні және ағымдағы мерзім.', 'Due date and current gestational age from LMP, conception, or a day 3/5/6 embryo transfer.'),
+    full: L('Классическое правило Негеле (ПДМ + 280 дней) с поправкой на длину цикла, а для ВРТ — точный расчёт от переноса: дата переноса + (266 − возраст эмбриона в сутках) дней. Дополнительно показывает дату теста на ХГЧ, конец I триместра и окно скрининга.', 'Классикалық Негеле ережесі (СЕК + 280 күн) цикл ұзақтығына түзетумен, ал ҚРТ үшін — тасымалдаудан нақты есеп: тасымалдау күні + (266 − эмбрионның тәуліктік жасы) күн. Қосымша ХГЧ тесті күнін, I триместрдің соңын және скрининг терезесін көрсетеді.', 'Classic Naegele rule (LMP + 280 days) adjusted for cycle length, and for ART an exact transfer-based calculation: transfer date + (266 − embryo age in days). Also shows the hCG test date, end of the first trimester and screening window.'),
+    features: [L('ПДМ, зачатие, перенос 3/5/6 сут', 'СЕК, ұрықтану, 3/5/6 тәул. тасымалдау', 'LMP, conception, day 3/5/6 transfer'), L('Текущий срок в неделях + днях', 'Апта + күнмен ағымдағы мерзім', 'Current age in weeks + days'), L('Ключевые даты беременности', 'Жүктіліктің негізгі күндері', 'Key pregnancy dates')],
+    input: [L('Дата ПДМ и длина цикла или дата переноса и возраст эмбриона', 'СЕК күні мен цикл ұзақтығы немесе тасымалдау күні мен эмбрион жасы', 'LMP date and cycle length, or transfer date and embryo age')],
+    steps: [L('Выберите способ расчёта.', 'Есептеу тәсілін таңдаңыз.', 'Choose the method.'), L('Введите дату (и длину цикла или день эмбриона).', 'Күнді (және цикл ұзақтығын немесе эмбрион күнін) енгізіңіз.', 'Enter the date (and cycle length or embryo day).'), L('Результат обновляется сразу.', 'Нәтиже бірден жаңарады.', 'The result updates instantly.')],
+    limits: [L('Только 4% родов приходятся точно на расчётную дату; УЗИ в I триместре точнее ПДМ.', 'Босанудың тек 4%-ы есептік күнге дәл келеді; I триместрдегі УДЗ СЕК-тен дәлірек.', 'Only ~4% of births occur on the due date; first-trimester ultrasound beats LMP.')],
+    output: [L('ПДР, текущий срок, даты теста ХГЧ и скринингов', 'Болжамды босану күні, ағымдағы мерзім, ХГЧ тесті мен скрининг күндері', 'EDD, current age, hCG test and screening dates')],
+  },
+  {
+    ...SELF, id: 'hcg-doubling', section: 'reproduction', interactive: 'hcg',
+    name: 'Удвоение β-ХГЧ', tags: ['hCG', 'doubling time', 'early pregnancy'],
+    tagline: L('Время удвоения и прирост β-ХГЧ за 48 ч по двум измерениям.', 'Екі өлшем бойынша β-ХГЧ екі еселену уақыты және 48 сағаттағы өсімі.', 'β-hCG doubling time and 48-h rise from two measurements.'),
+    full: L('Время удвоения = Δt × ln 2 / ln(ХГЧ₂ / ХГЧ₁). Для жизнеспособной маточной беременности минимальный ожидаемый прирост за 48 ч при исходном уровне < 1500 мЕд/мл — около 49%, при 1500–3000 — около 40%, при > 3000 — около 33% (Barnhart et al., 2016).', 'Екі еселену уақыты = Δt × ln 2 / ln(ХГЧ₂ / ХГЧ₁). Тіршілікке қабілетті жатырішілік жүктілік үшін 48 сағаттағы ең аз күтілетін өсім бастапқы деңгей < 1500 мБ/мл болғанда шамамен 49%, 1500–3000 — шамамен 40%, > 3000 — шамамен 33% (Barnhart et al., 2016).', 'Doubling time = Δt × ln 2 / ln(hCG₂ / hCG₁). For a viable intrauterine pregnancy the minimum expected 48-h rise is about 49% for a starting level < 1500 mIU/mL, about 40% for 1500–3000 and about 33% for > 3000 (Barnhart et al., 2016).'),
+    features: [L('Время удвоения, часы', 'Екі еселену уақыты, сағат', 'Doubling time, hours'), L('Прирост за 48 ч против минимального ожидаемого', '48 сағаттағы өсім мен ең аз күтілетінді салыстыру', '48-h rise vs minimum expected')],
+    input: [L('Два значения β-ХГЧ (мЕд/мл) и время между заборами', 'Екі β-ХГЧ мәні (мБ/мл) және алу арасындағы уақыт', 'Two β-hCG values (mIU/mL) and time between draws')],
+    steps: [L('Введите первое и второе значение.', 'Бірінші және екінші мәнді енгізіңіз.', 'Enter first and second values.'), L('Укажите интервал в часах.', 'Аралықты сағатпен көрсетіңіз.', 'Enter the interval in hours.')],
+    limits: [L('Медленный прирост не диагноз: оценку делает врач вместе с УЗИ.', 'Баяу өсім диагноз емес: бағалауды дәрігер УДЗ-мен бірге жасайды.', 'A slow rise is not a diagnosis: a clinician interprets it with ultrasound.')],
+    output: [L('Время удвоения и сравнение с ориентиром', 'Екі еселену уақыты және бағдармен салыстыру', 'Doubling time and comparison with the reference')],
+  },
+  {
+    ...SELF, id: 'tmsc', section: 'reproduction', also: ['andrology'], interactive: 'tmsc',
+    name: 'TMSC · ВМИ / ЭКО / ИКСИ', tags: ['TMSC', 'IUI', 'ICSI', 'semen'],
+    tagline: L('Общее число подвижных сперматозоидов и ориентир выбора метода ВРТ.', 'Қозғалмалы сперматозоидтардың жалпы саны және ҚРТ әдісін таңдау бағдары.', 'Total motile sperm count and an ART-method guide.'),
+    full: L('TMSC = объём (мл) × концентрация (млн/мл) × (PR + NP) %. Часто используемые ориентиры: > 9–10 млн — ВМИ обоснована, 1–9 млн — ВМИ с меньшими шансами или ЭКО, < 1 млн — ИКСИ. Значения из BOPASI можно перенести сюда напрямую.', 'TMSC = көлем (мл) × концентрация (млн/мл) × (PR + NP) %. Жиі қолданылатын бағдарлар: > 9–10 млн — ЖІҰ негізделген, 1–9 млн — мүмкіндігі азырақ ЖІҰ немесе ЭКҰ, < 1 млн — ИКСИ. BOPASI мәндерін мұнда тікелей көшіруге болады.', 'TMSC = volume (mL) × concentration (M/mL) × (PR + NP) %. Common guides: > 9–10 M — IUI reasonable, 1–9 M — IUI with lower odds or IVF, < 1 M — ICSI. Values from BOPASI can be copied straight in.'),
+    features: [L('TMSC и общее количество', 'TMSC және жалпы саны', 'TMSC and total count'), L('Сравнение с нижними референсами ВОЗ-6', 'ДДҰ-6 төменгі референстерімен салыстыру', 'Comparison with WHO-6 lower references')],
+    input: [L('Объём, концентрация, PR %, NP %', 'Көлем, концентрация, PR %, NP %', 'Volume, concentration, PR %, NP %')],
+    steps: [L('Введите показатели спермограммы.', 'Спермограмма көрсеткіштерін енгізіңіз.', 'Enter semen parameters.'), L('Прочитайте ориентир по методу.', 'Әдіс бойынша бағдарды оқыңыз.', 'Read the method guide.')],
+    limits: [L('Пороги различаются между клиниками; решение принимает врач.', 'Табалдырықтар клиникаларда әртүрлі; шешімді дәрігер қабылдайды.', 'Cut-offs vary by clinic; the clinician decides.')],
+    output: [L('TMSC, млн и ориентир ВМИ / ЭКО / ИКСИ', 'TMSC, млн және ЖІҰ / ЭКҰ / ИКСИ бағдары', 'TMSC, M and IUI / IVF / ICSI guide')],
+  },
+  {
+    ...SELF, id: 'fertile-window', section: 'reproduction', interactive: 'fertile',
+    name: 'Фертильное окно и овуляция', tags: ['ovulation', 'fertile window', 'cycle'],
+    tagline: L('Ожидаемая овуляция и фертильное окно на 3 цикла вперёд.', 'Күтілетін овуляция және 3 цикл алдағы фертильді терезе.', 'Expected ovulation and fertile window for the next 3 cycles.'),
+    full: L('Овуляция ≈ начало следующего цикла − 14 дней (длина лютеиновой фазы); фертильное окно — 5 дней до овуляции и день овуляции (Wilcox et al., 1995).', 'Овуляция ≈ келесі циклдің басы − 14 күн (лютеин фазасының ұзақтығы); фертильді терезе — овуляциядан 5 күн бұрын және овуляция күні (Wilcox et al., 1995).', 'Ovulation ≈ next cycle start − 14 days (luteal phase); fertile window = 5 days before ovulation plus ovulation day (Wilcox et al., 1995).'),
+    features: [L('Учитывает длину цикла и лютеиновой фазы', 'Цикл мен лютеин фазасының ұзақтығын ескереді', 'Uses cycle and luteal length')],
+    input: [L('Дата ПДМ, длина цикла, при желании длина лютеиновой фазы', 'СЕК күні, цикл ұзақтығы, қаласаңыз лютеин фазасының ұзақтығы', 'LMP date, cycle length, optionally luteal phase length')],
+    steps: [L('Введите дату и длину цикла.', 'Күн мен цикл ұзақтығын енгізіңіз.', 'Enter date and cycle length.')],
+    limits: [L('При нерегулярном цикле используйте тесты на ЛГ или УЗИ-мониторинг.', 'Тұрақсыз циклде ЛГ тестерін немесе УДЗ мониторингін пайдаланыңыз.', 'For irregular cycles use LH tests or ultrasound monitoring.')],
+    output: [L('Даты овуляции и фертильных окон', 'Овуляция және фертильді терезелер күндері', 'Ovulation and fertile-window dates')],
+  },
+  {
+    id: 'ivf-predictors', section: 'reproduction', mode: 'web', action: 'calc',
+    name: 'Предикторы исхода ЭКО (OPIS, SART)', authors: 'University of Aberdeen (McLernon et al.); SART', license: 'веб-сервис / web service',
+    links: [{ label: 'OPIS · University of Aberdeen', url: 'https://w3.abdn.ac.uk/clsm/opis' }, { label: 'SART Patient Predictor', url: 'https://www.sartcorsonline.com/predictor/patient' }],
+    tags: ['IVF outcome', 'live birth', 'prediction model'],
+    tagline: L('Валидированные модели вероятности живорождения после ЭКО по возрасту, анамнезу и циклу.', 'Жас, анамнез және цикл бойынша ЭКҰ-дан кейін тірі туу ықтималдығының валидацияланған модельдері.', 'Validated live-birth probability models after IVF from age, history and cycle.'),
+    full: L('OPIS (Outcome Prediction In Subfertility) построен на данных HFEA по сотням тысяч циклов и даёт кумулятивную вероятность живорождения до и после первого цикла. SART Patient Predictor — аналог на данных США. Код моделей закрыт, но формулы OPIS опубликованы в BMJ (McLernon et al., 2016), поэтому платформа даёт на них ссылки, а не пересчитывает вручную.', 'OPIS (Outcome Prediction In Subfertility) жүздеген мың циклдің HFEA деректеріне негізделген және бірінші циклге дейін және одан кейін тірі туудың жиынтық ықтималдығын береді. SART Patient Predictor — АҚШ деректеріндегі аналог. Модельдер коды жабық, бірақ OPIS формулалары BMJ-де жарияланған (McLernon et al., 2016), сондықтан платформа оларды қолмен қайта есептемей, сілтеме береді.', 'OPIS (Outcome Prediction In Subfertility) is built on HFEA data from hundreds of thousands of cycles and gives cumulative live-birth probability before and after the first cycle. SART Patient Predictor is a US-data counterpart. The model code is closed, but OPIS formulas are published in the BMJ (McLernon et al., 2016), so the platform links to them rather than re-implementing them.'),
+    features: [L('Кумулятивная вероятность за несколько циклов', 'Бірнеше циклдегі жиынтық ықтималдық', 'Cumulative probability across cycles')],
+    input: [L('Возраст, длительность бесплодия, причина, предыдущие беременности, данные цикла', 'Жас, бедеуліктің ұзақтығы, себебі, бұрынғы жүктіліктер, цикл деректері', 'Age, infertility duration, cause, prior pregnancies, cycle data')],
+    steps: [L('Откройте калькулятор по ссылке.', 'Сілтеме бойынша калькуляторды ашыңыз.', 'Open the calculator via the link.'), L('Заполните анкету.', 'Сауалнаманы толтырыңыз.', 'Fill in the form.')],
+    limits: [L('Модели откалиброваны на популяциях Великобритании и США.', 'Модельдер Ұлыбритания мен АҚШ популяцияларында калибрленген.', 'Models are calibrated on UK and US populations.')],
+    output: [L('Вероятность живорождения, %', 'Тірі туу ықтималдығы, %', 'Live-birth probability, %')],
+  },
+];
