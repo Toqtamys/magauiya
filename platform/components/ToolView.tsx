@@ -73,7 +73,7 @@ export function ToolView({ tool, section, related, lang }: { tool: Tool; section
 
       <div className="container-page grid gap-10 py-10 lg:grid-cols-[1fr_300px]">
         <div>
-          <Block title={tr(UI.whatItDoes, lang) + ' · ' + section.short}>
+          <Block title={tr(UI.whatItDoes, lang)}>
             <p className="text-sm leading-relaxed text-navy/75">{tr(tool.full, lang)}</p>
             {tool.features.length > 0 && <div className="mt-4"><UL items={tool.features} lang={lang} mark="▸" /></div>}
           </Block>

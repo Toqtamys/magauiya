@@ -1,18 +1,16 @@
-import { asset } from '@/lib/i18n';
+import { LangProvider } from '@/components/lang';
+import { Nav } from '@/components/Nav';
+import { Footer } from '@/components/Footer';
+import { HomeContent } from '@/components/HomeContent';
 
-/** Корень перенаправляет на язык по умолчанию (ru). Статический редирект. */
+/** Корень сайта сразу показывает русскую главную (без редиректа) —
+ *  так сайт работает на любом статическом хостинге. */
 export default function Index() {
-  const to = asset('/ru/');
   return (
-    <html lang="ru">
-      <head>
-        <meta httpEquiv="refresh" content={`0; url=${to}`} />
-        <link rel="canonical" href={to} />
-      </head>
-      <body style={{ fontFamily: 'system-ui', padding: 40 }}>
-        <a href={to}>BOPASI Platform →</a>
-        <script dangerouslySetInnerHTML={{ __html: `location.replace(${JSON.stringify(to)})` }} />
-      </body>
-    </html>
+    <LangProvider lang="ru">
+      <Nav />
+      <main className="min-h-screen"><HomeContent lang="ru" /></main>
+      <Footer lang="ru" />
+    </LangProvider>
   );
 }
