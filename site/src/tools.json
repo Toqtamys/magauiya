@@ -1697,7 +1697,7 @@
   "section": "drug",
   "interactive": "molmoda",
   "action": "open",
-  "authors": "MolModa — Durrant Lab, University of Pittsburgh (GPL)",
+  "authors": "MolModa — Durrant Lab, University of Pittsburgh (molmoda.org, GPL)",
   "name": {
    "ru": "MolModa · докинг в браузере",
    "kk": "MolModa · браузердегі докинг",
@@ -1709,9 +1709,9 @@
    "en": "A full molecular docking suite that runs on your computer: protein, pocket, ligands, AutoDock Vina."
   },
   "full": {
-   "ru": "MolModa — браузерное приложение лаборатории Durrant (Питтсбургский университет). Загружает структуры из PDB или файла, готовит белок и лиганды (протонирование), задаёт область докинга и запускает Webina — сборку AutoDock Vina для браузера. Расчёт идёт на вашем компьютере. BOPASI размещает неизменённую сборку MolModa по лицензии GPL.",
-   "kk": "MolModa — Durrant зертханасының (Питтсбург университеті) браузерлік қосымшасы. PDB-ден немесе файлдан құрылымдарды жүктейді, ақуыз бен лигандтарды дайындайды (протондау), докинг аймағын белгілейді және Webina — браузерге арналған AutoDock Vina жинағын іске қосады. Есептеу компьютеріңізде жүреді. BOPASI өзгертілмеген MolModa жинағын GPL лицензиясы бойынша орналастырады.",
-   "en": "MolModa is a browser application from the Durrant Lab (University of Pittsburgh). It loads structures from the PDB or a file, prepares the protein and ligands (protonation), defines the docking box and runs Webina, a browser build of AutoDock Vina. The computation runs on your computer. BOPASI hosts an unmodified MolModa build under the GPL."
+   "ru": "MolModa — браузерное приложение лаборатории Durrant (Питтсбургский университет). Загружает структуры из PDB или файла, готовит белок и лиганды (протонирование), задаёт область докинга и запускает Webina — сборку AutoDock Vina для браузера. Расчёт идёт на вашем компьютере. Приложение открывается на официальном сайте molmoda.org в новой вкладке.",
+   "kk": "MolModa — Durrant зертханасының (Питтсбург университеті) браузерлік қосымшасы. PDB-ден немесе файлдан құрылымдарды жүктейді, ақуыз бен лигандтарды дайындайды (протондау), докинг аймағын белгілейді және Webina — браузерге арналған AutoDock Vina жинағын іске қосады. Есептеу компьютеріңізде жүреді. Қосымша ресми molmoda.org сайтында жаңа қойындыда ашылады.",
+   "en": "MolModa is a browser application from the Durrant Lab (University of Pittsburgh). It loads structures from the PDB or a file, prepares the protein and ligands (protonation), defines the docking box and runs Webina, a browser build of AutoDock Vina. The computation runs on your computer. The app opens on the official molmoda.org site in a new tab."
   },
   "features": [
    {
@@ -1749,9 +1749,9 @@
   ],
   "steps": [
    {
-    "ru": "Откройте MolModa на этой странице или в отдельной вкладке",
-    "kk": "MolModa-ны осы бетте немесе бөлек қойындыда ашыңыз",
-    "en": "Open MolModa on this page or in a separate tab"
+    "ru": "Нажмите «Открыть MolModa» — приложение откроется в новой вкладке",
+    "kk": "«MolModa-ны ашу» түймесін басыңыз — қосымша жаңа қойындыда ашылады",
+    "en": "Press “Open MolModa” — the app opens in a new tab"
    },
    {
     "ru": "Загрузите белок и определите карман",

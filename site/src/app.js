@@ -3,7 +3,7 @@ const ORDER = CHAPTERS.flatMap((c) => c.tools);
 const toolById = (id) => TOOLS_DATA.find((t) => t.id === id);
 const chapterOf = (id) => CHAPTERS.find((c) => c.tools.includes(id));
 const isServer = (id) => !!toolById(id)?.server;
-const MOLMODA_URL = location.protocol === 'file:' ? 'https://toqtamys.github.io/magauiya/molmoda/' : '../molmoda/';
+const MOLMODA_URL = 'https://molmoda.org/';
 const MOUNT = {
   bopasi: (r) => mountEmbed(r, 'bopasi'), bluetol: (r) => mountEmbed(r, 'bluetol'), scd: mountScd, who6: mountWho, chamber: mountChamber,
   'lab-counter': mountCounter, tmsc: mountTmsc, 'rc-phase': mountRcpc, morphometry: mountMorphometry, cleavage: mountCleavage,
@@ -314,10 +314,12 @@ function mountEmbed(root, key) {
   return embedShell(root, frame);
 }
 function mountMolmoda(root) {
-  const frame = h('iframe', { class: 'embed-frame tall', title: 'MolModa', src: MOLMODA_URL, allow: 'clipboard-write; fullscreen' });
-  const r = embedShell(root, frame);
-  root.querySelector('.embed-bar').append(h('a', { class: 'btn-ghost sm', href: MOLMODA_URL, target: '_blank', rel: 'noopener' }, tr(UI.newTab)));
-  return r;
+  root.append(h('div', { class: 'launch' },
+    h('p', {}, tr(L('MolModa работает в отдельной вкладке на официальном сайте разработчиков. Белок, лиганды и докинг считаются на вашем компьютере.',
+      'MolModa әзірлеушілердің ресми сайтында бөлек қойындыда жұмыс істейді. Ақуыз, лигандтар және докинг компьютеріңізде есептеледі.',
+      'MolModa runs in a separate tab on the developers’ official site. The protein, ligands and docking are computed on your computer.'))),
+    h('a', { class: 'btn-big', href: MOLMODA_URL, target: '_blank', rel: 'noopener' }, tr(L('Открыть MolModa', 'MolModa-ны ашу', 'Open MolModa')))));
+  return { destroy() {} };
 }
 function embedShell(root, frame) {
   const fsBtn = h('button', { class: 'btn-ghost sm', onclick: () => {
