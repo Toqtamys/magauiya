@@ -12,7 +12,12 @@ const src = (f) => readFile(path.join(here, 'src', f), 'utf8');
 const LS = String.fromCharCode(0x2028), PS = String.fromCharCode(0x2029);
 const safeJSON = (v) => JSON.stringify(v).replace(/</g, '\\u003c').split(LS).join('\\u2028').split(PS).join('\\u2029');
 
-const tools = JSON.parse(await src('tools.json')).filter((t) => !t.server);   // серверные модели — только в server/
+// на сайт попадают только инструменты из разделов CHAPTERS (серверные модели и внешние сервисы убраны)
+const { default: vmMod } = await import('node:vm');
+const ctx0 = vmMod.createContext({});
+vmMod.runInContext((await src('i18n.js')) + '\n;globalThis.__ids = CHAPTERS.flatMap((c) => c.tools);', ctx0);
+const SITE_IDS = new Set(ctx0.__ids);
+const tools = JSON.parse(await src('tools.json')).filter((t) => !t.server && SITE_IDS.has(t.id));
 const apps = {
   bopasi: await readFile(path.join(repo, 'web', 'Magauiya.html'), 'utf8'),
   bluetol: await readFile(path.join(repo, 'bluetol', 'bluetol.html'), 'utf8'),
