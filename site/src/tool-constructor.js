@@ -218,7 +218,7 @@ function mountConstructor(root) {
           cell(tr(UI_DC.rings), p.rings), cell('ESOL logS', num(p.esol, 2))),
         h('div', { class: 'badges' },
           h('span', { class: p.lip <= 1 ? 'good' : 'warn' }, `Lipinski: ${p.lip === 0 ? tr(UI_DC.pass) : p.lip + ' ' + tr(UI_DC.viol)}`),
-          h('span', { class: p.veber ? 'good' : 'warn' }, `Veber: ${p.veber ? '✓' : '✗'}`),
+          h('span', { class: p.veber ? 'good' : 'warn' }, `Veber: ${tr(p.veber ? L('да', 'иә', 'yes') : L('нет', 'жоқ', 'no'))}`),
           sim != null ? h('span', { class: 'info' }, `${tr(UI_DC.sim)}: ${num(sim, 2)}`) : null)));
   }
   function rankAnalogues() {

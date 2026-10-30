@@ -30,7 +30,10 @@ const js = [
   await src('tool-lab.js'),
   await src('tool-morph.js'),
   await src('tool-constructor.js'),
-  await src('embryo.js'),
+  await src('ihc-engine.js'),
+  await src('tool-histo.js'),
+  await src('server-client.js'),
+  await src('stage.js'),
   await src('app.js'),
 ].join('\n\n');
 if (/<\/script/i.test(js)) throw new Error('</script внутри JS');

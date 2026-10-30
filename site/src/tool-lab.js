@@ -82,7 +82,7 @@ function mountCounter(root) {
     box.replaceChildren(
       h('div', { class: 'cnt-top' }, modeSeg, targetSel),
       h('div', { class: 'cnt-grid' },
-        h('div', { class: 'cnt-left' }, ring(s.n, st.target), s.n >= st.target ? h('p', { class: 'cnt-done' }, '✓ ' + tr(UI_CNT.done)) : null, msg ? h('p', { class: 'warn-box' }, msg) : null,
+        h('div', { class: 'cnt-left' }, ring(s.n, st.target), s.n >= st.target ? h('p', { class: 'cnt-done' }, tr(UI_CNT.done)) : null, msg ? h('p', { class: 'warn-box' }, msg) : null,
           h('div', { class: 'row' }, h('button', { class: 'btn-ghost', onclick: () => { st.log.pop(); render(); } }, `↶ ${tr(UI_CNT.undo)}`), h('button', { class: 'btn-link', onclick: () => { st.log = []; st.sel.clear(); render(); } }, tr(UI_CNT.reset)))),
         h('div', { class: 'cnt-mid' }, pad, h('p', { class: 'hint' }, `${tr(UI_CNT.keys)}: ${st.mode === 'morph' ? '1 — ' + tr(UI_CNT.normal).toLowerCase() + '; 2–5 — ' + tr(L('дефекты', 'ақаулар', 'defects')) + '; Enter — ' + tr(UI_CNT.saveAbn).toLowerCase() : '1 / 2'}; Backspace — ${tr(UI_CNT.undo).toLowerCase()}`)),
         h('div', { class: 'cnt-out calc-result' }, ...out)));

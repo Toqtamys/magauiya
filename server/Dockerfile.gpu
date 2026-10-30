@@ -1,0 +1,10 @@
+# GPU-воркер: PyTorch с CUDA. Модели монтируются в /opt/models (см. models.yaml)
+FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 BOPASI_DATA_DIR=/data
+WORKDIR /srv
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libgl1 && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app
+COPY models.yaml ./
+CMD ["celery", "-A", "app.worker", "worker", "-Q", "gpu", "--concurrency", "1", "--loglevel", "INFO"]

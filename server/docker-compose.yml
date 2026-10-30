@@ -1,0 +1,44 @@
+# Запуск: docker compose up -d --build
+# Без видеокарты: docker compose up -d --build api worker-cpu redis
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  api:
+    build: .
+    environment:
+      BOPASI_REDIS_URL: redis://redis:6379/0
+      BOPASI_CORS: https://toqtamys.github.io,http://localhost:8000
+    volumes: [data:/data, ./models.yaml:/srv/models.yaml:ro, /opt/models:/opt/models:ro]
+    ports: ["8000:8000"]
+    depends_on: [redis]
+    restart: unless-stopped
+
+  worker-cpu:
+    build: .
+    command: celery -A app.worker worker -Q cpu --concurrency 4 --loglevel INFO
+    environment: {BOPASI_REDIS_URL: "redis://redis:6379/0"}
+    volumes: [data:/data, ./models.yaml:/srv/models.yaml:ro, /opt/models:/opt/models:ro]
+    depends_on: [redis]
+    restart: unless-stopped
+
+  worker-gpu:
+    build: {context: ., dockerfile: Dockerfile.gpu}
+    environment: {BOPASI_REDIS_URL: "redis://redis:6379/0"}
+    volumes: [data:/data, ./models.yaml:/srv/models.yaml:ro, /opt/models:/opt/models:ro]
+    depends_on: [redis]
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices: [{driver: nvidia, count: all, capabilities: [gpu]}]
+
+  cleanup:
+    build: .
+    command: sh -c 'while true; do python -c "from app import jobs; print(jobs.cleanup())"; sleep 3600; done'
+    volumes: [data:/data]
+    restart: unless-stopped
+
+volumes:
+  data:

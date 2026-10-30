@@ -11,3 +11,4 @@ SpermCASA_results/
 __pycache__/
 *.pyc
 .venv/
+.taste-skill/

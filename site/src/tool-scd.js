@@ -109,7 +109,7 @@ function mountScd(root) {
   }
   function sync() {
     const f = st.fields[st.sel];
-    addBtn.textContent = (st.addMode ? '✓ ' : '+ ') + tr(UI_SCD.add); addBtn.classList.toggle('on', st.addMode);
+    addBtn.textContent = (st.addMode ? '− ' : '+ ') + tr(UI_SCD.add); addBtn.classList.toggle('on', st.addMode);
     canvas.style.cursor = st.addMode ? 'crosshair' : 'pointer';
     note.textContent = f ? (f.sample ? tr(UI_SCD.sampleNote) : `${f.name} · ${f.canvas.width}×${f.canvas.height}`) : '';
     thumbs.replaceChildren(...(st.fields.length > 1 ? st.fields.map((x, i) => h('button', { class: 'thumb' + (i === st.sel ? ' on' : ''), title: x.name, onclick: () => { st.sel = i; draw(); sync(); } }, h('img', { src: x.thumb, alt: x.name }))) : []));
