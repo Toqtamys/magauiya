@@ -12,7 +12,7 @@ const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftsha
 const pg = await b.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
 const U = 'file://' + path.join(here, '..', 'bopasi', 'index.html');
 await pg.goto(U); await pg.waitForTimeout(800);
-const ids = (await pg.evaluate(() => [...document.querySelectorAll('.card:not(.srv)')].map((a) => a.getAttribute('href').slice(1)))).filter((id) => id !== 'molmoda');
+const ids = (await pg.evaluate(() => [...document.querySelectorAll('.card:not(.srv)')].map((a) => a.getAttribute('href').slice(1)))).filter((id) => id !== 'molmoda' && id !== 'constructor');
 const slow = { bopasi: 2500, bluetol: 2500, constructor: 9000, 'rc-phase': 2500, scd: 2500 };
 for (const id of ids) {
   await pg.goto(U + '#' + id); await pg.waitForTimeout(slow[id] || 1400);

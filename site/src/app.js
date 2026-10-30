@@ -35,9 +35,9 @@ const App = {
     document.documentElement.lang = LANG;
     document.title = 'BOPASI — ' + tr(UI.title);
     $('#langs').replaceChildren(...LANGS.map((l) => h('button', { class: l === LANG ? 'on' : '', 'aria-pressed': l === LANG, onclick: () => this.setLang(l) }, LANG_LABEL[l])));
-    $('#navLinks').replaceChildren(...CHAPTERS.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#server' }, tr(UI.nav.server)));
+    $('#navLinks').replaceChildren(...CHAPTERS.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#about' }, tr(UI.nav.about)));
     const y = scrollY;
-    $('#page').replaceChildren(this.hero(), ...CHAPTERS.map((c) => this.section(c)), this.server(), this.about(), this.footer());
+    $('#page').replaceChildren(this.hero(), this.ticker(), ...CHAPTERS.map((c, i) => this.section(c, i)), this.about(), this.footer());
     scrollTo(0, y);
     this.paintPreviews();
     this.prepareReveal();
@@ -55,13 +55,18 @@ const App = {
           h('a', { class: 'btn-soft', href: '#andrology' }, tr(UI.allTools))),
         h('dl', { class: 'facts' },
           h('div', {}, h('dt', {}, String(n)), h('dd', {}, tr(UI.factBrowser))),
-          h('div', {}, h('dt', {}, String(TOOLS_DATA.length - n)), h('dd', {}, tr(UI.factServer))),
-          h('div', {}, h('dt', {}, '3'), h('dd', {}, tr(UI.factLangs))))),
-      h('div', { class: 'hero-stage' }, this.canvas));
+          h('div', {}, h('dt', {}, String(CHAPTERS.length)), h('dd', {}, tr(UI.factSections))),
+          h('div', {}, h('dt', {}, '0'), h('dd', {}, tr(UI.factUploads))))),
+      h('div', { class: 'hero-stage' }, this.canvas, h('i', { class: 'hud h1', 'aria-hidden': 'true' }), h('i', { class: 'hud h2', 'aria-hidden': 'true' }), h('span', { class: 'corner tl' }), h('span', { class: 'corner br' })));
   },
-  section(c) {
+  ticker() {
+    const names = ORDER.map((id) => tr(SHORT[id]));
+    const row = () => h('div', { class: 'tick-row' }, ...names.map((n) => h('span', {}, n)));
+    return h('div', { class: 'ticker', 'aria-hidden': 'true' }, row(), row());
+  },
+  section(c, i) {
     return h('section', { class: 'tools-sec', id: c.id },
-      h('div', { class: 'sec-head' }, h('h2', { class: 'reveal' }, tr(c.name)), h('p', { class: 'reveal' }, tr(c.lead))),
+      h('div', { class: 'sec-head' }, h('span', { class: 'sec-num reveal' }, String(i + 1).padStart(2, '0')), h('h2', { class: 'reveal glitch', 'data-text': tr(c.name) }, tr(c.name)), h('p', { class: 'reveal' }, tr(c.lead))),
       h('div', { class: 'cards' }, ...c.tools.map((id, i) => this.card(id, i))));
   },
   card(id, i) {

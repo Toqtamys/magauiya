@@ -12,7 +12,7 @@ const src = (f) => readFile(path.join(here, 'src', f), 'utf8');
 const LS = String.fromCharCode(0x2028), PS = String.fromCharCode(0x2029);
 const safeJSON = (v) => JSON.stringify(v).replace(/</g, '\\u003c').split(LS).join('\\u2028').split(PS).join('\\u2029');
 
-const tools = JSON.parse(await src('tools.json'));
+const tools = JSON.parse(await src('tools.json')).filter((t) => !t.server);   // серверные модели — только в server/
 const apps = {
   bopasi: await readFile(path.join(repo, 'web', 'Magauiya.html'), 'utf8'),
   bluetol: await readFile(path.join(repo, 'bluetol', 'bluetol.html'), 'utf8'),
