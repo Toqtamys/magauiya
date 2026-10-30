@@ -22,6 +22,9 @@ const App = {
     const saved = store.get('lang'), qs = new URLSearchParams(location.search).get('lang');
     LANG = LANGS.includes(qs) ? qs : LANGS.includes(saved) ? saved : 'ru';
     this.canvas = h('canvas', { id: 'stage', role: 'img', 'aria-label': 'BOPASI' });
+    const skyCv = h('canvas', { id: 'sky', 'aria-hidden': 'true' }); document.body.prepend(skyCv);
+    try { this.sky = createSky(skyCv, { groups: VCH.map((c) => c.tools.length), labels: ORDER.map((id) => tr(SHORT[id])), reduced: REDUCED }); } catch {}
+    this.hud = h('div', { class: 'sky-hud', 'aria-hidden': 'true' }); document.body.append(this.hud);
     this.render();
     Stage.init(this.canvas);
     Stage.setAuto(true);
@@ -46,6 +49,8 @@ const App = {
     this.paintPreviews();
     this.prepareReveal();
     Stage.redraw();
+    this.sky?.setLabels(ORDER.map((id) => tr(SHORT[id])));
+    if (this.hud) { const n = TOOLS_DATA.filter((t) => !t.server).length; this.hud.replaceChildren(h('b', {}, String(n)), h('span', {}, tr(n % 10 === 1 && n % 100 !== 11 ? UI.tools1 : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? UI.tools2 : UI.tools), h('br'), h('i', {}, tr(UI.stickerTop)))); }
   },
 
   hero() {
@@ -61,8 +66,8 @@ const App = {
           h('div', {}, h('dt', {}, String(n)), h('dd', {}, tr(UI.factBrowser))),
           h('div', {}, h('dt', {}, String(VCH.length)), h('dd', {}, tr(UI.factSections))),
           h('div', {}, h('dt', {}, '0'), h('dd', {}, tr(UI.factUploads))))),
-      h('div', { class: 'hero-stage' }, this.canvas, h('i', { class: 'hud h1', 'aria-hidden': 'true' }),
-        h('div', { class: 'sticker', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('b', {}, String(n)), h('span', {}, tr(UI.tools)), h('small', {}, tr(UI.stickerTop)), h('small', {}, tr(UI.stickerBottom)))));
+      h('div', { class: 'hero-stage' }, this.canvas));
+
   },
   ticker() {
     const names = ORDER.map((id) => tr(SHORT[id]));
@@ -80,7 +85,8 @@ const App = {
     const pic = own
       ? h('img', { src: PREVIEWS[id], alt: '', loading: 'lazy', width: 640, height: 400 })
       : h('canvas', { class: 'snap', 'data-scene': String(SERVER_SCENE[id] ?? 0), 'aria-hidden': 'true' });
-    return h('a', { class: 'card reveal' + (i === 0 ? ' wide' : '') + (srv ? ' srv' : ''), href: '#' + id, style: `--d:${(i % 3) * 70}ms`, onclick: (e) => this.from(e) },
+    return h('a', { class: 'card reveal' + (i === 0 ? ' wide' : '') + (srv ? ' srv' : ''), href: '#' + id, style: `--d:${(i % 3) * 70}ms`, onclick: (e) => this.from(e),
+      onmouseenter: () => this.sky?.focus(ORDER.indexOf(id)), onmouseleave: () => this.sky?.focus(-1) },
       h('div', { class: 'pic' }, pic),
       h('div', { class: 'card-body' },
         h('p', { class: 'tag' + (srv ? ' srv' : '') }, srv ? tr(UI.tagServer) : tr(UI.tagBrowser) + ' · ' + tr(kindOf(id))),
@@ -108,12 +114,13 @@ const App = {
       h('h2', { class: 'reveal' }, tr(UI.aboutH)),
       h('div', { class: 'about-body' },
         ...UI.about.map((p) => h('p', { class: 'reveal' }, tr(p))),
+        h('p', { class: 'who reveal' }, tr(UI.authors)),
         h('p', { class: 'sign reveal' }, tr(UI.sign)),
         h('p', { class: 'role reveal' }, `${tr(UI.role)} · `, h('a', { href: 'mailto:orda.ezhenid@gmail.com' }, 'orda.ezhenid@gmail.com'))));
   },
   footer() {
     return h('footer', { class: 'foot' },
-      h('span', {}, tr(UI.footWhat)),
+      h('span', {}, `${tr(UI.footWhat)} · ${tr(UI.sign)}`),
       h('span', { class: 'foot-r' }, tr(UI.footDisc)));
   },
 

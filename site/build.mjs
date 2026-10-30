@@ -60,6 +60,7 @@ const js = [
   await src('tool-sci.js'),
   `const SCI_SAMPLES = ${safeJSON(sciSamples)};`,
   await src('stage.js'),
+  await src('sky.js'),
   await src('app.js'),
 ].join('\n\n');
 if (/<\/script/i.test(js)) throw new Error('</script внутри JS');
@@ -108,6 +109,8 @@ const ctx = vm.createContext({});
 vm.runInContext((await src('i18n.js')) + '\n;globalThis.__x = { CHAPTERS, SHORT, KIND, UI };', ctx);
 const { CHAPTERS, SHORT, KIND, UI } = ctx.__x;
 await mkdir(path.join(nx, 'src', 'data'), { recursive: true });
+// общее небо: тот же файл, что в офлайн-версии, как ES-модуль
+await writeFile(path.join(nx, 'src', 'lib', 'sky.gen.js'), '// сгенерировано из site/src/sky.js\n' + (await src('sky.js')) + '\nexport { createSky };\n');
 const pickL = (o) => o && typeof o === 'object' && 'ru' in o ? o : null;
 await writeFile(path.join(nx, 'src', 'data', 'catalog.json'), JSON.stringify({
   chapters: CHAPTERS.map((c) => ({ id: c.id, name: c.name, lead: c.lead, tools: c.tools })),
