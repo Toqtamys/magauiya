@@ -26,6 +26,20 @@ const apps = {
 const previews = {};
 const pdir = path.join(here, 'previews');
 if (existsSync(pdir)) for (const f of readdirSync(pdir)) if (f.endsWith('.jpg')) previews[f.slice(0, -4)] = 'data:image/jpeg;base64,' + (await readFile(path.join(pdir, f))).toString('base64');
+// открытые проекты в офлайн-файле: Mol* (готовая сборка) + NiiVue/SeqViz/React (esbuild из next/node_modules)
+const nxm = path.join(repo, 'next', 'node_modules');
+const { build: esb } = await import('esbuild');
+const sciLib = (await esb({ entryPoints: [path.join(here, 'sci', 'entry.js')], bundle: true, minify: true, format: 'iife', platform: 'browser', target: 'es2020',
+  define: { 'process.env.NODE_ENV': '"production"' }, legalComments: 'none', nodePaths: [nxm], write: false, logLevel: 'error' })).outputFiles[0].text;
+const molJs = await readFile(path.join(nxm, 'molstar', 'build', 'viewer', 'molstar.js'), 'utf8');
+const molCss = await readFile(path.join(nxm, 'molstar', 'build', 'viewer', 'molstar.css'), 'utf8');
+// <!-- и <script внутри строк ломают разбор <script> в HTML — экранируем первый символ (\x21, \x73 работают и в строках, и в регулярках)
+const inlineSafe = (code) => code.replace(/<(!--|script)/gi, (m, w) => '<\\x' + w.charCodeAt(0).toString(16) + w.slice(1));
+const sciSamples = {
+  pdb: await readFile(path.join(here, 'samples', '4WP4.pdb'), 'utf8'),
+  gb: await readFile(path.join(here, 'samples', 'pBAD30.gb'), 'utf8'),
+  nii: (await readFile(path.join(here, 'samples', 'ovary-synthetic.nii.gz'))).toString('base64'),
+};
 const js = [
   await src('i18n.js'),
   await src('core.js'),
@@ -43,6 +57,8 @@ const js = [
   await src('ihc-engine.js'),
   await src('tool-histo.js'),
   await src('server-client.js'),
+  await src('tool-sci.js'),
+  `const SCI_SAMPLES = ${safeJSON(sciSamples)};`,
   await src('stage.js'),
   await src('app.js'),
 ].join('\n\n');
@@ -50,7 +66,20 @@ if (/<\/script/i.test(js)) throw new Error('</script внутри JS');
 
 let html = await src('template.html');
 html = html.split('{{CSS}}').join(await src('style.css'));
+// шрифты постера (fontsource, OFL) — внутрь файла, чтобы работали без интернета
+const fontCss = [];
+for (const [pkg, ws] of [['oswald', [500, 700]], ['ibm-plex-mono', [500, 700]], ['rubik', [400, 500, 700]]]) for (const w of ws) {
+  const dir = path.join(nxm, '@fontsource', pkg);
+  let css = await readFile(path.join(dir, w + '.css'), 'utf8');
+  css = css.split('@font-face').filter((b) => /(cyrillic|latin)/.test(b) && !/(vietnamese|greek|hebrew|math|symbols)/.test(b.slice(0, 200))).map((b) => '@font-face' + b).join('');
+  const urls = [...new Set(css.match(/\.\/files\/[^)]+\.woff2/g) || [])];
+  for (const u of urls) css = css.split(u).join('data:font/woff2;base64,' + (await readFile(path.join(dir, u))).toString('base64'));
+  fontCss.push(css.replace(/,\s*url\(\.\/files\/[^)]+\.woff\)\s*format\('woff'\)/g, ''));
+}
+html = html.split('{{FONTS}}').join(fontCss.join('\n'));
 html = html.split('{{JS}}').join(js);   // split/join: без подстановок $& в String.replace
+html = html.split('<script type="module">').join(`<style>${molCss}</style>\n<script>${inlineSafe(molJs)}</script>\n<script>${inlineSafe(sciLib)}</script>\n<script type="module">`);
+if (/<\/script/i.test(molJs + sciLib)) throw new Error('</script внутри библиотек');
 
 await writeFile(path.join(repo, 'BOPASI.html'), html);   // офлайн-версия одним файлом
 

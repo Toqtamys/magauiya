@@ -1,5 +1,5 @@
 // ─── Приложение: страница, путешествие сквозь клетку, панели инструментов ───
-const VCH = CHAPTERS.filter((c) => !c.web);   // в офлайн-файле — только встроенные инструменты
+const VCH = CHAPTERS;   // все разделы, включая открытые проекты (библиотеки встроены в файл)
 const ORDER = VCH.flatMap((c) => c.tools);
 const toolById = (id) => TOOLS_DATA.find((t) => t.id === id);
 const chapterOf = (id) => VCH.find((c) => c.tools.includes(id));
@@ -10,7 +10,7 @@ const MOUNT = {
   'lab-counter': mountCounter, tmsc: mountTmsc, 'rc-phase': mountRcpc, morphometry: mountMorphometry, cleavage: mountCleavage,
   kinetics: mountKinetics, gardner: mountGardner, poseidon: mountPoseidon, 'due-date': mountDueDate, 'hcg-doubling': mountHcg,
   'fertile-window': mountFertile, constructor: mountConstructor, 'he-nuclei': (r) => mountHisto(r, 'he'), ki67: (r) => mountHisto(r, 'dab'),
-  molmoda: mountMolmoda,
+  molmoda: mountMolmoda, niivue: mountNiivue, molstar: mountMolstar, seqviz: mountSeqviz,
 };
 const kindOf = (id) => (isServer(id) ? SERVER_KIND : KIND[id] || L('расчёт', 'есептеу', 'calculator'));
 const SERVER_SCENE = { constructor: 8, molmoda: 8, bela: 3, embryovision: 2, emlife: 3, 'scd-dl': 1, pycasa: 0, hovernet: 4, 'protein-design': 8, pocketdock: 8 };
@@ -36,6 +36,9 @@ const App = {
     document.documentElement.lang = LANG;
     document.title = 'BOPASI — ' + tr(UI.title);
     $('#langs').replaceChildren(...LANGS.map((l) => h('button', { class: l === LANG ? 'on' : '', 'aria-pressed': l === LANG, onclick: () => this.setLang(l) }, LANG_LABEL[l])));
+    const ann = () => h('div', { class: 'tb-row' }, ...[UI.announce, UI.announce2, UI.announce3, UI.announce, UI.announce2, UI.announce3].map((a) => h('span', {}, tr(a))));
+    $('#topbar').replaceChildren(ann(), ann());
+    $('#logo').replaceChildren(...'BOPASI'.split('').map((c) => h('span', {}, c)), h('i', {}, '!'));
     $('#navLinks').replaceChildren(...VCH.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#about' }, tr(UI.nav.about)));
     const y = scrollY;
     $('#page').replaceChildren(this.hero(), this.ticker(), ...VCH.map((c, i) => this.section(c, i)), this.about(), this.footer());
@@ -49,7 +52,7 @@ const App = {
     const n = TOOLS_DATA.filter((t) => !t.server).length;
     return h('header', { class: 'hero', id: 'top' },
       h('div', { class: 'hero-text' },
-        h('h1', {}, tr(UI.title)),
+        h('h1', {}, ...tr(UI.title).split(/\s+/).map((w) => h('span', { class: 'w' }, w))),
         h('p', { class: 'lead' }, tr(UI.lead)),
         h('div', { class: 'hero-cta' },
           h('a', { class: 'btn-big', href: '#bopasi', onclick: (e) => this.from(e) }, tr(UI.cta)),
@@ -58,7 +61,8 @@ const App = {
           h('div', {}, h('dt', {}, String(n)), h('dd', {}, tr(UI.factBrowser))),
           h('div', {}, h('dt', {}, String(VCH.length)), h('dd', {}, tr(UI.factSections))),
           h('div', {}, h('dt', {}, '0'), h('dd', {}, tr(UI.factUploads))))),
-      h('div', { class: 'hero-stage' }, this.canvas, h('i', { class: 'hud h1', 'aria-hidden': 'true' }), h('i', { class: 'hud h2', 'aria-hidden': 'true' }), h('span', { class: 'corner tl' }), h('span', { class: 'corner br' })));
+      h('div', { class: 'hero-stage' }, this.canvas, h('i', { class: 'hud h1', 'aria-hidden': 'true' }),
+        h('div', { class: 'sticker', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('b', {}, String(n)), h('span', {}, tr(UI.tools)), h('small', {}, tr(UI.stickerTop)), h('small', {}, tr(UI.stickerBottom)))));
   },
   ticker() {
     const names = ORDER.map((id) => tr(SHORT[id]));
