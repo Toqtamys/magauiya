@@ -28,7 +28,7 @@ export default function NiivueTool() {
       const m = await import("@niivue/niivue");
       if (!alive) return;
       mod.current = m;
-      const nv = new m.Niivue({ backColor: [0.04, 0.07, 0.25, 1], crosshairColor: [1, 0.77, 0.2, 1], show3Dcrosshair: true, dragAndDropEnabled: true, isColorbar: false });
+      const nv = new m.Niivue({ backColor: [0, 0, 0, 1], crosshairColor: [1, 0.77, 0.2, 1], show3Dcrosshair: true, dragAndDropEnabled: true, isColorbar: false });
       nvRef.current = nv;
       await nv.attachToCanvas(canvas.current);
       nv.setSliceType(m.SLICE_TYPE.MULTIPLANAR);

@@ -1,24 +1,27 @@
 "use client";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { Mail } from "lucide-react";
-import { Wordmark } from "./Wordmark";
 
 export function About() {
   const tr = useTranslations();
   return (
-    <section id="about" className="mx-auto mt-32 max-w-[1400px] px-4 md:px-8">
-      <div className="grid gap-10 glass rounded-[48px] border border-sun/30 p-8 text-white md:p-14 lg:grid-cols-[1fr_1.4fr]">
-        <h2 className="font-display text-[clamp(44px,5vw,80px)] font-bold uppercase leading-[0.9] text-sun neon">{tr("aboutH")}</h2>
-        <div className="space-y-4 text-lg">
+    <section id="about" className="mx-auto mt-40 max-w-[1400px] px-5 md:px-12">
+      <div className="grid gap-12 border-t border-white/20 pt-14 lg:grid-cols-[1fr_1.4fr]">
+        <div>
+          <p className="font-mono text-xs font-semibold uppercase tracking-x text-white/50">BOPASI</p>
+          <h2 className="mt-3 font-display text-[clamp(40px,5vw,72px)] font-bold uppercase leading-[0.95]">{tr("aboutH")}</h2>
+        </div>
+        <div className="space-y-5 text-lg leading-relaxed text-white/80">
           {[0, 1, 2].map((i) => (
-            <motion.p key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.7 }}>
+            <motion.p key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.7 }}>
               {tr(`about${i}`)}
             </motion.p>
           ))}
-          <p className="pt-4 font-mono text-sm font-semibold uppercase tracking-wider text-sun">{tr("authors")}</p>
-          <p className="font-display text-3xl font-bold uppercase text-neon neon-m">{tr("sign")}</p>
-          <p className="flex flex-wrap items-center gap-2 font-mono text-sm">{tr("role")} · <Mail className="size-4 text-sun" /><a className="text-sun underline" href="mailto:orda.ezhenid@gmail.com">orda.ezhenid@gmail.com</a></p>
+          <div className="border-t border-white/15 pt-8">
+            <p className="font-mono text-xs font-semibold uppercase tracking-x text-white/50">{tr("authors")}</p>
+            <p className="mt-2 font-display text-3xl font-bold uppercase tracking-wide text-white">{tr("sign")}</p>
+            <p className="mt-3 font-mono text-sm text-white/60">{tr("role")} · <a className="underline decoration-white/40 underline-offset-4 hover:decoration-white" href="mailto:orda.ezhenid@gmail.com">orda.ezhenid@gmail.com</a></p>
+          </div>
         </div>
       </div>
     </section>
@@ -28,12 +31,9 @@ export function About() {
 export function Footer() {
   const tr = useTranslations();
   return (
-    <footer className="mx-auto mt-24 max-w-[1400px] px-4 pb-10 md:px-8">
-      <div className="overflow-hidden"><motion.div initial={{ y: "100%" }} whileInView={{ y: 0 }} viewport={{ once: true }} transition={{ type: "spring", stiffness: 80, damping: 15 }}>
-        <Wordmark size="text-[clamp(80px,19vw,300px)]" />
-      </motion.div></div>
-      <div className="mt-6 flex flex-wrap justify-between gap-4 font-mono text-sm uppercase text-white/75">
-        <span>{tr("footWhat")} · {tr("sign")}</span><span>{tr("footDisc")}</span>
+    <footer className="mx-auto mt-32 max-w-[1400px] px-5 pb-10 md:px-12">
+      <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-white/10 pt-8 text-center font-mono text-[11px] font-semibold uppercase tracking-x text-white/50">
+        <span>BOPASI © 2026</span><span>{tr("sign")}</span><span>{tr("footDisc").replace(/^2026 · /, "")}</span>
       </div>
     </footer>
   );

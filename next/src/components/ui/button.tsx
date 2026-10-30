@@ -1,16 +1,16 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
-// кнопки-«таблетки» с моноширинной подписью
+// прямоугольные кнопки-рамки с моноширинной подписью; при наведении заливаются белым
 export const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full font-mono font-semibold uppercase tracking-wide transition-all duration-200 active:scale-95 focus-visible:outline-3 focus-visible:outline-sun focus-visible:outline-offset-2",
+  "btn-x inline-flex items-center justify-center gap-3 font-mono font-semibold uppercase tracking-x transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-4",
   {
     variants: {
       variant: {
-        primary: "bg-sun text-ink shadow-[0_0_24px_rgba(46,242,255,.55)] hover:bg-neon hover:text-white hover:shadow-[0_0_28px_rgba(255,43,214,.7)] hover:-translate-y-0.5",
-        dark: "bg-ink text-white shadow-[inset_0_0_0_1px_#2ef2ff] hover:bg-sun hover:text-ink hover:-translate-y-0.5",
-        outline: "text-white shadow-[inset_0_0_0_2px_#2ef2ff] hover:bg-sun hover:text-ink",
+        primary: "border-2 border-white text-white",
+        dark: "border border-white/40 text-white",
+        outline: "border-2 border-white/60 text-white",
       },
-      size: { md: "px-8 py-4 text-lg", sm: "px-5 py-2.5 text-sm" },
+      size: { md: "px-8 py-4 text-sm", sm: "px-5 py-2.5 text-xs" },
     },
     defaultVariants: { variant: "primary", size: "md" },
   },
