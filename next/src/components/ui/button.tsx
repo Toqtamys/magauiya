@@ -1,18 +1,18 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
+// кнопки-«таблетки» с моноширинной подписью
 export const buttonVariants = cva(
-  "chamfer relative inline-flex items-center justify-center gap-2 overflow-hidden px-7 py-4 text-sm font-semibold uppercase tracking-[0.12em] transition-colors focus-visible:outline-3 focus-visible:outline-red focus-visible:outline-offset-2",
+  "inline-flex items-center justify-center gap-2 rounded-full font-mono font-semibold uppercase tracking-wide transition-all duration-200 active:scale-95 focus-visible:outline-3 focus-visible:outline-sun focus-visible:outline-offset-2",
   {
     variants: {
       variant: {
-        primary: "shine bg-red text-white hover:bg-red-dark",
-        outline: "bg-white text-ink shadow-[inset_0_0_0_2px_var(--color-ink)] hover:bg-ink hover:text-white",
-        dark: "bg-ink text-white hover:bg-red",
+        primary: "bg-white text-blue hover:bg-sun hover:text-ink hover:-translate-y-0.5",
+        dark: "bg-ink text-white hover:bg-sun hover:text-ink hover:-translate-y-0.5",
+        outline: "text-white shadow-[inset_0_0_0_2px_#fff] hover:bg-white hover:text-blue",
       },
-      size: { md: "", sm: "px-4 py-2.5 text-xs" },
+      size: { md: "px-8 py-4 text-lg", sm: "px-5 py-2.5 text-sm" },
     },
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
-
 export type ButtonVariants = VariantProps<typeof buttonVariants>;

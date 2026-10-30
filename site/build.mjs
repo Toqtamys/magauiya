@@ -83,7 +83,7 @@ const pickL = (o) => o && typeof o === 'object' && 'ru' in o ? o : null;
 await writeFile(path.join(nx, 'src', 'data', 'catalog.json'), JSON.stringify({
   chapters: CHAPTERS.map((c) => ({ id: c.id, name: c.name, lead: c.lead, tools: c.tools })),
   short: SHORT, kind: KIND,
-  tools: tools.map(({ id, name, tagline, full, features, input, steps, limits, output, authors }) => ({ id, name, tagline, full, features, input, steps, limits, output, authors })),
+  tools: tools.map(({ id, name, tagline, full, features, input, steps, limits, output, authors, github, license }) => ({ id, name, tagline, full, features, input, steps, limits, output, authors, github, license })),
 }, null, 1));
 // сообщения next-intl: плоские строки интерфейса на трёх языках
 const msgs = { ru: {}, kk: {}, en: {} };
@@ -92,6 +92,15 @@ for (const [k, v] of Object.entries(UI.nav || {})) for (const lg of ['ru', 'kk',
 UI.about.forEach((p, i) => { for (const lg of ['ru', 'kk', 'en']) msgs[lg]['about' + i] = p[lg]; });
 await mkdir(path.join(nx, 'messages'), { recursive: true });
 for (const lg of ['ru', 'kk', 'en']) await writeFile(path.join(nx, 'messages', lg + '.json'), JSON.stringify(msgs[lg], null, 1));
+
+// примеры для открытых проектов и сборка Mol* (из next/node_modules)
+await rm(path.join(pub, 'samples'), { recursive: true, force: true });
+await cp(path.join(here, 'samples'), path.join(pub, 'samples'), { recursive: true });
+const ms = path.join(nx, 'node_modules', 'molstar');
+if (existsSync(ms)) {
+  await mkdir(path.join(pub, 'molstar'), { recursive: true });
+  for (const f of ['build/viewer/molstar.js', 'build/viewer/molstar.css', 'LICENSE']) await cp(path.join(ms, f), path.join(pub, 'molstar', path.basename(f)));
+}
 
 // локальные копии библиотек (из node_modules при наличии, иначе из vendor/ рядом со сборкой)
 const nm = path.join(here, 'node_modules');

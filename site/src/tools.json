@@ -2426,5 +2426,312 @@
     "en": "Wait for it to finish and download the JSON, CSV or TXT report"
    }
   ]
+ },
+ {
+  "id": "niivue",
+  "section": "science",
+  "interactive": "react",
+  "action": "analyze",
+  "github": "github.com/niivue/niivue",
+  "license": "BSD-2-Clause",
+  "authors": "NiiVue — Chris Rorden, Taylor Hanayik и участники проекта (открытый код)",
+  "name": {
+   "ru": "NiiVue · 3D-снимки",
+   "kk": "NiiVue · 3D-суреттер",
+   "en": "NiiVue · 3D scans"
+  },
+  "tagline": {
+   "ru": "Просмотр объёмных медицинских снимков — 3D-УЗИ, МРТ, КТ: срезы в трёх плоскостях, объём и измерение расстояний.",
+   "kk": "Көлемді медициналық суреттерді қарау — 3D-УДЗ, МРТ, КТ: үш жазықтықтағы кесінділер, көлем және қашықтықты өлшеу.",
+   "en": "View volumetric medical scans — 3D ultrasound, MRI, CT: slices in three planes, volume rendering and distance measurement."
+  },
+  "full": {
+   "ru": "NiiVue — открытый просмотрщик медицинских объёмов на WebGL2. Открывает NIfTI (.nii, .nii.gz), NRRD, MGH/MGZ и другие форматы, показывает аксиальный, сагиттальный и корональный срезы и объёмную реконструкцию. Можно менять контраст, переключать вид и измерять расстояния прямо на срезе. Всё считается на видеокарте вашего компьютера — файл никуда не отправляется. Пример — синтетический 3D-снимок яичника с фолликулами, созданный BOPASI (не данные пациента).",
+   "kk": "NiiVue — WebGL2 негізіндегі медициналық көлемдерді қарауға арналған ашық бағдарлама. NIfTI (.nii, .nii.gz), NRRD, MGH/MGZ және басқа форматтарды ашады, аксиальды, сагиттальды және корональды кесінділерді және көлемдік қайта құруды көрсетеді. Контрастты өзгертуге, көріністі ауыстыруға және кесіндіде қашықтықты өлшеуге болады. Барлығы компьютеріңіздің бейнекартасында есептеледі — файл ешқайда жіберілмейді. Мысал — BOPASI жасаған фолликулдары бар аналық бездің синтетикалық 3D-суреті (пациент деректері емес).",
+   "en": "NiiVue is an open WebGL2 viewer for medical volumes. It opens NIfTI (.nii, .nii.gz), NRRD, MGH/MGZ and other formats, shows axial, sagittal and coronal slices and a volume rendering. You can adjust contrast, switch views and measure distances right on a slice. Everything runs on your computer’s graphics card — the file is not uploaded. The sample is a synthetic 3D ovary with follicles made by BOPASI (not patient data)."
+  },
+  "features": [
+   {
+    "ru": "Три плоскости и объёмный рендер",
+    "kk": "Үш жазықтық және көлемдік рендер",
+    "en": "Three planes and a volume render"
+   },
+   {
+    "ru": "Измерение расстояний на срезе",
+    "kk": "Кесіндіде қашықтықты өлшеу",
+    "en": "Distance measurement on a slice"
+   },
+   {
+    "ru": "Контраст и цветовые карты",
+    "kk": "Контраст және түс карталары",
+    "en": "Contrast and colour maps"
+   },
+   {
+    "ru": "NIfTI, NRRD, MGH/MGZ",
+    "kk": "NIfTI, NRRD, MGH/MGZ",
+    "en": "NIfTI, NRRD, MGH/MGZ"
+   }
+  ],
+  "input": [
+   {
+    "ru": "Файл объёма: .nii, .nii.gz, .nrrd, .mgz (экспорт из 3D-УЗИ, МРТ, КТ)",
+    "kk": "Көлем файлы: .nii, .nii.gz, .nrrd, .mgz (3D-УДЗ, МРТ, КТ экспорты)",
+    "en": "A volume file: .nii, .nii.gz, .nrrd, .mgz (exported from 3D ultrasound, MRI, CT)"
+   },
+   {
+    "ru": "Браузер с поддержкой WebGL2",
+    "kk": "WebGL2 қолдайтын браузер",
+    "en": "A browser with WebGL2"
+   }
+  ],
+  "steps": [
+   {
+    "ru": "Посмотрите пример или перетащите свой файл в окно",
+    "kk": "Мысалды қараңыз немесе файлды терезеге сүйреңіз",
+    "en": "Look at the sample or drop your file into the window"
+   },
+   {
+    "ru": "Переключите вид: срезы, объём или всё сразу",
+    "kk": "Көріністі ауыстырыңыз: кесінділер, көлем немесе бәрі бірге",
+    "en": "Switch the view: slices, volume or all at once"
+   },
+   {
+    "ru": "Выберите «Измерить» и протяните линию на срезе",
+    "kk": "«Өлшеу» таңдап, кесіндіде сызық тартыңыз",
+    "en": "Choose “Measure” and drag a line on a slice"
+   },
+   {
+    "ru": "Колесо мыши листает срезы, правая кнопка меняет контраст",
+    "kk": "Тінтуір дөңгелегі кесінділерді парақтайды, оң жақ түйме контрастты өзгертеді",
+    "en": "The mouse wheel scrolls slices, the right button adjusts contrast"
+   }
+  ],
+  "limits": [
+   {
+    "ru": "DICOM-серии нужно сначала конвертировать в NIfTI (например, dcm2niix)",
+    "kk": "DICOM сериясын алдымен NIfTI-ге түрлендіру керек (мысалы, dcm2niix)",
+    "en": "DICOM series must first be converted to NIfTI (for example with dcm2niix)"
+   },
+   {
+    "ru": "Просмотрщик, а не диагностическое изделие",
+    "kk": "Қарау құралы, диагностикалық бұйым емес",
+    "en": "A viewer, not a diagnostic device"
+   },
+   {
+    "ru": "Нужна видеокарта с WebGL2",
+    "kk": "WebGL2 бар бейнекарта керек",
+    "en": "Needs a graphics card with WebGL2"
+   }
+  ],
+  "output": [
+   {
+    "ru": "Срезы, объём и измерения на экране",
+    "kk": "Экрандағы кесінділер, көлем және өлшемдер",
+    "en": "Slices, volume and measurements on screen"
+   },
+   {
+    "ru": "Снимок экрана в PNG",
+    "kk": "PNG экран суреті",
+    "en": "A PNG screenshot"
+   }
+  ]
+ },
+ {
+  "id": "molstar",
+  "section": "science",
+  "interactive": "react",
+  "action": "analyze",
+  "github": "github.com/molstar/molstar",
+  "license": "MIT",
+  "authors": "Mol* — David Sehnal, Alexander Rose и участники (PDBe, RCSB PDB); Sehnal et al., Nucleic Acids Research 2021",
+  "name": {
+   "ru": "Mol* · структуры белков",
+   "kk": "Mol* · ақуыз құрылымдары",
+   "en": "Mol* · protein structures"
+  },
+  "tagline": {
+   "ru": "Профессиональный 3D-просмотрщик белков и молекул, которым пользуются банки PDB: ленты, поверхности, лиганды.",
+   "kk": "PDB банктері қолданатын ақуыздар мен молекулалардың кәсіби 3D-қарау құралы: таспалар, беттер, лигандтар.",
+   "en": "A professional 3D viewer for proteins and molecules, used by the PDB banks: cartoons, surfaces, ligands."
+  },
+  "full": {
+   "ru": "Mol* (molstar) — открытый просмотрщик макромолекул, на котором работают сайты RCSB PDB и PDBe. Открывает PDB, mmCIF, BinaryCIF, SDF, MOL2 и другие форматы: показывает белок лентами, поверхностью или атомами, выделяет лиганды, окрашивает по цепям и вторичной структуре, измеряет расстояния и углы. Работает на вашем компьютере. Пример — белок латекса Hev b 6.02 (гевеин) из хирургических перчаток, PDB 4WP4: главный аллерген латекса, важный для клиник.",
+   "kk": "Mol* (molstar) — RCSB PDB және PDBe сайттары жұмыс істейтін макромолекулаларды қарауға арналған ашық бағдарлама. PDB, mmCIF, BinaryCIF, SDF, MOL2 және басқа форматтарды ашады: ақуызды таспамен, бетпен немесе атомдармен көрсетеді, лигандтарды бөледі, тізбектер мен екінші құрылым бойынша бояйды, қашықтықтар мен бұрыштарды өлшейді. Компьютеріңізде жұмыс істейді. Мысал — хирургиялық қолғаптардан алынған латекс ақуызы Hev b 6.02 (гевеин), PDB 4WP4: клиникалар үшін маңызды латекстің негізгі аллергені.",
+   "en": "Mol* (molstar) is the open macromolecule viewer behind the RCSB PDB and PDBe websites. It opens PDB, mmCIF, BinaryCIF, SDF, MOL2 and more: it shows a protein as cartoons, surface or atoms, highlights ligands, colours by chain and secondary structure, and measures distances and angles. It runs on your computer. The sample is the latex protein Hev b 6.02 (hevein) from surgical gloves, PDB 4WP4 — the major latex allergen, relevant to clinics."
+  },
+  "features": [
+   {
+    "ru": "Ленты, поверхность, шарики и палочки",
+    "kk": "Таспалар, бет, шарлар мен таяқшалар",
+    "en": "Cartoons, surface, ball-and-stick"
+   },
+   {
+    "ru": "Измерение расстояний и углов",
+    "kk": "Қашықтықтар мен бұрыштарды өлшеу",
+    "en": "Distance and angle measurement"
+   },
+   {
+    "ru": "PDB, mmCIF, SDF, MOL2",
+    "kk": "PDB, mmCIF, SDF, MOL2",
+    "en": "PDB, mmCIF, SDF, MOL2"
+   },
+   {
+    "ru": "Загрузка по коду PDB при наличии интернета",
+    "kk": "Интернет болса, PDB коды бойынша жүктеу",
+    "en": "Load by PDB code when online"
+   }
+  ],
+  "input": [
+   {
+    "ru": "Файл структуры .pdb, .cif, .bcif, .sdf, .mol2",
+    "kk": ".pdb, .cif, .bcif, .sdf, .mol2 құрылым файлы",
+    "en": "A structure file .pdb, .cif, .bcif, .sdf, .mol2"
+   },
+   {
+    "ru": "или код PDB (нужен интернет)",
+    "kk": "немесе PDB коды (интернет керек)",
+    "en": "or a PDB code (needs internet)"
+   }
+  ],
+  "steps": [
+   {
+    "ru": "Посмотрите пример или откройте свой файл кнопкой «Открыть файл»",
+    "kk": "Мысалды қараңыз немесе «Файлды ашу» түймесімен өз файлыңызды ашыңыз",
+    "en": "Look at the sample or open your file with “Open file”"
+   },
+   {
+    "ru": "Вращайте мышью, колесо — приближение",
+    "kk": "Тінтуірмен айналдырыңыз, дөңгелек — жақындату",
+    "en": "Rotate with the mouse, the wheel zooms"
+   },
+   {
+    "ru": "Клик по атому — выделение и подпись",
+    "kk": "Атомды басу — бөлу және жазба",
+    "en": "Click an atom to select and label it"
+   },
+   {
+    "ru": "Панели справа меняют вид и цвета",
+    "kk": "Оң жақтағы панельдер көрініс пен түстерді өзгертеді",
+    "en": "The right-hand panels change the look and colours"
+   }
+  ],
+  "limits": [
+   {
+    "ru": "Показывает структуру, но не предсказывает её",
+    "kk": "Құрылымды көрсетеді, бірақ болжамайды",
+    "en": "Shows a structure but does not predict one"
+   },
+   {
+    "ru": "Большие комплексы требуют мощного компьютера",
+    "kk": "Үлкен кешендер қуатты компьютерді қажет етеді",
+    "en": "Large complexes need a powerful computer"
+   },
+   {
+    "ru": "Загрузка по коду PDB работает только онлайн",
+    "kk": "PDB коды бойынша жүктеу тек онлайн жұмыс істейді",
+    "en": "Loading by PDB code works only online"
+   }
+  ],
+  "output": [
+   {
+    "ru": "Интерактивная 3D-модель, снимки экрана, измерения",
+    "kk": "Интерактивті 3D-модель, экран суреттері, өлшемдер",
+    "en": "An interactive 3D model, screenshots, measurements"
+   }
+  ]
+ },
+ {
+  "id": "seqviz",
+  "section": "science",
+  "interactive": "react",
+  "action": "analyze",
+  "github": "github.com/Lattice-Automation/seqviz",
+  "license": "MIT",
+  "authors": "SeqViz — Lattice Automation (открытый код); пример pBAD30 — из тестовых данных Biopython",
+  "name": {
+   "ru": "SeqViz · карта ДНК",
+   "kk": "SeqViz · ДНҚ картасы",
+   "en": "SeqViz · DNA map"
+  },
+  "tagline": {
+   "ru": "Кольцевая и линейная карта ДНК: гены, промоторы, сайты рестрикции и поиск по последовательности.",
+   "kk": "ДНҚ-ның сақиналы және сызықтық картасы: гендер, промоторлар, рестрикция сайттары және тізбек бойынша іздеу.",
+   "en": "Circular and linear DNA maps: genes, promoters, restriction sites and sequence search."
+  },
+  "full": {
+   "ru": "SeqViz — открытый просмотрщик последовательностей ДНК. Открывает GenBank, FASTA, SnapGene (.dna) и SBOL или вставленную последовательность, рисует кольцевую и линейную карту с аннотациями, показывает сайты выбранных ферментов рестрикции, ищет участки по последовательности и показывает комплементарную цепь. Всё работает в браузере. Пример — плазмида pBAD30 (4923 п. н.) из открытых тестовых данных Biopython.",
+   "kk": "SeqViz — ДНҚ тізбектерін қарауға арналған ашық бағдарлама. GenBank, FASTA, SnapGene (.dna) және SBOL файлдарын немесе қойылған тізбекті ашады, аннотациялары бар сақиналы және сызықтық картаны салады, таңдалған рестрикция ферменттерінің сайттарын көрсетеді, тізбек бойынша учаскелерді іздейді және комплементарлы тізбекті көрсетеді. Барлығы браузерде жұмыс істейді. Мысал — Biopython-ның ашық тест деректеріндегі pBAD30 плазмидасы (4923 н. ж.).",
+   "en": "SeqViz is an open DNA sequence viewer. It opens GenBank, FASTA, SnapGene (.dna) and SBOL files or a pasted sequence, draws circular and linear maps with annotations, shows the sites of chosen restriction enzymes, searches the sequence and shows the complementary strand. It all runs in the browser. The sample is the pBAD30 plasmid (4,923 bp) from Biopython’s open test data."
+  },
+  "features": [
+   {
+    "ru": "Кольцевая и линейная карта",
+    "kk": "Сақиналы және сызықтық карта",
+    "en": "Circular and linear maps"
+   },
+   {
+    "ru": "Сайты рестрикции EcoRI, BamHI, HindIII и других",
+    "kk": "EcoRI, BamHI, HindIII және басқа рестрикция сайттары",
+    "en": "EcoRI, BamHI, HindIII and other restriction sites"
+   },
+   {
+    "ru": "Поиск по последовательности",
+    "kk": "Тізбек бойынша іздеу",
+    "en": "Sequence search"
+   },
+   {
+    "ru": "GenBank, FASTA, SnapGene, SBOL",
+    "kk": "GenBank, FASTA, SnapGene, SBOL",
+    "en": "GenBank, FASTA, SnapGene, SBOL"
+   }
+  ],
+  "input": [
+   {
+    "ru": "Файл .gb, .gbk, .fasta, .fa, .dna или вставленная последовательность",
+    "kk": ".gb, .gbk, .fasta, .fa, .dna файлы немесе қойылған тізбек",
+    "en": "A .gb, .gbk, .fasta, .fa, .dna file or a pasted sequence"
+   }
+  ],
+  "steps": [
+   {
+    "ru": "Посмотрите пример или откройте файл",
+    "kk": "Мысалды қараңыз немесе файлды ашыңыз",
+    "en": "Look at the sample or open a file"
+   },
+   {
+    "ru": "Переключите вид: кольцо, линия или оба",
+    "kk": "Көріністі ауыстырыңыз: сақина, сызық немесе екеуі",
+    "en": "Switch the view: circle, line or both"
+   },
+   {
+    "ru": "Отметьте ферменты, чтобы увидеть сайты разрезания",
+    "kk": "Кесу сайттарын көру үшін ферменттерді белгілеңіз",
+    "en": "Tick enzymes to see their cut sites"
+   },
+   {
+    "ru": "Введите фрагмент в поиск — совпадения подсветятся",
+    "kk": "Іздеуге фрагментті енгізіңіз — сәйкестіктер жарықтандырылады",
+    "en": "Type a fragment into search — matches are highlighted"
+   }
+  ],
+  "limits": [
+   {
+    "ru": "Показывает и ищет, но не выравнивает последовательности",
+    "kk": "Көрсетеді және іздейді, бірақ тізбектерді туралап салыстырмайды",
+    "en": "Shows and searches but does not align sequences"
+   },
+   {
+    "ru": "Очень длинные геномы рисуются медленно",
+    "kk": "Өте ұзын геномдар баяу салынады",
+    "en": "Very long genomes render slowly"
+   }
+  ],
+  "output": [
+   {
+    "ru": "Интерактивная карта последовательности",
+    "kk": "Тізбектің интерактивті картасы",
+    "en": "An interactive sequence map"
+   }
+  ]
  }
 ]
