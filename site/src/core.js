@@ -94,6 +94,14 @@ function drawGlyph(ctx, name, x, y, s, color, lw = 2) {
     case 'embryo': C(24, 24, 16); C(20, 21, 5.3); C(29, 20, 4.6); C(22, 30, 4.3); C(30, 29, 3.8); break;
     case 'calendar': ctx.strokeRect(8, 11, 32, 29); P('M8 19h32M16 7v6M32 7v6'); C(24, 29, 4.5); break;
     case 'curve': P('M7 40 C18 39 24 30 28 22 S36 9 42 8'); P('M7 41h35M7 41V7'); C(28, 22, 2); break;
+    case 'halo': ctx.setLineDash([3, 3]); C(24, 24, 17); ctx.setLineDash([]); ctx.save(); ctx.translate(24, 24); ctx.rotate(-0.5); ctx.beginPath(); ctx.ellipse(0, 0, 7, 4.5, 0, 0, 6.283); ctx.fill(); ctx.restore(); break;
+    case 'report': ctx.strokeRect(11, 6, 26, 36); P('M16 15h16M16 21h16M16 27h10'); P('M17 35l3 3 6-7'); break;
+    case 'grid': ctx.strokeRect(8, 8, 32, 32); P('M8 16h32M8 24h32M8 32h32M16 8v32M24 8v32M32 8v32'); break;
+    case 'tally': P('M10 12v24M16 12v24M22 12v24M28 12v24M7 30l26-14'); C(38, 36, 3); break;
+    case 'ruler': P('M7 33 33 7l8 8-26 26z'); P('M13 27l3 3M18 22l3 3M23 17l3 3M28 12l3 3'); break;
+    case 'clock': C(24, 26, 15); P('M24 26V17M24 26l7 4M19 6h10'); break;
+    case 'blast': C(24, 24, 17); C(24, 24, 13); ctx.beginPath(); ctx.arc(24, 24, 13, 2.4, 4.0); ctx.lineTo(18, 24); ctx.closePath(); ctx.fill(); break;
+    case 'ovary': C(24, 24, 15); C(19, 20, 4); C(29, 22, 3); C(23, 30, 3.5); C(31, 30, 2); break;
     case 'molecule': C(24, 12, 4); C(12, 30, 4); C(36, 30, 4); C(24, 38, 3); P('M24 16 15 27M24 16l9 11M14 33l8 4M34 33l-8 4'); break;
   }
   ctx.restore();
@@ -104,41 +112,3 @@ function glyphSVG(name, size = 28) {
   return c.toDataURL();
 }
 
-// ─── Звук: тихий эмбиент на WebAudio (как play/pause у «The Year of Greta») ──
-const Sound = {
-  ctx: null, master: null, on: false,
-  start() {
-    if (!this.ctx) {
-      const A = window.AudioContext || window.webkitAudioContext; if (!A) return false;
-      const ctx = this.ctx = new A();
-      const master = this.master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-      const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 900; filter.Q.value = 0.6; filter.connect(master);
-      const delay = ctx.createDelay(1.5); delay.delayTime.value = 0.9; const fb = ctx.createGain(); fb.gain.value = 0.35;
-      delay.connect(fb); fb.connect(delay); delay.connect(filter);
-      [110, 164.81, 220, 246.94, 329.63].forEach((f, i) => {
-        const o = ctx.createOscillator(); o.type = i % 2 ? 'triangle' : 'sine'; o.frequency.value = f; o.detune.value = (i - 2) * 4;
-        const g = ctx.createGain(); g.gain.value = [0.22, 0.12, 0.14, 0.07, 0.05][i];
-        const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05 + i * 0.031; const lg = ctx.createGain(); lg.gain.value = g.gain.value * 0.6;
-        lfo.connect(lg); lg.connect(g.gain); o.connect(g); g.connect(filter); g.connect(delay); o.start(); lfo.start();
-      });
-      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.03; const lg = ctx.createGain(); lg.gain.value = 420;
-      lfo.connect(lg); lg.connect(filter.frequency); lfo.start();
-    }
-    this.ctx.resume();
-    this.master.gain.cancelScheduledValues(this.ctx.currentTime);
-    this.master.gain.setTargetAtTime(0.11, this.ctx.currentTime, 1.2);
-    this.on = true; return true;
-  },
-  stop() {
-    if (!this.ctx) return;
-    this.master.gain.setTargetAtTime(0, this.ctx.currentTime, 0.4);
-    this.on = false;
-  },
-  blip() {
-    if (!this.on || !this.ctx) return;
-    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(880, c.currentTime); o.frequency.exponentialRampToValueAtTime(520, c.currentTime + 0.25);
-    g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(0.05, c.currentTime + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.5);
-    o.connect(g); g.connect(this.master); o.start(); o.stop(c.currentTime + 0.55);
-  },
-};

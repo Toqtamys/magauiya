@@ -14,8 +14,14 @@ function calcShell(root, fields, compute) {
       ctl = h('div', { class: 'seg' }, ...f.options.map(([v, lab]) => h('button', { 'data-v': v, onclick: () => { els[f.id].value = v; paintSeg(); update(); } }, tr(lab))));
       ctl.value = f.value; els[f.id] = ctl;
     } else if (f.type === 'select') {
-      ctl = h('select', { id: 'c-' + f.id, onchange: update }, ...f.options.map(([v, lab]) => h('option', { value: v, selected: String(v) === String(f.value) }, tr(lab))));
+      ctl = h('select', { id: 'c-' + f.id, onchange: () => { f.after?.(els); update(); } }, ...f.options.map(([v, lab]) => h('option', { value: v, selected: String(v) === String(f.value) }, tr(lab))));
       els[f.id] = ctl;
+    } else if (f.type === 'check') {
+      ctl = h('input', { id: 'c-' + f.id, type: 'checkbox', checked: !!f.value, onchange: update });
+      els[f.id] = ctl;
+      const lab = h('label', { class: 'field check' + (f.wide ? ' wide' : ''), for: 'c-' + f.id }, ctl, h('span', {}, tr(f.label)));
+      if (f.show) lab.dataset.show = '1';
+      f.el = lab; form.append(lab); continue;
     } else if (f.type === 'range') {
       ctl = h('input', { id: 'c-' + f.id, type: 'range', min: f.min, max: f.max, step: f.step || 1, value: f.value, oninput: update });
       els[f.id] = ctl;
@@ -28,7 +34,7 @@ function calcShell(root, fields, compute) {
     f.el = wrapEl; form.append(wrapEl);
   }
   function paintSeg() { for (const f of fields) if (f.type === 'seg') els[f.id].querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.v === els[f.id].value)); }
-  function vals() { const o = {}; for (const f of fields) o[f.id] = f.type === 'seg' || f.type === 'select' || f.type === 'date' ? els[f.id].value : parseFloat(String(els[f.id].value).replace(',', '.')); return o; }
+  function vals() { const o = {}; for (const f of fields) o[f.id] = f.type === 'check' ? els[f.id].checked : f.type === 'seg' || f.type === 'select' || f.type === 'date' ? els[f.id].value : parseFloat(String(els[f.id].value).replace(',', '.')); return o; }
   function update() {
     const v = vals();
     for (const f of fields) if (f.show) f.el.hidden = !f.show(v);

@@ -23,10 +23,14 @@ const js = [
   `const TOOLS_DATA = ${safeJSON(tools)};`,
   `const APPS = ${safeJSON(apps)};`,
   await src('rcpc-engine.js'),
-  await src('tool-rcpc.js'),
+  await src('scd-engine.js'),
   await src('tool-calc.js'),
+  await src('tool-rcpc.js'),
+  await src('tool-scd.js'),
+  await src('tool-lab.js'),
+  await src('tool-morph.js'),
   await src('tool-constructor.js'),
-  await src('scene.js'),
+  await src('embryo.js'),
   await src('app.js'),
 ].join('\n\n');
 if (/<\/script/i.test(js)) throw new Error('</script внутри JS');

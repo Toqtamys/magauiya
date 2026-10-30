@@ -5,12 +5,17 @@ const L = (ru, kk, en) => ({ ru, kk, en });
 
 const UI = {
   tagline: L('Открытые ИИ-инструменты репродуктивной медицины', 'Репродуктивті медицинаның ашық ЖИ-құралдары', 'Open AI tools for reproductive medicine'),
-  introTitle: L('Вся репродуктивная ИИ-медицина — в одном окне', 'Барлық репродуктивті ЖИ-медицина — бір терезеде', 'All of reproductive AI — in one window'),
+  introTitle: L('Лаборатория репродукции в браузере', 'Браузердегі репродукция зертханасы', 'A reproduction lab in your browser'),
   introLead: L(
-    'Спермограмма по видео, фрагментация ДНК, перевод снимков RC ⇄ фазовый контраст, грейдинг бластоцист, калькуляторы ВРТ и 3D-конструктор препаратов. Всё работает прямо в браузере — ваши снимки и видео не покидают компьютер.',
-    'Бейне бойынша спермограмма, ДНҚ фрагментациясы, RC ⇄ фазалық контраст суреттерін аудару, бластоциста грейдингі, ҚРТ калькуляторлары және дәрілердің 3D-конструкторы. Барлығы тікелей браузерде жұмыс істейді — суреттер мен бейнелер компьютеріңізден шықпайды.',
-    'Video semen analysis, DNA fragmentation, RC ⇄ phase-contrast conversion, blastocyst grading, ART calculators and a 3D drug constructor. Everything runs right in your browser — your images and videos never leave your computer.'),
+    'Спермограмма по видео, индекс фрагментации ДНК, морфология и подсчёт, измерение и грейдинг эмбрионов, калькуляторы ВРТ и 3D-конструктор препаратов. Всё работает прямо на странице — снимки и видео не покидают ваш компьютер.',
+    'Бейне бойынша спермограмма, ДНҚ фрагментациясының индексі, морфология және санау, эмбриондарды өлшеу және грейдинг, ҚРТ калькуляторлары және дәрілердің 3D-конструкторы. Барлығы тікелей бетте жұмыс істейді — суреттер мен бейнелер компьютеріңізден шықпайды.',
+    'Video semen analysis, DNA fragmentation index, morphology and counting, embryo measurement and grading, ART calculators and a 3D drug constructor. Everything runs right on the page — your images and videos never leave your computer.'),
   scroll: L('Листайте', 'Айналдырыңыз', 'Scroll'),
+  explore: L('Смотреть инструменты', 'Құралдарды қарау', 'Explore the tools'),
+  statTools: L('инструментов', 'құрал', 'tools'),
+  statLangs: L('языка', 'тіл', 'languages'),
+  statUploads: L('загрузок на сервер', 'серверге жүктеу', 'server uploads'),
+  chapter: L('Глава', 'Тарау', 'Chapter'),
   start: L('Начать', 'Бастау', 'Start'),
   open: L('Открыть инструмент', 'Құралды ашу', 'Open tool'),
   back: L('Назад', 'Артқа', 'Back'),
@@ -45,31 +50,59 @@ const UI = {
   example: L('пример', 'мысал', 'example'),
 };
 
-// Главы спирали (как месяцы в «The Year of Greta») и порядок инструментов
+// Главы страницы и порядок инструментов; stage — стадия развития эмбриона в анимации
 const CHAPTERS = [
-  { id: 'andrology', name: L('Андрология', 'Андрология', 'Andrology'), tools: ['bopasi', 'bluetol', 'tmsc'] },
-  { id: 'embryology', name: L('Эмбриология', 'Эмбриология', 'Embryology'), tools: ['rc-phase', 'gardner'] },
-  { id: 'reproduction', name: L('Репродуктология', 'Репродуктология', 'Reproductive medicine'), tools: ['due-date', 'hcg-doubling', 'fertile-window'] },
-  { id: 'drug', name: L('Дизайн препаратов', 'Дәрі дизайны', 'Drug design'), tools: ['constructor'] },
+  { id: 'andrology', stage: 'fert', name: L('Андрология', 'Андрология', 'Andrology'),
+    lead: L('Спермограмма по видео, фрагментация ДНК, подсчёт и морфология — всё, что нужно лаборатории андрологии.', 'Бейне бойынша спермограмма, ДНҚ фрагментациясы, санау және морфология — андрология зертханасына қажеттінің бәрі.', 'Video semen analysis, DNA fragmentation, counting and morphology — everything an andrology lab needs.'),
+    tools: ['bopasi', 'scd', 'bluetol', 'who6', 'chamber', 'lab-counter', 'tmsc'] },
+  { id: 'embryology', stage: 'cleave', name: L('Эмбриология', 'Эмбриология', 'Embryology'),
+    lead: L('Снимки ооцитов и эмбрионов: перевод контраста, измерения, грейдинг и морфокинетика.', 'Ооциттер мен эмбриондар суреттері: контрастты аудару, өлшеулер, грейдинг және морфокинетика.', 'Oocyte and embryo images: contrast conversion, measurements, grading and morphokinetics.'),
+    tools: ['rc-phase', 'morphometry', 'cleavage', 'kinetics', 'gardner'] },
+  { id: 'reproduction', stage: 'blast', name: L('Репродуктология', 'Репродуктология', 'Reproductive medicine'),
+    lead: L('Овариальный резерв, сроки, ХГЧ и фертильное окно — калькуляторы для практики ВРТ.', 'Аналық без резерві, мерзімдер, ХГЧ және фертильді терезе — ҚРТ тәжірибесіне арналған калькуляторлар.', 'Ovarian reserve, dates, hCG and the fertile window — calculators for ART practice.'),
+    tools: ['poseidon', 'due-date', 'hcg-doubling', 'fertile-window'] },
+  { id: 'drug', stage: 'hatch', name: L('Дизайн препаратов', 'Дәрі дизайны', 'Drug design'),
+    lead: L('Учебный 3D-конструктор: орган, мишень с реальной структурой и свойства молекулы.', 'Оқу 3D-конструкторы: мүше, нақты құрылымы бар нысана және молекула қасиеттері.', 'A learning 3D constructor: organ, a target with a real structure and molecule properties.'),
+    tools: ['constructor'] },
 ];
 
-// Короткие имена для карточек (полные — в панели инструмента)
+// Короткие имена для карточек
 const SHORT = {
   'bopasi': 'BOPASI',
+  'scd': L('SCD / Halo · DFI', 'SCD / Halo · DFI', 'SCD / Halo · DFI'),
   'bluetol': L('Блютол · DFI', 'Блютол · DFI', 'Bluetol · DFI'),
+  'who6': L('Заключение ВОЗ-6', 'ДДҰ-6 қорытындысы', 'WHO-6 report'),
+  'chamber': L('Камера · концентрация', 'Камера · концентрация', 'Chamber count'),
+  'lab-counter': L('Лабораторный счётчик', 'Зертханалық санауыш', 'Lab counter'),
   'tmsc': 'TMSC',
   'rc-phase': 'RC ⇄ PC',
+  'morphometry': L('Морфометрия', 'Морфометрия', 'Morphometry'),
+  'cleavage': L('Грейд 2–3 дня', '2–3 күн грейді', 'Day 2–3 grade'),
+  'kinetics': L('Морфокинетика', 'Морфокинетика', 'Morphokinetics'),
   'gardner': L('Грейд Гарднера', 'Гарднер грейді', 'Gardner grade'),
+  'poseidon': 'POSEIDON',
   'due-date': L('Срок родов', 'Босану мерзімі', 'Due date'),
   'hcg-doubling': L('Удвоение ХГЧ', 'ХГЧ екі еселенуі', 'hCG doubling'),
   'fertile-window': L('Фертильное окно', 'Фертильді терезе', 'Fertile window'),
   'constructor': L('Конструктор препаратов', 'Дәрі конструкторы', 'Drug constructor'),
 };
 
-// Глиф карточки
 const GLYPH = {
-  'bopasi': 'sperm', 'bluetol': 'nucleus', 'tmsc': 'sperm', 'rc-phase': 'oocyte', 'gardner': 'embryo',
-  'due-date': 'calendar', 'hcg-doubling': 'curve', 'fertile-window': 'calendar', 'constructor': 'molecule',
+  'bopasi': 'sperm', 'scd': 'halo', 'bluetol': 'nucleus', 'who6': 'report', 'chamber': 'grid', 'lab-counter': 'tally', 'tmsc': 'sperm',
+  'rc-phase': 'oocyte', 'morphometry': 'ruler', 'cleavage': 'embryo', 'kinetics': 'clock', 'gardner': 'blast',
+  'poseidon': 'ovary', 'due-date': 'calendar', 'hcg-doubling': 'curve', 'fertile-window': 'calendar', 'constructor': 'molecule',
+};
+
+// Подписи стадий эмбриона в анимации
+const STAGE_LABEL = {
+  zygote: L('Зигота · 2 пронуклеуса', 'Зигота · 2 пронуклеус', 'Zygote · 2 pronuclei'),
+  fert: L('Оплодотворение', 'Ұрықтану', 'Fertilization'),
+  c2: L('2 клетки · день 1', '2 жасуша · 1-күн', '2 cells · day 1'),
+  c4: L('4 клетки · день 2', '4 жасуша · 2-күн', '4 cells · day 2'),
+  c8: L('8 клеток · день 3', '8 жасуша · 3-күн', '8 cells · day 3'),
+  morula: L('Морула · день 4', 'Морула · 4-күн', 'Morula · day 4'),
+  blast: L('Бластоциста · день 5', 'Бластоциста · 5-күн', 'Blastocyst · day 5'),
+  hatch: L('Хетчинг · день 6', 'Хетчинг · 6-күн', 'Hatching · day 6'),
 };
 
 let LANG = 'ru';
