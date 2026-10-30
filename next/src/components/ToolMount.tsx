@@ -43,7 +43,7 @@ export function ToolMount({ id, locale, labels }: { id: string; locale: Locale; 
   }, [id, locale]);
   return (
     <div className="tool-root">
-      {state === "loading" && <p className="animate-pulse py-10 font-mono text-sm uppercase tracking-wider text-blue">{labels.loading}</p>}
+      {state === "loading" && <p className="animate-pulse py-10 font-mono text-sm uppercase tracking-wider text-[#0a1240]">{labels.loading}</p>}
       {state === "error" && <p className="rounded-2xl bg-[#fff1e6] p-4 text-sm text-[#9a4a12]">{labels.failed}: {error}</p>}
       <div ref={ref} />
     </div>

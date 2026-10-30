@@ -4,7 +4,7 @@
 // следующая вырастает из точки фокуса. Шкала масштаба и подпись — в углах кадра.
 const Stage = (() => {
   // светлая палитра: бумажный фон, синие оболочки, тёмно-синие ядра и головки
-  const C = { ground: '#0b0626', deep: '#1b0d4f', mid: '#f3e9ff', soft: '#b9a6ff', line: '#2ef2ff', ice: '#2ef2ff', white: '#ffffff', cyan: '#ff2bd6', blue: '#2ef2ff', brown: '#ff2bd6' };   // киберпанк: ночное поле, неоновые линии
+  const C = { ground: '#000000', deep: '#0e1116', mid: '#232831', soft: '#59616e', line: '#e8ecf1', ice: '#ffffff', white: '#ffffff', cyan: '#b8c4d2', blue: '#ffffff', brown: '#7a8494' };   // как фото из космоса: чёрное поле, белые линии, серые оттенки
   let cv, g, W = 0, H = 0, dpr = 1, U = 1;
   let pos = 0, target = 0, auto = false, running = true, visible = true, last = 0, time = 0, raf = 0;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -250,6 +250,18 @@ const Stage = (() => {
     setAuto(on) { auto = on; kick(); },
     pause(on) { running = !on; if (!on) kick(); },
     redraw() { if (g) draw(); },
+    // кадр сцены k в любой canvas: центр (cx, cy) и масштаб u в долях кадра — фон разделов и «планета» на первом экране
+    paint(canvas, k, t, o = {}) {
+      const save = { cv, g, W, H, U, dpr };
+      const b = canvas.getBoundingClientRect(), d = Math.min(o.dpr || 1.5, devicePixelRatio || 1);
+      W = Math.max(1, b.width || canvas.width); H = Math.max(1, b.height || canvas.height);
+      const pw = Math.round(W * d), ph = Math.round(H * d);
+      if (canvas.width !== pw || canvas.height !== ph) { canvas.width = pw; canvas.height = ph; }
+      cv = canvas; g = canvas.getContext('2d'); U = Math.min(W, H) * (o.u ?? 0.36); dpr = d;
+      g.setTransform(d, 0, 0, d, 0, 0); if (o.clear) g.clearRect(0, 0, W, H); else { g.fillStyle = C.ground; g.fillRect(0, 0, W, H); }
+      g.save(); g.translate(W * (o.cx ?? 0.5), H * (o.cy ?? 0.5)); if (o.rot) g.rotate(o.rot); SCENE[k](t); g.restore();
+      ({ cv, g, W, H, U, dpr } = save);
+    },
     // один кадр сцены k в отдельный canvas — превью для карточек
     snapshot(canvas, k, t = 3) {
       const save = { cv, g, W, H, U, dpr };

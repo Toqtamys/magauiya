@@ -37,47 +37,61 @@ const App = {
   // ── вся страница строится из данных: смена языка — перерисовка
   render() {
     document.documentElement.lang = LANG;
-    document.title = 'BOPASI — ' + tr(UI.title);
+    document.title = 'BOPASI ' + tr(UI.title);
     $('#langs').replaceChildren(...LANGS.map((l) => h('button', { class: l === LANG ? 'on' : '', 'aria-pressed': l === LANG, onclick: () => this.setLang(l) }, LANG_LABEL[l])));
-    const ann = () => h('div', { class: 'tb-row' }, ...[UI.announce, UI.announce2, UI.announce3, UI.announce, UI.announce2, UI.announce3].map((a) => h('span', {}, tr(a))));
-    $('#topbar').replaceChildren(ann(), ann());
-    $('#logo').replaceChildren(...'BOPASI'.split('').map((c) => h('span', {}, c)), h('i', {}, '!'));
+    $('#logo').textContent = 'BOPASI';
     $('#navLinks').replaceChildren(...VCH.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#about' }, tr(UI.nav.about)));
     const y = scrollY;
-    $('#page').replaceChildren(this.hero(), this.ticker(), ...VCH.map((c, i) => this.section(c, i)), this.about(), this.footer());
+    this.planet?.destroy(); this.scenes?.forEach((x) => x.stop()); this.scenes = [];
+    $('#page').replaceChildren(this.hero(), ...VCH.map((c, i) => this.section(c, i)), this.about(), this.footer());
+    this.liven();
     scrollTo(0, y);
     this.paintPreviews();
     this.prepareReveal();
     Stage.redraw();
     this.sky?.setLabels(ORDER.map((id) => tr(SHORT[id])));
-    if (this.hud) { const n = TOOLS_DATA.filter((t) => !t.server).length; this.hud.replaceChildren(h('b', {}, String(n)), h('span', {}, tr(n % 10 === 1 && n % 100 !== 11 ? UI.tools1 : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? UI.tools2 : UI.tools), h('br'), h('i', {}, tr(UI.stickerTop)))); }
+    if (this.hud) { const n = TOOLS_DATA.filter((t) => !t.server).length; this.hud.replaceChildren(h('i', { class: 'dot' }), h('b', {}, String(n)), h('span', {}, ` ${tr(this.word(n))} · ${tr(UI.stickerTop)}`)); }
   },
 
   hero() {
     const n = TOOLS_DATA.filter((t) => !t.server).length;
-    return h('header', { class: 'hero', id: 'top' },
+    this.planetCv = h('canvas', { class: 'planet', 'aria-hidden': 'true' });
+    return h('header', { class: 'hero', id: 'top' }, this.planetCv,
       h('div', { class: 'hero-text' },
-        h('h1', {}, ...tr(UI.title).split(/\s+/).map((w) => h('span', { class: 'w' }, w))),
+        h('p', { class: 'kicker' }, `BOPASI · ${n} ${tr(this.word(n))} · ${tr(UI.stickerTop)}`),
+        h('h1', {}, tr(UI.title)),
         h('p', { class: 'lead' }, tr(UI.lead)),
         h('div', { class: 'hero-cta' },
-          h('a', { class: 'btn-big', href: '#bopasi', onclick: (e) => this.from(e) }, tr(UI.cta)),
-          h('a', { class: 'btn-soft', href: '#andrology' }, tr(UI.allTools))),
-        h('dl', { class: 'facts' },
-          h('div', {}, h('dt', {}, String(n)), h('dd', {}, tr(UI.factBrowser))),
-          h('div', {}, h('dt', {}, String(VCH.length)), h('dd', {}, tr(UI.factSections))),
-          h('div', {}, h('dt', {}, '0'), h('dd', {}, tr(UI.factUploads))))),
-      h('div', { class: 'hero-stage' }, this.canvas));
-
+          h('a', { class: 'btn-x', href: '#bopasi', onclick: (e) => this.from(e) }, tr(UI.cta)),
+          h('a', { class: 'btn-x dim', href: '#andrology' }, tr(UI.allTools)))),
+      h('a', { class: 'cue', href: '#andrology', 'aria-label': tr(UI.scroll) }, '⌄'));
   },
-  ticker() {
-    const names = ORDER.map((id) => tr(SHORT[id]));
-    const row = () => h('div', { class: 'tick-row' }, ...names.map((n) => h('span', {}, n)));
-    return h('div', { class: 'ticker', 'aria-hidden': 'true' }, row(), row());
+  word(n) { return n % 10 === 1 && n % 100 !== 11 ? UI.tools1 : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? UI.tools2 : UI.tools; },
+  // живые фоны: планета на первом экране и сцены разделов, только пока видны
+  liven() {
+    try { this.planet = createPlanet(this.planetCv, { reduced: REDUCED }); } catch {}
+    const SC = { andrology: 0, embryology: 2, reproduction: 3, histology: 4, oncology: 5, science: 7 };
+    document.querySelectorAll('canvas.scene').forEach((c) => {
+      const k = SC[c.dataset.id] ?? 0, t0 = performance.now();
+      let on = false, raf = 0, last = 0;
+      const paint = (t) => { const sm = c.clientWidth < 700; Stage.paint(c, k, t, { cx: sm ? 0.5 : 0.7, cy: 0.45, u: sm ? 0.62 : 0.8, dpr: 1 }); };
+      const loop = (now) => { if (!on) return; if (!App.panelTool && now - last > 40) { paint(3 + (now - t0) / 1000); last = now; } raf = requestAnimationFrame(loop); };
+      requestAnimationFrame(() => paint(3));
+      const io = new IntersectionObserver(([e]) => { on = e.isIntersecting && !REDUCED && !this.panelTool; cancelAnimationFrame(raf); if (on) raf = requestAnimationFrame(loop); });
+      io.observe(c);
+      this.scenes.push({ stop() { on = false; cancelAnimationFrame(raf); io.disconnect(); } });
+    });
   },
   section(c, i) {
+    const n = c.tools.length;
     return h('section', { class: 'tools-sec', id: c.id },
-      h('div', { class: 'sec-head' }, h('span', { class: 'sec-num reveal' }, String(i + 1).padStart(2, '0')), h('h2', { class: 'reveal glitch', 'data-text': tr(c.name) }, tr(c.name)), h('p', { class: 'reveal' }, tr(c.lead))),
-      h('div', { class: 'cards' }, ...c.tools.map((id, i) => this.card(id, i))));
+      h('div', { class: 'mission' }, h('canvas', { class: 'scene', 'data-id': c.id, 'aria-hidden': 'true' }), h('i', { class: 'shade' }),
+        h('div', { class: 'mission-text reveal' },
+          h('p', { class: 'kicker' }, `${tr(UI.section)} ${String(i + 1).padStart(2, '0')} · ${n} ${tr(n === 1 ? UI.tools1 : n < 5 ? UI.tools2 : UI.tools)}`),
+          h('h2', {}, tr(c.name)),
+          h('p', { class: 'lead' }, tr(c.lead)),
+          h('a', { class: 'btn-x', href: '#' + c.id + '-tools', onclick: (e) => { e.preventDefault(); $('#' + c.id + '-tools').scrollIntoView({ behavior: REDUCED ? 'auto' : 'smooth' }); } }, tr(UI.explore)))),
+      h('div', { class: 'cards', id: c.id + '-tools' }, ...c.tools.map((id, i) => this.card(id, i))));
   },
   card(id, i) {
     const t = toolById(id), srv = isServer(id);
@@ -120,8 +134,8 @@ const App = {
   },
   footer() {
     return h('footer', { class: 'foot' },
-      h('span', {}, `${tr(UI.footWhat)} · ${tr(UI.sign)}`),
-      h('span', { class: 'foot-r' }, tr(UI.footDisc)));
+      h('span', {}, 'BOPASI © 2026'), h('span', {}, tr(UI.sign)),
+      h('span', { class: 'foot-r' }, tr(UI.footDisc).replace(/^2026 · /, '')));
   },
 
   // ── появление при прокрутке; только для того, что ниже первого экрана
@@ -135,7 +149,11 @@ const App = {
   from(e) { this.origin = { x: e.clientX, y: e.clientY }; },
 
   bind() {
-    addEventListener('scroll', () => { const max = document.documentElement.scrollHeight - innerHeight; $('#progress').style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`; }, { passive: true });
+    let y0 = scrollY;
+    addEventListener('scroll', () => {
+      const max = document.documentElement.scrollHeight - innerHeight; $('#progress').style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+      const y = scrollY, bar = $('.bar'); bar.classList.toggle('solid', y > 40); bar.classList.toggle('away', y > 120 && y > y0); y0 = y;   // шапка прячется вниз и возвращается вверх
+    }, { passive: true });
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.panelTool) { e.preventDefault(); this.close(); } });
     $('#pBack').addEventListener('click', () => this.close());
     $('#logo').addEventListener('click', (e) => { e.preventDefault(); this.close(); scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
@@ -158,7 +176,7 @@ const App = {
     document.body.classList.remove('panel-open'); p.setAttribute('aria-hidden', 'true');
     if (this.mounted) { try { this.mounted.destroy(); } catch {} this.mounted = null; }
     const id = this.panelTool; this.panelTool = null;
-    Stage.pause(false);
+    Stage.pause(false); this.planet?.pause(false);
     setTimeout(() => { if (!this.panelTool) $('#toolMount').replaceChildren(); }, 700);
     if (id) { const a = document.querySelector(`.card[href="#${CSS.escape(id)}"]`); if (a) a.focus({ preventScroll: true }); }
     this.onScroll();
@@ -172,7 +190,7 @@ const App = {
     this.panelTool = id;
     const i = ORDER.indexOf(id), ch = chapterOf(id);
     document.body.classList.add('panel-open'); p.setAttribute('aria-hidden', 'false');
-    setTimeout(() => { if (this.panelTool) Stage.pause(true); }, 800);
+    setTimeout(() => { if (this.panelTool) { Stage.pause(true); this.planet?.pause(true); } }, 800);
     $('#pBack').replaceChildren(h('span', { 'aria-hidden': 'true' }, '← '), tr(UI.back));
     $('#pEyebrow').textContent = `${tr(ch.name)} · ${tr(kindOf(id))}`;
     $('#pTitle').textContent = tr(t.name);

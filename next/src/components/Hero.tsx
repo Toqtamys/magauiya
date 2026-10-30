@@ -1,46 +1,43 @@
 "use client";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { ArrowDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { buttonVariants } from "./ui/button";
+import { TOOLS } from "@/lib/catalog";
 
-const CellScene = dynamic(() => import("./CellScene"), { ssr: false, loading: () => <div className="size-full" /> });   // 3D только в браузере
+const Planet = dynamic(() => import("./Planet"), { ssr: false });
 
+// Первый экран: планета-яйцеклетка внизу, слово ЛАБ и две кнопки, как на странице миссии
 export function Hero() {
   const tr = useTranslations();
-  const words = tr("title").split(" ");
-  const stageRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(stageRef);   // 3D останавливается, когда сцена за экраном
   const { scrollY } = useScroll();
-  const lift = useTransform(scrollY, [0, 600], [0, -80]);
+  const y = useTransform(scrollY, [0, 900], [0, 220]);
+  const fade = useTransform(scrollY, [0, 600], [1, 0]);
+  const n = TOOLS.length;
+  const word = n % 10 === 1 && n % 100 !== 11 ? "tools1" : "tools";
   return (
-    <header id="top" className="relative mx-auto grid min-h-[calc(100svh-124px)] max-w-[1400px] items-center gap-6 overflow-hidden px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_1fr]">
-      <div className="relative z-10">
-        <h1 className="glitch font-display text-[clamp(56px,8.4vw,150px)] font-bold uppercase leading-[0.86] tracking-tight">
-          {words.map((w, i) => (
-            <span key={i} className="block overflow-hidden">
-              <motion.span className="inline-block" initial={{ y: "110%", rotate: 6 }} animate={{ y: 0, rotate: 0 }}
-                transition={{ delay: 0.1 + i * 0.12, type: "spring", stiffness: 120, damping: 14 }}>
-                {w}
-              </motion.span>
-            </span>
-          ))}
-        </h1>
-        <motion.p className="mt-8 max-w-[34ch] text-lg leading-relaxed text-white/90 md:text-xl"
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.7 }}>{tr("lead")}</motion.p>
-        <motion.div className="mt-10 flex flex-wrap gap-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.7 }}>
+    <header id="top" className="relative -mt-20 flex h-[100svh] min-h-[620px] items-end overflow-hidden">
+      <motion.div style={{ y }} className="absolute inset-0"><Planet /></motion.div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40" />
+      <motion.div style={{ opacity: fade }} className="relative z-10 mx-auto w-full max-w-[1400px] px-5 pb-[14vh] md:px-12">
+        <motion.p className="font-mono text-xs font-semibold uppercase tracking-x text-white/70 md:text-sm"
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.8 }}>
+          BOPASI · {n} {tr(word)} · {tr("stickerTop")}
+        </motion.p>
+        <motion.h1 className="mt-4 font-display text-[clamp(88px,16vw,240px)] font-bold uppercase leading-[0.82] tracking-[-0.01em]"
+          initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 1.1, ease: [0.2, 0.7, 0.2, 1] }}>
+          {tr("title")}
+        </motion.h1>
+        <motion.p className="mt-6 max-w-[52ch] text-base leading-relaxed text-white/80 md:text-lg"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 0.9 }}>{tr("lead")}</motion.p>
+        <motion.div className="mt-9 flex flex-wrap gap-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.9 }}>
           <Link href="/t/bopasi/" className={buttonVariants()}>{tr("cta")}</Link>
-          <a href="#andrology" className={buttonVariants({ variant: "outline" })}>{tr("allTools")}<ArrowDown className="size-5" /></a>
+          <a href="#andrology" className={buttonVariants({ variant: "outline" })}>{tr("allTools")}</a>
         </motion.div>
-      </div>
-      <motion.div ref={stageRef} style={{ y: lift }} className="relative order-first aspect-square w-full lg:order-none"
-        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.1, ease: [0.2, 0.7, 0.2, 1] }}>
-        <div className="spin-slow absolute inset-[6%] rounded-full border border-dashed border-sun/40 shadow-[0_0_60px_rgba(46,242,255,.15)_inset]" aria-hidden="true" />
-        <CellScene active={inView} />
       </motion.div>
+      <a href="#drop" className="scroll-cue absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-white/70" aria-label={tr("scroll")}><ChevronDown className="size-7" /></a>
     </header>
   );
 }

@@ -51,3 +51,4 @@ messages/
 public/samples/
 public/molstar/
 src/lib/sky.gen.js
+src/lib/stage.gen.js

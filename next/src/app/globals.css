@@ -1,54 +1,44 @@
 @import "tailwindcss";
 
-/* BOPASI: ночное небо киберпанка — неоновый циан, маджента, стекло */
+/* BOPASI: как сайт космической компании — чёрное поле, белые буквы, ничего лишнего */
 @theme {
-  --color-blue: #0a0624;
-  --color-blue-deep: #05030f;
-  --color-blue-mid: rgb(22 12 64 / 0.62);
-  --color-blue-soft: #6b3cff;
-  --color-sun: #2ef2ff;
-  --color-sun-deep: #ff2bd6;
-  --color-ink: #05030f;
-  --color-neon: #ff2bd6;
-  --font-display: "Oswald", "Rubik", system-ui, sans-serif;
+  --color-blue: #000000;
+  --color-blue-deep: #000000;
+  --color-blue-mid: rgb(255 255 255 / 0.04);
+  --color-blue-soft: #8a93a3;
+  --color-sun: #ffffff;
+  --color-sun-deep: #c9d2e0;
+  --color-ink: #000000;
+  --color-neon: #ffffff;
+  --color-dim: #8b8f98;
+  --font-display: "IBM Plex Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --font-body: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 120px; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { background: #05030f; color: #fff; font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
-::selection { background: var(--color-sun); color: var(--color-ink); }
+body { background: #000; color: #fff; font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+::selection { background: #fff; color: #000; }
 
 .font-display { font-family: var(--font-display); }
 .font-mono { font-family: var(--font-mono); }
+.tracking-x { letter-spacing: .14em; }
 
-/* тонкие строки развёртки поверх неба */
-.scan::after {
-  content: ""; position: fixed; inset: 0; z-index: -5; pointer-events: none; opacity: .6;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 4px);
-}
-.neon { text-shadow: 0 0 22px rgba(46,242,255,.45), 0 0 2px rgba(255,255,255,.6); }
-.neon-m { text-shadow: 0 0 22px rgba(255,43,214,.55); }
-.glitch { animation: glitch 7s steps(1) infinite; }
-@keyframes glitch {
-  0%, 91%, 100% { text-shadow: 0 0 22px rgba(46,242,255,.45); transform: none; }
-  92% { text-shadow: -4px 0 #ff2bd6, 4px 0 #2ef2ff; transform: translateX(2px) skewX(-6deg); }
-  93% { text-shadow: 3px 0 #ff2bd6, -3px 0 #2ef2ff; transform: translateX(-3px); }
-  94% { text-shadow: -2px 0 #ff2bd6, 2px 0 #2ef2ff; transform: none; }
-}
-.glass { background: linear-gradient(160deg, rgb(20 10 58 / .86), rgb(8 4 26 / .9)); }
-.hud-orb { box-shadow: 0 0 0 0 rgba(46,242,255,.7); animation: orb 2.4s ease-out infinite; }
-@keyframes orb { 0% { box-shadow: 0 0 0 0 rgba(46,242,255,.65); } 100% { box-shadow: 0 0 0 18px rgba(46,242,255,0); } }
+/* кнопка-рамка: белая заливка «въезжает» снизу */
+.btn-x { position: relative; isolation: isolate; overflow: hidden; }
+.btn-x::before { content: ""; position: absolute; inset: 0; z-index: -1; background: #fff; transform: translateY(101%); transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+.btn-x:hover::before, .btn-x:focus-visible::before { transform: translateY(0); }
+.btn-x:hover, .btn-x:focus-visible { color: #000; }
+
+/* медленный наезд камеры на фон раздела */
+.kenburns { animation: kb 24s ease-in-out infinite alternate; }
+@keyframes kb { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
+.scroll-cue { animation: cue 2s ease-in-out infinite; }
+@keyframes cue { 0%, 100% { transform: translateY(0); opacity: .5; } 50% { transform: translateY(8px); opacity: 1; } }
 .marquee { animation: marquee 40s linear infinite; }
 @keyframes marquee { to { transform: translateX(-100%); } }
-.wobble { animation: wobble 6s ease-in-out infinite; transform-origin: 50% 40%; }
-@keyframes wobble { 0%, 100% { transform: rotate(-6deg) scale(1); } 50% { transform: rotate(5deg) scale(1.04); } }
-.drip { animation: drip 3.2s ease-in-out infinite; transform-origin: top; }
-@keyframes drip { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.18); } }
-.spin-slow { animation: spin 30s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .wobble, .drip, .spin-slow, .glitch, .hud-orb { animation: none !important; }
+  .kenburns, .scroll-cue, .marquee { animation: none !important; }
 }

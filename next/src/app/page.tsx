@@ -1,5 +1,4 @@
 import { Hero } from "@/components/Hero";
-import { Ticker } from "@/components/Ticker";
 import { QuickDrop } from "@/components/QuickDrop";
 import { LegacyHashRedirect } from "@/components/LegacyHashRedirect";
 import { Section } from "@/components/Section";
@@ -11,7 +10,6 @@ export default function Home() {
     <main>
       <Hero />
       <LegacyHashRedirect />
-      <Ticker />
       <QuickDrop />
       {CHAPTERS.map((c, i) => <Section key={c.id} chapter={c} index={i} />)}
       <About />

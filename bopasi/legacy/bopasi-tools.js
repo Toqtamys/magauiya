@@ -4,7 +4,7 @@ const LANG_LABEL = { ru: 'Рус', kk: 'Қаз', en: 'Eng' };
 const L = (ru, kk, en) => ({ ru, kk, en });
 
 const UI = {
-  title: L('Лаборатория репродукции', 'Репродукция зертханасы', 'The reproduction lab'),
+  title: L('Лаб', 'Лаб', 'Lab'),
   lead: L('Инструменты для андрологии, эмбриологии, репродуктологии и гистологии — и открытые научные проекты. Всё работает в браузере: снимки и видео не покидают ваш компьютер.',
     'Андрология, эмбриология, репродуктология және гистологияға арналған құралдар — және ашық ғылыми жобалар. Барлығы браузерде жұмыс істейді: суреттер мен бейнелер компьютеріңізден шықпайды.',
     'Tools for andrology, embryology, reproductive medicine and histology — plus open science projects. Everything runs in your browser: images and videos never leave your computer.'),
@@ -99,7 +99,10 @@ const UI = {
     'Results are for research and are not a medical conclusion. Decisions are made by a clinician.'),
   announce: L('Все расчёты — прямо в браузере', 'Барлық есептеу — тікелей браузерде', 'Every calculation runs in your browser'),
   announce2: L('Снимки и видео не покидают ваш компьютер', 'Суреттер мен бейнелер компьютеріңізден шықпайды', 'Images and videos never leave your computer'),
-  announce3: L('Посмотрите вверх: каждая звезда — инструмент', 'Жоғары қараңыз: әр жұлдыз — бір құрал', 'Look up: every star is a tool'),
+  announce3: L('Каждая звезда на небе — инструмент', 'Аспандағы әр жұлдыз — бір құрал', 'Every star in the sky is a tool'),
+  section: L('Раздел', 'Бөлім', 'Section'),
+  explore: L('Смотреть инструменты', 'Құралдарды көру', 'Explore tools'),
+  scroll: L('Листайте', 'Төмен қарай', 'Scroll'),
   authors: L('Авторы', 'Авторлар', 'Authors'),
   stickerTop: L('в браузере', 'браузерде', 'in the browser'),
   stickerBottom: L('без установки', 'орнатусыз', 'no install'),

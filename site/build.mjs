@@ -69,7 +69,7 @@ let html = await src('template.html');
 html = html.split('{{CSS}}').join(await src('style.css'));
 // шрифты постера (fontsource, OFL) — внутрь файла, чтобы работали без интернета
 const fontCss = [];
-for (const [pkg, ws] of [['oswald', [500, 700]], ['ibm-plex-mono', [500, 700]], ['rubik', [400, 500, 700]]]) for (const w of ws) {
+for (const [pkg, ws] of [['ibm-plex-sans', [400, 700]], ['ibm-plex-mono', [500, 700]]]) for (const w of ws) {
   const dir = path.join(nxm, '@fontsource', pkg);
   let css = await readFile(path.join(dir, w + '.css'), 'utf8');
   css = css.split('@font-face').filter((b) => /(cyrillic|latin)/.test(b) && !/(vietnamese|greek|hebrew|math|symbols)/.test(b.slice(0, 200))).map((b) => '@font-face' + b).join('');
@@ -110,7 +110,8 @@ vm.runInContext((await src('i18n.js')) + '\n;globalThis.__x = { CHAPTERS, SHORT,
 const { CHAPTERS, SHORT, KIND, UI } = ctx.__x;
 await mkdir(path.join(nx, 'src', 'data'), { recursive: true });
 // общее небо: тот же файл, что в офлайн-версии, как ES-модуль
-await writeFile(path.join(nx, 'src', 'lib', 'sky.gen.js'), '// сгенерировано из site/src/sky.js\n' + (await src('sky.js')) + '\nexport { createSky };\n');
+await writeFile(path.join(nx, 'src', 'lib', 'stage.gen.js'), '// сгенерировано из site/src/stage.js\nconst L = (ru, kk, en) => ({ ru, kk, en }); const tr = (x) => (x && x.ru) || \'\'; const REDUCED = false; const SCENES = [];\n' + (await src('stage.js')) + '\nexport { Stage };\n');
+await writeFile(path.join(nx, 'src', 'lib', 'sky.gen.js'), '// сгенерировано из site/src/sky.js\n' + (await src('sky.js')) + '\nexport { createSky, createPlanet };\n');
 const pickL = (o) => o && typeof o === 'object' && 'ru' in o ? o : null;
 await writeFile(path.join(nx, 'src', 'data', 'catalog.json'), JSON.stringify({
   chapters: CHAPTERS.map((c) => ({ id: c.id, name: c.name, lead: c.lead, tools: c.tools })),
