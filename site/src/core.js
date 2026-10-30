@@ -19,6 +19,32 @@ const store = {
   set(k, v) { try { localStorage.setItem('bopasi:' + k, v); } catch {} },
 };
 
+// ── совместимость со старыми браузерами
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    r = Math.min(+r || 0, w / 2, h / 2);
+    this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this;
+  };
+}
+if (!window.CSS) window.CSS = {};
+if (!CSS.escape) CSS.escape = (v) => String(v).replace(/[^a-zA-Z0-9_-]/g, (c) => '\\' + c);
+
+// ── ошибки не должны быть немыми: показываем их внизу экрана
+const Oops = {
+  el: null,
+  show(msg) {
+    if (!document.body) return;
+    if (!this.el) { this.el = document.createElement('div'); this.el.className = 'oops'; this.el.setAttribute('role', 'alert'); document.body.append(this.el); }
+    const lang = (typeof LANG !== 'undefined' && LANG) || 'ru';
+    const head = { ru: 'Ошибка в браузере. Пришлите этот текст автору:', kk: 'Браузердегі қате. Осы мәтінді авторға жіберіңіз:', en: 'Browser error. Please send this text to the author:' }[lang];
+    this.el.textContent = `${head} ${String(msg).slice(0, 300)} · ${navigator.userAgent.slice(0, 120)}`;
+    this.el.hidden = false; clearTimeout(this.t); this.t = setTimeout(() => (this.el.hidden = true), 15000);
+  },
+};
+addEventListener('error', (e) => { if (e.message && !/ResizeObserver loop/.test(e.message)) Oops.show(e.message + (e.lineno ? ` (${e.lineno})` : '')); });
+addEventListener('unhandledrejection', (e) => { const m = e.reason && (e.reason.message || e.reason); if (m && !/Failed to fetch|NetworkError|Load failed|abort/i.test(m)) Oops.show(m); });
+
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Библиотеки: сначала локальная копия (на сайте), затем CDN (при открытии файла с диска)

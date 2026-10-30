@@ -12,29 +12,7 @@ const MOUNT = {
   molmoda: mountMolmoda,
 };
 const kindOf = (id) => (isServer(id) ? SERVER_KIND : KIND[id] || L('расчёт', 'есептеу', 'calculator'));
-const MQ = matchMedia('(max-width: 979px)');
-
-// нормы для списка: [группа, [[название, значение], …]]
-const NORMS = [
-  [L('Спермограмма · ВОЗ 2021, нижние пределы', 'Спермограмма · ДДҰ 2021, төменгі шектер', 'Semen analysis · WHO 2021, lower limits'), [
-    [L('Объём', 'Көлем', 'Volume'), '1,4 мл'], [L('Концентрация', 'Концентрация', 'Concentration'), '16 млн/мл'],
-    [L('Общее количество', 'Жалпы саны', 'Total number'), '39 млн'], [L('Общая подвижность', 'Жалпы қозғалғыштық', 'Total motility'), '42%'],
-    [L('Прогрессивная подвижность', 'Прогрессивті қозғалғыштық', 'Progressive motility'), '30%'], [L('Жизнеспособность', 'Тіршілікке қабілеттілік', 'Vitality'), '54%'],
-    [L('Нормальные формы', 'Қалыпты пішіндер', 'Normal forms'), '4%'], ['pH', '≥ 7,2'],
-    [L('Лейкоциты, верхний предел', 'Лейкоциттер, жоғарғы шек', 'Leukocytes, upper limit'), '1,0 млн/мл']]],
-  [L('Камеры для подсчёта', 'Санауға арналған камералар', 'Counting chambers'), [
-    [L('Большой квадрат Нейбауэра', 'Нейбауэрдің үлкен шаршысы', 'Neubauer large square'), '0,004 мкл'], [L('Квадрат Маклера', 'Маклер шаршысы', 'Makler square'), '0,0001 мкл'],
-    [L('Согласие двух повторов', 'Екі қайталаудың сәйкестігі', 'Agreement of two replicates'), '|N₁−N₂| ≤ 1,96√(N₁+N₂)']]],
-  [L('Эмбрион 2–3 дня · Стамбульский консенсус', '2–3 күндік эмбрион · Стамбул консенсусы', 'Day 2–3 embryo · Istanbul consensus'), [
-    [L('Грейд 1, фрагментация', '1-грейд, фрагментация', 'Grade 1, fragmentation'), '< 10%'], [L('Грейд 2', '2-грейд', 'Grade 2'), '10–25%'],
-    [L('Грейд 3', '3-грейд', 'Grade 3'), L('> 25% или многоядерность', '> 25% немесе көпядролық', '> 25% or multinucleation')],
-    [L('4 клетки', '4 жасуша', '4 cells'), L('44 ± 1 ч', '44 ± 1 сағ', '44 ± 1 h')], [L('8 клеток', '8 жасуша', '8 cells'), L('68 ± 1 ч', '68 ± 1 сағ', '68 ± 1 h')]]],
-  [L('Морфокинетика · Meseguer 2011', 'Морфокинетика · Meseguer 2011', 'Morphokinetics · Meseguer 2011'), [
-    ['t5', L('48,8–56,6 ч', '48,8–56,6 сағ', '48.8–56.6 h')], ['s2 = t4 − t3', L('≤ 0,76 ч', '≤ 0,76 сағ', '≤ 0.76 h')], ['cc2 = t3 − t2', L('≤ 11,9 ч', '≤ 11,9 сағ', '≤ 11.9 h')]]],
-  ['POSEIDON', [
-    [L('Возраст', 'Жас', 'Age'), L('35 лет', '35 жас', '35 years')], [L('АМГ', 'АМГ', 'AMH'), L('1,2 нг/мл', '1,2 нг/мл', '1.2 ng/mL')],
-    [L('Антральные фолликулы', 'Антральды фолликулдар', 'Antral follicle count'), '5'], [L('Субоптимальный ответ', 'Субоптималды жауап', 'Suboptimal response'), L('4–9 ооцитов', '4–9 ооцит', '4–9 oocytes')]]],
-];
+const SERVER_SCENE = { constructor: 8, molmoda: 8, bela: 3, embryovision: 2, emlife: 3, 'scd-dl': 1, pycasa: 0, hovernet: 4, 'protein-design': 8, pocketdock: 8 };
 
 const App = {
   panelTool: null, mounted: null, anchors: [],
@@ -42,9 +20,10 @@ const App = {
   start() {
     const saved = store.get('lang'), qs = new URLSearchParams(location.search).get('lang');
     LANG = LANGS.includes(qs) ? qs : LANGS.includes(saved) ? saved : 'ru';
-    this.canvas = h('canvas', { id: 'stage', role: 'img', 'aria-label': 'BOPASI: от сперматозоидов до белка' });
+    this.canvas = h('canvas', { id: 'stage', role: 'img', 'aria-label': 'BOPASI' });
     this.render();
     Stage.init(this.canvas);
+    Stage.setAuto(true);
     this.bind();
     addEventListener('hashchange', () => this.route());
     this.route(true);
@@ -56,137 +35,51 @@ const App = {
     document.documentElement.lang = LANG;
     document.title = 'BOPASI — ' + tr(UI.title);
     $('#langs').replaceChildren(...LANGS.map((l) => h('button', { class: l === LANG ? 'on' : '', 'aria-pressed': l === LANG, onclick: () => this.setLang(l) }, LANG_LABEL[l])));
-    $('#navLinks').replaceChildren(...[['tools', UI.nav.tools], ['norms', UI.nav.norms], ['server', UI.nav.server], ['about', UI.nav.about]].map(([id, t]) => h('a', { href: '#' + id }, tr(t))));
+    $('#navLinks').replaceChildren(...CHAPTERS.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#server' }, tr(UI.nav.server)));
     const y = scrollY;
-    $('#page').replaceChildren(
-      h('div', { class: 'split' },
-        h('div', { class: 'read' }, this.hero(), this.intro(), this.figure(), this.menu()), h('div', { class: 'slot' })),
-      this.showcase(),
-      h('div', { class: 'split' }, h('div', { class: 'read' }, this.norms()), h('div', { class: 'slot' })),
-      this.steps(),
-      h('div', { class: 'split' }, h('div', { class: 'read' }, this.server(), this.about()), h('div', { class: 'slot' })),
-      this.footer());
+    $('#page').replaceChildren(this.hero(), ...CHAPTERS.map((c) => this.section(c)), this.server(), this.about(), this.footer());
     scrollTo(0, y);
-    this.anchors = [
-      ['top', 0], ['intro', 0.35],
-      ...CHAPTERS.map((c) => ['m-' + c.id, c.scene]),
-      ['norms', 8], ['about', 8],
-    ];
+    this.paintPreviews();
     this.prepareReveal();
-    this.drawFigure(3);
-    this.drawSteps();
-    $('.slot').append(this.canvas);
-    this.onScroll();
     Stage.redraw();
   },
 
   hero() {
-    // полоса — исчерченность хромосомы (G-бэнды): ширины тёмных и светлых полос
-    const bands = [10, 6, 22, 8, 14, 5, 30, 10, 8, 18, 6, 12, 26, 7, 9, 16, 5, 20, 12, 8, 28, 6, 14, 10, 7, 24, 9, 15, 6, 18];
+    const n = TOOLS_DATA.filter((t) => !t.server).length;
     return h('header', { class: 'hero', id: 'top' },
-      h('div', { class: 'bands', 'aria-hidden': 'true' }, ...bands.map((w, i) => h('i', { class: i % 2 ? 'l' : 'd', style: `flex-grow:${w}` }))),
-      h('div', { class: 'hero-body' },
+      h('div', { class: 'hero-text' },
         h('h1', {}, tr(UI.title)),
         h('p', { class: 'lead' }, tr(UI.lead)),
-        h('a', { class: 'btn-big', href: '#bopasi', onclick: (e) => this.from(e) }, tr(UI.cta)),
-        h('p', { class: 'hero-links' }, ...['tools', 'norms', 'server'].map((id) => h('a', { href: '#' + id }, tr(UI.nav[id]))))));
+        h('div', { class: 'hero-cta' },
+          h('a', { class: 'btn-big', href: '#bopasi', onclick: (e) => this.from(e) }, tr(UI.cta)),
+          h('a', { class: 'btn-soft', href: '#andrology' }, tr(UI.allTools))),
+        h('dl', { class: 'facts' },
+          h('div', {}, h('dt', {}, String(n)), h('dd', {}, tr(UI.factBrowser))),
+          h('div', {}, h('dt', {}, String(TOOLS_DATA.length - n)), h('dd', {}, tr(UI.factServer))),
+          h('div', {}, h('dt', {}, '3'), h('dd', {}, tr(UI.factLangs))))),
+      h('div', { class: 'hero-stage' }, this.canvas));
   },
-  intro() {
-    return h('section', { class: 'intro', id: 'intro' },
-      h('h2', { class: 'reveal' }, tr(UI.introH)),
-      ...UI.intro.map((p, i) => h('p', { class: 'reveal' + (i === 0 ? ' first' : ''), style: `--d:${60 + i * 70}ms` }, tr(p))));
+  section(c) {
+    return h('section', { class: 'tools-sec', id: c.id },
+      h('div', { class: 'sec-head' }, h('h2', { class: 'reveal' }, tr(c.name)), h('p', { class: 'reveal' }, tr(c.lead))),
+      h('div', { class: 'cards' }, ...c.tools.map((id, i) => this.card(id, i))));
   },
-  figure() {
-    const c = h('canvas', { class: 'fig-canvas', width: 900, height: 560, role: 'img', 'aria-label': tr(UI.figH) });
-    this.fig = { c, seed: 3, out: h('p', { class: 'fig-num' }) };
-    return h('figure', { class: 'fig reveal', 'data-ui': '' },
-      h('div', { class: 'fig-head' }, h('h3', {}, tr(UI.figH)), this.fig.out),
-      h('button', { class: 'fig-btn', 'aria-label': tr(UI.figCap), onclick: () => this.drawFigure(++this.fig.seed) }, c),
-      h('figcaption', {}, tr(UI.figCap)));
+  card(id, i) {
+    const t = toolById(id), srv = isServer(id);
+    const own = Object.prototype.hasOwnProperty.call(PREVIEWS, id);
+    const pic = own
+      ? h('img', { src: PREVIEWS[id], alt: '', loading: 'lazy', width: 640, height: 400 })
+      : h('canvas', { class: 'snap', 'data-scene': String(SERVER_SCENE[id] ?? 0), 'aria-hidden': 'true' });
+    return h('a', { class: 'card reveal' + (i === 0 ? ' wide' : '') + (srv ? ' srv' : ''), href: '#' + id, style: `--d:${(i % 3) * 70}ms`, onclick: (e) => this.from(e) },
+      h('div', { class: 'pic' }, pic),
+      h('div', { class: 'card-body' },
+        h('p', { class: 'tag' + (srv ? ' srv' : '') }, srv ? tr(UI.tagServer) : tr(UI.tagBrowser) + ' · ' + tr(kindOf(id))),
+        h('h3', {}, tr(SHORT[id])),
+        h('p', { class: 'desc' }, tr(t.tagline)),
+        h('span', { class: 'go' }, tr(UI.open), h('span', { 'aria-hidden': 'true' }, ' →'))));
   },
-  drawFigure(seed) {
-    if (!this.fig) return;
-    const { canvas } = IHC.synth({ kind: 'dab', seed: seed * 7 + 1, w: 900, h: 560, count: 150, pos: 0.15 + ((seed * 37) % 50) / 100, touch: true });
-    const res = IHC.detect(canvas.getContext('2d').getImageData(0, 0, 900, 560), { kind: 'dab' });
-    const g = this.fig.c.getContext('2d'); g.drawImage(canvas, 0, 0);
-    g.lineWidth = 2.5;
-    for (const q of res.nuclei) { g.strokeStyle = q.pos ? '#9a4a12' : '#1f4fff'; g.beginPath(); g.arc(q.x, q.y, Math.sqrt(q.area / Math.PI) + 2, 0, 6.283); g.stroke(); }
-    const s = IHC.summary(res);
-    this.fig.out.textContent = `Ki-67 ${num(s.index * 100)}% · ${s.pos} / ${s.n}`;
-  },
-  menu() {
-    return h('section', { class: 'menu', id: 'tools' },
-      h('div', { class: 'sheet' },
-        h('h2', {}, tr(UI.toolsH)),
-        h('p', { class: 'sheet-note' }, tr(UI.toolsNote)),
-        ...CHAPTERS.map((c) => h('div', { class: 'group', id: 'm-' + c.id },
-          h('h3', {}, tr(c.name)),
-          h('ul', {}, ...c.tools.map((id) => h('li', { class: 'reveal' },
-            h('a', { href: '#' + id, class: 'item' + (isServer(id) ? ' srv' : ''), onclick: (e) => this.from(e) },
-              h('span', { class: 'name' }, tr(SHORT[id])), h('span', { class: 'dots', 'aria-hidden': 'true' }), h('span', { class: 'val' }, tr(kindOf(id)))),
-            h('p', { class: 'desc' }, tr(toolById(id).tagline)))))))));
-  },
-  showcase() {
-    const right = h('div', { class: 'show-r' });
-    const sec = h('section', { class: 'show', id: 'live' },
-      h('div', { class: 'show-l' }, h('p', { class: 'show-hint' }, tr(UI.showHint)), h('div', { class: 'show-form' }), h('h2', { class: 'show-h l' }, tr(UI.showA))),
-      h('div', { class: 'show-rw' }, right, h('p', { class: 'show-h r', 'aria-hidden': 'true' }, tr(UI.showB))));
-    const tmp = h('div');
-    mountWho(tmp);
-    const form = tmp.querySelector('.calc-form'), result = tmp.querySelector('.calc-result');
-    sec.querySelector('.show-form').replaceWith(form);
-    result.setAttribute('data-ui', '');
-    right.append(result);
-    return sec;
-  },
-  norms() {
-    return h('section', { class: 'norms', id: 'norms' },
-      h('h2', { class: 'reveal' }, tr(UI.normsH)),
-      ...NORMS.map(([grp, rows]) => h('div', { class: 'ngroup' },
-        h('p', { class: 'nhead' }, tr(grp)),
-        h('ul', {}, ...rows.map(([k, v]) => h('li', { class: 'reveal' }, h('i', { 'aria-hidden': 'true' }), h('span', { class: 'k' }, tr(k)), h('span', { class: 'v' }, tr(v))))))));
-  },
-  steps() {
-    const range = h('input', { type: 'range', min: 0, max: 3, step: 1, value: 0, 'aria-label': tr(UI.stepsLabel) });
-    const names = h('ol', { class: 'step-names' }, ...UI.steps.map(([, n], i) => h('li', { 'data-i': i }, h('button', { onclick: () => { range.value = i; this.setStep(i); } }, tr(n)))));
-    range.addEventListener('input', () => this.setStep(+range.value));
-    this.stepEls = { range, names, clause: h('h2', { class: 'step-clause' }), frag: h('div', { class: 'step-frag', 'data-ui': '' }) };
-    return h('section', { class: 'steps', id: 'how' },
-      h('div', { class: 'steps-l' }, this.stepEls.clause),
-      h('div', { class: 'steps-r' }, this.stepEls.frag),
-      h('div', { class: 'steps-ctl' }, range, names));
-  },
-  drawSteps() {
-    if (!this.scd) {
-      const { img } = SCD.synth({ seed: 11 });
-      const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
-      c.getContext('2d').putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
-      const res = SCD.detect(SCD.prepare(c.getContext('2d').getImageData(0, 0, c.width, c.height)), {});
-      this.scd = { c, res, sum: SCD.summary(res.cells) };
-    }
-    this.setStep(+this.stepEls.range.value || 0);
-  },
-  setStep(i) {
-    const { clause, frag, names } = this.stepEls, { c, res, sum } = this.scd;
-    clause.textContent = tr(UI.steps[i][0]);
-    names.querySelectorAll('li').forEach((li) => li.classList.toggle('on', +li.dataset.i === i));
-    const cv = h('canvas', { width: c.width, height: c.height, class: 'step-canvas', role: 'img', 'aria-label': tr(UI.steps[i][1]) });
-    const g = cv.getContext('2d'); g.drawImage(c, 0, 0);
-    if (i >= 1) {
-      for (const k of res.cells) {
-        g.strokeStyle = i === 1 ? '#ffffff' : SCD_COL[k.cls]; g.lineWidth = 3;
-        g.save(); g.translate(k.x, k.y); g.rotate(k.angle); g.beginPath(); g.ellipse(0, 0, k.major / 2 + 3, k.minor / 2 + 3, 0, 0, 6.283); g.stroke(); g.restore();
-        if (i >= 2 && k.halo > 0) { g.setLineDash([5, 5]); g.globalAlpha = 0.6; g.beginPath(); g.arc(k.x, k.y, k.major / 2 + k.halo, 0, 6.283); g.stroke(); g.setLineDash([]); g.globalAlpha = 1; }
-      }
-    }
-    const kids = [cv];
-    if (i === 3) {
-      kids.push(h('div', { class: 'step-report' },
-        h('p', { class: 'sr-big' }, `DFI ${num(sum.dfi)}%`),
-        h('p', {}, `${sum.frag} / ${sum.counted}`),
-        ...['large', 'medium', 'small', 'none', 'degraded'].map((k) => h('p', { class: 'sr-row' }, h('i', { style: `background:${SCD_COL[k]}` }), `${tr(SCD_NAME[k])}: ${sum.n[k]}`))));
-    }
-    frag.replaceChildren(...kids);
+  paintPreviews() {
+    requestAnimationFrame(() => document.querySelectorAll('canvas.snap').forEach((c) => { try { Stage.snapshot(c, +c.dataset.scene, 4); } catch {} }));
   },
   server() {
     const list = h('ul', { class: 'srv-list' });
@@ -197,25 +90,24 @@ const App = {
     }));
     paint(Server.tools);
     return h('section', { class: 'server', id: 'server' },
-      h('h2', { class: 'reveal' }, tr(UI.serverH)),
-      h('p', { class: 'reveal' }, tr(UI.serverText)),
-      h('div', { class: 'srv-frag reveal', 'data-ui': '' }, serverBox(paint), list));
+      h('div', { class: 'srv-text' }, h('h2', { class: 'reveal' }, tr(UI.serverH)), h('p', { class: 'reveal' }, tr(UI.serverText))),
+      h('div', { class: 'srv-frag reveal' }, serverBox(paint), list));
   },
   about() {
     return h('section', { class: 'about', id: 'about' },
       h('h2', { class: 'reveal' }, tr(UI.aboutH)),
-      ...UI.about.map((p) => h('p', { class: 'reveal' }, tr(p))),
-      h('p', { class: 'sign reveal' }, tr(UI.sign)),
-      h('p', { class: 'role reveal' }, `${tr(UI.role)} · `, h('a', { href: 'mailto:orda.ezhenid@gmail.com' }, 'orda.ezhenid@gmail.com')));
+      h('div', { class: 'about-body' },
+        ...UI.about.map((p) => h('p', { class: 'reveal' }, tr(p))),
+        h('p', { class: 'sign reveal' }, tr(UI.sign)),
+        h('p', { class: 'role reveal' }, `${tr(UI.role)} · `, h('a', { href: 'mailto:orda.ezhenid@gmail.com' }, 'orda.ezhenid@gmail.com'))));
   },
   footer() {
     return h('footer', { class: 'foot' },
       h('span', {}, tr(UI.footWhat)),
-      h('span', { class: 'foot-links' }, ...['tools', 'norms', 'server', 'about'].map((id) => h('a', { href: '#' + id }, tr(UI.nav[id])))),
       h('span', { class: 'foot-r' }, tr(UI.footDisc)));
   },
 
-  // ── появление: заголовок, потом текст, потом картинка; только ниже первого экрана
+  // ── появление при прокрутке; только для того, что ниже первого экрана
   prepareReveal() {
     if (!('IntersectionObserver' in window) || REDUCED) return;
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.remove('pre'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -6% 0px' });
@@ -226,33 +118,12 @@ const App = {
   from(e) { this.origin = { x: e.clientX, y: e.clientY }; },
 
   bind() {
-    addEventListener('scroll', () => this.onScroll(), { passive: true });
-    addEventListener('resize', () => this.onScroll());
-    MQ.addEventListener?.('change', () => this.onScroll());
+    addEventListener('scroll', () => { const max = document.documentElement.scrollHeight - innerHeight; $('#progress').style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`; }, { passive: true });
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && this.panelTool) { e.preventDefault(); this.close(); } });
     $('#pBack').addEventListener('click', () => this.close());
     $('#logo').addEventListener('click', (e) => { e.preventDefault(); this.close(); scrollTo({ top: 0, behavior: REDUCED ? 'auto' : 'smooth' }); });
   },
-
-  // ── прокрутка → положение в путешествии (непрерывно между якорями)
-  onScroll() {
-    const max = document.documentElement.scrollHeight - innerHeight;
-    $('#progress').style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
-    if (this.panelTool) return;
-    if (MQ.matches) { const first = $('.slot'); if (this.canvas.parentElement !== first) first.append(this.canvas); Stage.setAuto(true); return; }
-    let slot = null;
-    for (const el of document.querySelectorAll('.slot')) { const b = el.parentElement.getBoundingClientRect(); if (b.top < innerHeight * 0.6 && b.bottom > innerHeight * 0.4) slot = el; }
-    if (slot && this.canvas.parentElement !== slot) slot.append(this.canvas);
-    Stage.setAuto(false);
-    const mid = innerHeight * 0.5;
-    const pts = this.anchors.map(([id, p]) => { const el = document.getElementById(id); return el ? [el.getBoundingClientRect().top - mid, p] : null; }).filter(Boolean);
-    let p = pts[0][1];
-    for (let i = 0; i < pts.length; i++) {
-      const [d, v] = pts[i];
-      if (d <= 0) { p = v; const nx = pts[i + 1]; if (nx && nx[0] > 0) p = v + (nx[1] - v) * (-d / (nx[0] - d)); }
-    }
-    Stage.set(p);
-  },
+  onScroll() {},
 
   // ── маршрут: #<инструмент> открывает панель; иначе — якоря страницы
   route(first) {
@@ -272,7 +143,7 @@ const App = {
     const id = this.panelTool; this.panelTool = null;
     Stage.pause(false);
     setTimeout(() => { if (!this.panelTool) $('#toolMount').replaceChildren(); }, 700);
-    if (id) { const a = document.querySelector(`.item[href="#${CSS.escape(id)}"]`); if (a) a.focus({ preventScroll: true }); }
+    if (id) { const a = document.querySelector(`.card[href="#${CSS.escape(id)}"]`); if (a) a.focus({ preventScroll: true }); }
     this.onScroll();
   },
   openTool(id, fromRoute) {
