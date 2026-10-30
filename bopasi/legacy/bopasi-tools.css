@@ -1,25 +1,26 @@
-/* Токены для инструментов BOPASI внутри сайта на Next.js: футуризм, красный на белом */
+/* Токены для инструментов BOPASI внутри сайта на Next.js: кобальт и солнце на белой панели */
 :root {
-  --paper: #ffffff; --tone: #fff3f2; --tone2: #ffe2df; --ink: #0d0b0e; --soft: #5a5257; --navy: #0d0b0e; --navy2: #241c20;
-  --blue: #e1061b; --blue-d: #b10014; --cyan: #ff3b2f; --ice: #fff3f2; --mist: #fff3f2; --line: #f1cfcb; --red: #e1061b;
+  --paper: #ffffff; --tone: #eef2ff; --tone2: #dfe6ff; --ink: #0a1240; --soft: #4a5378; --navy: #0b1a6e; --navy2: #1532b8;
+  --blue: #1d3fd6; --blue-d: #1532b8; --cyan: #ffc533; --ice: #eef2ff; --mist: #eef2ff; --line: #d3dbf7; --red: #1d3fd6;
   --text: var(--ink); --muted: var(--soft);
   --good: #0b7a54; --good-bg: #e3f5ee; --warn: #9a4a12; --warn-bg: #fbeee2;
-  --fd: var(--font-display), 'Geologica', system-ui, sans-serif;
-  --fb: var(--font-body), 'Onest', system-ui, sans-serif;
+  --fd: 'Oswald', 'Rubik', system-ui, sans-serif;
+  --fb: 'Rubik', system-ui, sans-serif;
   --fm: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --t1: 64px; --t2: 40px; --t3: 22px; --t4: 17px; --t5: 14px;
 }
 .tool-root { font-family: var(--fb); color: var(--ink); font-size: 16px; line-height: 1.55; }
 .tool-root h1, .tool-root h2, .tool-root h3 { font-family: var(--fd); }
 .tool-root button { cursor: pointer; }
-.tool-root .big { border-radius: 0; background: var(--ink); color: #fff; }
+.tool-root .big { border-radius: 20px; background: var(--navy); color: #fff; }
 .tool-root .big:first-child { background: var(--red); }
 .tool-root .big .k { text-transform: none; letter-spacing: 0; font-size: 14px; }
 .tool-root .big strong { overflow-wrap: anywhere; }
-.tool-root .btn { background: var(--red); color: #fff; }
+.tool-root .btn { background: var(--blue); color: #fff; border-radius: 999px; }
+.tool-root .btn-ghost { border-radius: 999px; }
 .tool-root .line > :last-child { white-space: nowrap; }
 .tool-root .launch { background: var(--tone); padding: 32px; display: grid; gap: 24px; justify-items: start; max-width: 720px; }
-.tool-root .btn-big { display: inline-flex; background: var(--red); color: #fff; text-decoration: none; padding: 16px 26px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; font-size: 14px; }
+.tool-root .btn-big { display: inline-flex; background: var(--blue); color: #fff; text-decoration: none; padding: 16px 28px; border-radius: 999px; font-weight: 600; text-transform: uppercase; font-size: 15px; }
 .embed.fs { position: fixed; inset: 0; z-index: 80; }
 @media (max-width: 1100px) {
   .tool-root .rc, .tool-root .dc, .tool-root .scd, .tool-root .mm, .tool-root .calc, .tool-root .cnt-grid { grid-template-columns: 1fr; }

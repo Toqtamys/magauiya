@@ -1,7 +1,8 @@
 // ─── Приложение: страница, путешествие сквозь клетку, панели инструментов ───
-const ORDER = CHAPTERS.flatMap((c) => c.tools);
+const VCH = CHAPTERS.filter((c) => !c.web);   // в офлайн-файле — только встроенные инструменты
+const ORDER = VCH.flatMap((c) => c.tools);
 const toolById = (id) => TOOLS_DATA.find((t) => t.id === id);
-const chapterOf = (id) => CHAPTERS.find((c) => c.tools.includes(id));
+const chapterOf = (id) => VCH.find((c) => c.tools.includes(id));
 const isServer = (id) => !!toolById(id)?.server;
 const MOLMODA_URL = 'https://molmoda.org/';
 const MOUNT = {
@@ -35,9 +36,9 @@ const App = {
     document.documentElement.lang = LANG;
     document.title = 'BOPASI — ' + tr(UI.title);
     $('#langs').replaceChildren(...LANGS.map((l) => h('button', { class: l === LANG ? 'on' : '', 'aria-pressed': l === LANG, onclick: () => this.setLang(l) }, LANG_LABEL[l])));
-    $('#navLinks').replaceChildren(...CHAPTERS.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#about' }, tr(UI.nav.about)));
+    $('#navLinks').replaceChildren(...VCH.map((c) => h('a', { href: '#' + c.id }, tr(c.name))), h('a', { href: '#about' }, tr(UI.nav.about)));
     const y = scrollY;
-    $('#page').replaceChildren(this.hero(), this.ticker(), ...CHAPTERS.map((c, i) => this.section(c, i)), this.about(), this.footer());
+    $('#page').replaceChildren(this.hero(), this.ticker(), ...VCH.map((c, i) => this.section(c, i)), this.about(), this.footer());
     scrollTo(0, y);
     this.paintPreviews();
     this.prepareReveal();
@@ -55,7 +56,7 @@ const App = {
           h('a', { class: 'btn-soft', href: '#andrology' }, tr(UI.allTools))),
         h('dl', { class: 'facts' },
           h('div', {}, h('dt', {}, String(n)), h('dd', {}, tr(UI.factBrowser))),
-          h('div', {}, h('dt', {}, String(CHAPTERS.length)), h('dd', {}, tr(UI.factSections))),
+          h('div', {}, h('dt', {}, String(VCH.length)), h('dd', {}, tr(UI.factSections))),
           h('div', {}, h('dt', {}, '0'), h('dd', {}, tr(UI.factUploads))))),
       h('div', { class: 'hero-stage' }, this.canvas, h('i', { class: 'hud h1', 'aria-hidden': 'true' }), h('i', { class: 'hud h2', 'aria-hidden': 'true' }), h('span', { class: 'corner tl' }), h('span', { class: 'corner br' })));
   },

@@ -8,9 +8,9 @@ export default function NotFound() {
   const tr = useTranslations();
   return (
     <main className="mx-auto grid min-h-[70vh] max-w-[900px] content-center gap-6 px-4">
-      <p className="font-[family-name:var(--font-display)] text-[clamp(80px,14vw,180px)] font-extrabold leading-none text-red">404</p>
-      <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold uppercase">{tr("notFoundH")}</h1>
-      <p className="text-lg text-soft">{tr("notFoundP")}</p>
+      <p className="font-display text-[clamp(100px,18vw,240px)] font-bold leading-none text-sun">404</p>
+      <h1 className="font-display text-5xl font-bold uppercase">{tr("notFoundH")}</h1>
+      <p className="text-lg text-white/85">{tr("notFoundP")}</p>
       <Link href="/" className={buttonVariants({ className: "w-fit" })}><ArrowLeft className="size-4" />{tr("home")}</Link>
     </main>
   );

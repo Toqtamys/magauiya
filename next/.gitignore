@@ -48,3 +48,5 @@ public/rdkit/
 public/previews/
 src/data/catalog.json
 messages/
+public/samples/
+public/molstar/

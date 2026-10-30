@@ -4,6 +4,7 @@ import type { Locale } from "./store";
 export type L = { ru: string; kk: string; en: string };
 export type Tool = {
   id: string; name: L | string; tagline: L; full: L; features: L[]; input: L[]; steps: L[]; limits: L[]; output: L[]; authors?: string;
+  github?: string; license?: string; preview?: string;
 };
 export type Chapter = { id: string; name: L; lead: L; tools: string[] };
 
