@@ -1,0 +1,5 @@
+MolModa — molecular modeling and docking in the browser.
+Authors: Durrant Lab, University of Pittsburgh. Website: https://molmoda.org
+License: GNU GPL (see LICENSE.md); third-party licenses: THIRD-PARTY-LICENSES.md.
+This folder is an unmodified production build of MolModa 2026.8.4 hosted for the BOPASI
+platform; the only build-time addition is an empty archive/index.json (list of archived versions).

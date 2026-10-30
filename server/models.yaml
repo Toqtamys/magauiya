@@ -1,0 +1,100 @@
+# Внешние модели BOPASI. Каждая запись — инструмент, который сервер запускает как
+# отдельную программу (своё окружение, свои веса). Порядок подключения модели:
+#   1. склонировать репозиторий модели в /opt/models/<name> и скачать веса по его README;
+#   2. положить рядом обёртку run_bopasi.py, которая читает {input}, пишет JSON в {output}
+#      и печатает строки "PROGRESS <0..1> <текст>" (шаблон: wrappers/template.py);
+#   3. перезапустить API и воркер — инструмент появится в /api/tools как доступный.
+# Пока путей из requires нет, инструмент виден в /api/tools с available: false и причиной.
+
+tools:
+  - name: bela
+    section: embryology
+    title: {ru: "BELA · плоидность и качество по time-lapse", kk: "BELA · time-lapse бойынша плоидтылық пен сапа", en: "BELA · ploidy and quality from time-lapse"}
+    source: "Rajendran et al., Nature Communications 2024 (STORK-V / BELA, Weill Cornell)"
+    accepts: [.zip, .mp4, .avi]
+    gpu: true
+    workdir: /opt/models/stork-v
+    requires: [/opt/models/stork-v/run_bopasi.py]
+    command: [python, run_bopasi.py, --input, "{input}", --output, "{output}"]
+    timeout_s: 3600
+
+  - name: embryovision
+    section: embryology
+    title: {ru: "Embryovision · морфология по кадрам EmbryoScope", kk: "Embryovision · EmbryoScope кадрлары бойынша морфология", en: "Embryovision · morphology from EmbryoScope frames"}
+    source: "Leahy et al., MICCAI 2020 (Harvard)"
+    accepts: [.zip, .mp4, .avi]
+    gpu: true
+    workdir: /opt/models/embryovision
+    requires: [/opt/models/embryovision/run_bopasi.py]
+    command: [python, run_bopasi.py, --input, "{input}", --output, "{output}"]
+    timeout_s: 3600
+
+  - name: emlife
+    section: embryology
+    title: {ru: "eMLife · вероятность живорождения", kk: "eMLife · тірі туу ықтималдығы", en: "eMLife · live birth probability"}
+    source: "BMC Pregnancy and Childbirth 2022"
+    accepts: [.zip, .mp4, .avi]
+    gpu: true
+    workdir: /opt/models/emlife
+    requires: [/opt/models/emlife/run_bopasi.py]
+    command: [python, run_bopasi.py, --input, "{input}", --output, "{output}"]
+    timeout_s: 3600
+
+  - name: scd-dl
+    section: andrology
+    title: {ru: "SCD · нейросетевая классификация гало", kk: "SCD · гало нейрожелілік жіктеу", en: "SCD · neural halo classification"}
+    source: "J Hum Reprod Sci 2023 — deep learning DFI"
+    accepts: [.jpg, .jpeg, .png, .tif, .tiff]
+    gpu: true
+    max_files: 20
+    workdir: /opt/models/scd-resnet
+    requires: [/opt/models/scd-resnet/run_bopasi.py]
+    command: [python, run_bopasi.py, --inputs, "{inputs}", --output, "{output}"]
+    timeout_s: 900
+
+  - name: pycasa
+    section: andrology
+    title: {ru: "pycasa · CASA по видео", kk: "pycasa · бейне бойынша CASA", en: "pycasa · CASA from video"}
+    source: "pycasa (open source)"
+    accepts: [.mp4, .avi, .mov]
+    gpu: false
+    workdir: /opt/models/pycasa
+    requires: [/opt/models/pycasa/run_bopasi.py]
+    command: [python, run_bopasi.py, --input, "{input}", --output, "{output}"]
+    timeout_s: 1800
+
+  - name: hovernet
+    section: oncology
+    title: {ru: "HoVer-Net · типы ядер (PanNuke)", kk: "HoVer-Net · ядро түрлері (PanNuke)", en: "HoVer-Net · nucleus types (PanNuke)"}
+    source: "Graham et al., Medical Image Analysis 2019; PanNuke — Gamper et al. 2019"
+    accepts: [.jpg, .jpeg, .png, .tif, .tiff]
+    gpu: true
+    max_files: 20
+    workdir: /opt/models/hover_net
+    requires: [/opt/models/hover_net/run_bopasi.py]
+    command: [python, run_bopasi.py, --inputs, "{inputs}", --output, "{output}"]
+    timeout_s: 1800
+
+  - name: protein-design
+    section: drug
+    title: {ru: "RFdiffusion + ProteinMPNN · дизайн белка", kk: "RFdiffusion + ProteinMPNN · ақуыз дизайны", en: "RFdiffusion + ProteinMPNN · protein design"}
+    source: "Watson et al., Nature 2023; Dauparas et al., Science 2022"
+    accepts: [.pdb]
+    gpu: true
+    workdir: /opt/models/protein-design
+    requires: [/opt/models/protein-design/run_bopasi.py]
+    command: [python, run_bopasi.py, --input, "{input}", --output, "{output}", --contigs, "{contigs}", --designs, "{designs}"]
+    params: {contigs: "A1-100/0 50-80", designs: 4}
+    timeout_s: 7200
+
+  - name: pocketdock
+    section: drug
+    title: {ru: "PocketDock · докинг в карман белка", kk: "PocketDock · ақуыз қалтасына докинг", en: "PocketDock · docking into a protein pocket"}
+    source: "PocketDock (pocketdock.readthedocs.io)"
+    accepts: [.pdb, .sdf, .zip]
+    gpu: false
+    max_files: 2
+    workdir: /opt/models/pocketdock
+    requires: [/opt/models/pocketdock/run_bopasi.py]
+    command: [python, run_bopasi.py, --inputs, "{inputs}", --output, "{output}"]
+    timeout_s: 3600
