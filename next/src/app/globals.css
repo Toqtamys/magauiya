@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
-/* BOPASI: кобальтовый фон, белый шрифт, солнечные стикеры */
+/* BOPASI: ночное небо киберпанка — неоновый циан, маджента, стекло */
 @theme {
-  --color-blue: #1d3fd6;
-  --color-blue-deep: #0b1a6e;
-  --color-blue-mid: #1532b8;
-  --color-blue-soft: #3a5cf0;
-  --color-sun: #ffc533;
-  --color-sun-deep: #f29a1d;
-  --color-ink: #0a1240;
+  --color-blue: #0a0624;
+  --color-blue-deep: #05030f;
+  --color-blue-mid: rgb(22 12 64 / 0.62);
+  --color-blue-soft: #6b3cff;
+  --color-sun: #2ef2ff;
+  --color-sun-deep: #ff2bd6;
+  --color-ink: #05030f;
+  --color-neon: #ff2bd6;
   --font-display: "Oswald", "Rubik", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --font-body: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -16,17 +17,29 @@
 
 html { scroll-behavior: smooth; scroll-padding-top: 120px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { background: var(--color-blue); color: #fff; font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+body { background: #05030f; color: #fff; font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
 ::selection { background: var(--color-sun); color: var(--color-ink); }
 
 .font-display { font-family: var(--font-display); }
 .font-mono { font-family: var(--font-mono); }
 
-/* лёгкое зерно на фоне */
-.grain::before {
-  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .12;
-  background-image: radial-gradient(rgba(255,255,255,.35) 1px, transparent 1px); background-size: 6px 6px;
+/* тонкие строки развёртки поверх неба */
+.scan::after {
+  content: ""; position: fixed; inset: 0; z-index: -5; pointer-events: none; opacity: .6;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 4px);
 }
+.neon { text-shadow: 0 0 22px rgba(46,242,255,.45), 0 0 2px rgba(255,255,255,.6); }
+.neon-m { text-shadow: 0 0 22px rgba(255,43,214,.55); }
+.glitch { animation: glitch 7s steps(1) infinite; }
+@keyframes glitch {
+  0%, 91%, 100% { text-shadow: 0 0 22px rgba(46,242,255,.45); transform: none; }
+  92% { text-shadow: -4px 0 #ff2bd6, 4px 0 #2ef2ff; transform: translateX(2px) skewX(-6deg); }
+  93% { text-shadow: 3px 0 #ff2bd6, -3px 0 #2ef2ff; transform: translateX(-3px); }
+  94% { text-shadow: -2px 0 #ff2bd6, 2px 0 #2ef2ff; transform: none; }
+}
+.glass { background: linear-gradient(160deg, rgb(20 10 58 / .86), rgb(8 4 26 / .9)); }
+.hud-orb { box-shadow: 0 0 0 0 rgba(46,242,255,.7); animation: orb 2.4s ease-out infinite; }
+@keyframes orb { 0% { box-shadow: 0 0 0 0 rgba(46,242,255,.65); } 100% { box-shadow: 0 0 0 18px rgba(46,242,255,0); } }
 .marquee { animation: marquee 40s linear infinite; }
 @keyframes marquee { to { transform: translateX(-100%); } }
 .wobble { animation: wobble 6s ease-in-out infinite; transform-origin: 50% 40%; }
@@ -37,5 +50,5 @@ body { background: var(--color-blue); color: #fff; font-family: var(--font-body)
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .wobble, .drip, .spin-slow { animation: none !important; }
+  .marquee, .wobble, .drip, .spin-slow, .glitch, .hud-orb { animation: none !important; }
 }

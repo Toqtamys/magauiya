@@ -4,7 +4,7 @@
 // следующая вырастает из точки фокуса. Шкала масштаба и подпись — в углах кадра.
 const Stage = (() => {
   // светлая палитра: бумажный фон, синие оболочки, тёмно-синие ядра и головки
-  const C = { ground: '#1d3fd6', deep: '#2f52e6', mid: '#ffffff', soft: '#c7d3ff', line: '#ffffff', ice: '#ffffff', white: '#ffffff', cyan: '#ffc533', blue: '#ffc533', brown: '#f29a1d' };   // постер: синее поле, белые оболочки, солнечные ядра
+  const C = { ground: '#0b0626', deep: '#1b0d4f', mid: '#f3e9ff', soft: '#b9a6ff', line: '#2ef2ff', ice: '#2ef2ff', white: '#ffffff', cyan: '#ff2bd6', blue: '#2ef2ff', brown: '#ff2bd6' };   // киберпанк: ночное поле, неоновые линии
   let cv, g, W = 0, H = 0, dpr = 1, U = 1;
   let pos = 0, target = 0, auto = false, running = true, visible = true, last = 0, time = 0, raf = 0;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -201,7 +201,7 @@ const Stage = (() => {
   }
   function draw() {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = C.ground; g.fillRect(0, 0, W, H);
+    g.clearRect(0, 0, W, H);   // прозрачный кадр: сцена висит прямо в небе
     const i = Math.floor(clamp(pos, 0, SCENE.length - 1)), f = clamp(pos - i, 0, 1), j = Math.min(SCENE.length - 1, i + 1);
     const cx = W / 2 + mouse.x * 14, cy = H / 2 + mouse.y * 10;
     const layer = (k, scale, alpha) => {

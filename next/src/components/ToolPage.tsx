@@ -9,7 +9,7 @@ import { ToolMount } from "./ToolMount";
 import dynamic from "next/dynamic";
 
 // открытые проекты с GitHub — React-компоненты, только в браузере
-const Loading = () => <p className="animate-pulse py-10 font-mono text-sm uppercase tracking-wider text-blue">…</p>;
+const Loading = () => <p className="animate-pulse py-10 font-mono text-sm uppercase tracking-wider text-ink">…</p>;
 const REACT_TOOLS: Record<string, React.ComponentType> = {
   niivue: dynamic(() => import("./tools/NiivueTool"), { ssr: false, loading: Loading }),
   molstar: dynamic(() => import("./tools/MolstarTool"), { ssr: false, loading: Loading }),
@@ -24,7 +24,7 @@ export function ToolPage({ id }: { id: string }) {
   const ch = chapterOf(id)!;
   const i = ORDER.indexOf(id), prev = ORDER[i - 1], next = ORDER[i + 1];
   const list = (title: string, items: L[] | undefined, ordered = false) => !items?.length ? null : (
-    <section className="rounded-[32px] bg-blue-mid p-7">
+    <section className="glass rounded-[32px] border border-sun/25 p-7">
       <h3 className="mb-5 font-display text-3xl font-bold uppercase">{title}</h3>
       {ordered ? (
         <ol className="space-y-3">{items.map((x, k) => (
@@ -42,11 +42,11 @@ export function ToolPage({ id }: { id: string }) {
       <Link href={`/#${ch.id}`} className={buttonVariants({ variant: "dark", size: "sm" })}><ArrowLeft className="size-4" />{tr("back")}</Link>
       <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 110, damping: 16 }}>
         <p className="mt-8 font-mono text-sm font-semibold uppercase tracking-wider text-sun">{t(ch.name, locale)} · {t(KIND[id], locale)}</p>
-        <h1 className="mt-3 font-display text-[clamp(44px,6vw,96px)] font-bold uppercase leading-[0.9]">{t(tool.name, locale)}</h1>
+        <h1 className="neon mt-3 font-display text-[clamp(44px,6vw,96px)] font-bold uppercase leading-[0.9]">{t(tool.name, locale)}</h1>
         <p className="mt-5 max-w-[780px] text-xl text-white/90">{t(tool.tagline, locale)}</p>
-        <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-blue-deep px-5 py-2.5 text-sm"><ShieldCheck className="size-4 text-sun" />{tr("localNote")}</p>
+        <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-sun/30 bg-blue-deep/70 px-5 py-2.5 text-sm"><ShieldCheck className="size-4 text-sun" />{tr("localNote")}</p>
       </motion.div>
-      <motion.div data-tool-panel className="mt-8 rounded-[36px] bg-white p-4 text-ink shadow-[0_24px_60px_-30px_rgba(10,18,64,.8)] md:p-8"
+      <motion.div data-tool-panel className="mt-8 rounded-[36px] bg-white p-4 text-ink shadow-[0_0_0_1px_rgba(46,242,255,.5),0_0_60px_rgba(46,242,255,.25)] md:p-8"
         initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, type: "spring", stiffness: 100, damping: 18 }}>
         {REACT_TOOLS[id] ? (() => { const C = REACT_TOOLS[id]; return <C />; })()
           : <ToolMount id={id} locale={locale} labels={{ loading: tr("toolLoading"), failed: tr("toolFailed") }} />}
@@ -56,11 +56,11 @@ export function ToolPage({ id }: { id: string }) {
         {list(tr("input"), tool.input)}
         {list(tr("output"), tool.output)}
         {list(tr("limits"), tool.limits)}
-        <section className="rounded-[32px] bg-white p-7 text-ink md:col-span-2">
-          <h3 className="mb-3 font-display text-3xl font-bold uppercase text-blue">{tr("whatItDoes")}</h3>
+        <section className="glass rounded-[32px] border border-neon/40 p-7 text-white md:col-span-2">
+          <h3 className="mb-3 font-display text-3xl font-bold uppercase text-sun">{tr("whatItDoes")}</h3>
           <p className="text-lg">{t(tool.full, locale)}</p>
-          {tool.features?.length ? <ul className="mt-4 space-y-2">{tool.features.map((x, k) => <li key={k} className="flex gap-3"><span className="mt-2.5 size-2.5 flex-none rounded-full bg-blue" />{t(x, locale)}</li>)}</ul> : null}
-          {tool.authors && <p className="mt-5 font-mono text-sm text-ink/70">{tr("credits")}: {tool.authors}{tool.license ? ` · ${tool.license}` : ""}</p>}
+          {tool.features?.length ? <ul className="mt-4 space-y-2">{tool.features.map((x, k) => <li key={k} className="flex gap-3"><span className="mt-2.5 size-2.5 flex-none rounded-full bg-neon" />{t(x, locale)}</li>)}</ul> : null}
+          {tool.authors && <p className="mt-5 font-mono text-sm text-white/70">{tr("credits")}: {tool.authors}{tool.license ? ` · ${tool.license}` : ""}</p>}
         </section>
       </div>
       <nav className="mt-12 flex justify-between gap-4">

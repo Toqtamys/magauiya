@@ -9,10 +9,10 @@ export function Ticker() {
     <div key={k} className="marquee flex flex-none gap-10 pr-10">
       {ORDER.map((id) => (
         <span key={id} className="inline-flex items-center gap-10 whitespace-nowrap font-display text-2xl font-bold uppercase md:text-3xl">
-          {t(SHORT[id], locale)}<span className="text-blue">●</span>
+          {t(SHORT[id], locale)}<span className="text-neon">✦</span>
         </span>
       ))}
     </div>
   );
-  return <div className="-rotate-2 scale-105 flex overflow-hidden bg-sun py-4 text-ink" aria-hidden="true">{row("a")}{row("b")}</div>;
+  return <div className="-rotate-2 scale-105 flex overflow-hidden bg-sun py-4 text-ink shadow-[0_0_40px_rgba(46,242,255,.55)]" aria-hidden="true">{row("a")}{row("b")}</div>;
 }

@@ -50,3 +50,4 @@ src/data/catalog.json
 messages/
 public/samples/
 public/molstar/
+src/lib/sky.gen.js
