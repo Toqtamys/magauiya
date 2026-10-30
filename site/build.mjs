@@ -50,6 +50,7 @@ const js = [
   await src('scd-engine.js'),
   await src('tool-calc.js'),
   await src('tool-rcpc.js'),
+  await src('scd-ai.js'),
   await src('tool-scd.js'),
   await src('tool-lab.js'),
   await src('tool-morph.js'),
@@ -92,7 +93,7 @@ const legacyJs = [
   await src('i18n.js'), await src('core.js'),
   `const TOOLS_DATA = ${safeJSON(tools)};`, `const APPS = ${safeJSON(apps)};`, 'const PREVIEWS = {};',
   await src('rcpc-engine.js'), await src('scd-engine.js'), await src('tool-calc.js'), await src('tool-rcpc.js'),
-  await src('tool-scd.js'), await src('tool-lab.js'), await src('tool-morph.js'), await src('tool-constructor.js'),
+  await src('scd-ai.js'), await src('tool-scd.js'), await src('tool-lab.js'), await src('tool-morph.js'), await src('tool-constructor.js'),
   await src('ihc-engine.js'), await src('tool-histo.js'), await src('bridge.js'),
 ].join('\n\n');
 await writeFile(path.join(pub, 'legacy', 'bopasi-tools.js'), legacyJs);
@@ -133,6 +134,15 @@ const ms = path.join(nx, 'node_modules', 'molstar');
 if (existsSync(ms)) {
   await mkdir(path.join(pub, 'molstar'), { recursive: true });
   for (const f of ['build/viewer/molstar.js', 'build/viewer/molstar.css', 'LICENSE']) await cp(path.join(ms, f), path.join(pub, 'molstar', path.basename(f)));
+}
+
+// нейросеть SCD и ONNX Runtime Web (только для сайта: в офлайн-файл не входят)
+await rm(path.join(pub, 'models'), { recursive: true, force: true });
+await cp(path.join(here, 'models'), path.join(pub, 'models'), { recursive: true });
+const ortDir = path.join(nx, 'node_modules', 'onnxruntime-web');
+if (existsSync(ortDir)) {
+  await mkdir(path.join(pub, 'ort'), { recursive: true });
+  for (const f of ['dist/ort.wasm.min.js', 'dist/ort-wasm-simd-threaded.mjs', 'dist/ort-wasm-simd-threaded.wasm']) await cp(path.join(ortDir, f), path.join(pub, 'ort', path.basename(f)));
 }
 
 // локальные копии библиотек (из node_modules при наличии, иначе из vendor/ рядом со сборкой)

@@ -32,11 +32,26 @@ const UI_SCD = {
   copied: L('Скопировано', 'Көшірілді', 'Copied'),
   csv: L('Скачать CSV', 'CSV жүктеу', 'Download CSV'),
   busy: L('Анализ…', 'Талдау…', 'Analysing…'),
+  method: L('Метод', 'Әдіс', 'Method'),
+  classic: L('Классический', 'Классикалық', 'Classic'),
+  ai: L('Нейросеть', 'Нейрожелі', 'Neural net'),
+  aiLoad: L('Загрузка нейросети', 'Нейрожелі жүктелуде', 'Loading the neural net'),
+  aiRun: L('Нейросеть ищет клетки…', 'Нейрожелі жасушаларды іздеуде…', 'The neural net is finding cells…'),
+  aiDone: L('Нейросеть: найдено клеток', 'Нейрожелі: табылған жасушалар', 'Neural net: cells found'),
+  aiAgree: L('совпало с измерением гало', 'гало өлшемімен сәйкес', 'agree with the halo measurement'),
+  aiOffline: L('Нейросеть работает только на сайте BOPASI (в офлайн-файле её нет).', 'Нейрожелі тек BOPASI сайтында жұмыс істейді (офлайн файлда жоқ).', 'The neural net runs only on the BOPASI website (not in the offline file).'),
+  aiFail: L('Нейросеть не запустилась', 'Нейрожелі іске қосылмады', 'The neural net failed to start'),
+  aiSample: L('Нейросеть обучена на настоящих микроснимках; на синтетическом примере она клеток не находит. Загрузите свой снимок.', 'Нейрожелі нақты микросуреттерде оқытылған; синтетикалық мысалда жасуша таппайды. Өз суретіңізді жүктеңіз.', 'The neural net was trained on real micrographs and finds no cells in the synthetic sample. Load your own image.'),
+  aiAbout: L('Сегментация: YOLOv8s-seg, обучена на 2000 снимках SCD (Ornelas Nande и соавт., 2026, CC BY 4.0). Нейросеть решает «фрагментирована / нет», измерение гало по Fernández уточняет подкласс.', 'Сегментация: YOLOv8s-seg, 2000 SCD суретінде оқытылған (Ornelas Nande және бірл., 2026, CC BY 4.0). Нейрожелі «фрагменттелген / жоқ» шешеді, Fernández бойынша гало өлшемі ішкі класты нақтылайды.', 'Segmentation: YOLOv8s-seg trained on 2,000 SCD images (Ornelas Nande et al., 2026, CC BY 4.0). The net decides “fragmented / not”; the Fernández halo measurement refines the subclass.'),
 };
 const SCD_MAX = 1400;
 
 function mountScd(root) {
-  const st = { fields: [], sel: 0, addMode: false, addCls: 'none', coreSens: 1, haloSens: 1 };
+  const st = { fields: [], sel: 0, addMode: false, addCls: 'none', coreSens: 1, haloSens: 1, method: store.get('scdMethod') === 'ai' ? 'ai' : 'classic', aiMsg: '' };
+  let alive = true;
+  const aiNote = h('p', { class: 'hint scd-ai-note', 'aria-live': 'polite' });
+  const segBtns = ['classic', 'ai'].map((m) => h('button', { type: 'button', onclick: () => setMethod(m) }, tr(UI_SCD[m])));
+  const seg = h('div', { class: 'seg', role: 'group', 'aria-label': tr(UI_SCD.method) }, ...segBtns);
   const canvas = h('canvas', { class: 'scd-canvas', tabindex: 0 });
   const note = h('p', { class: 'rc-note' });
   const thumbs = h('div', { class: 'rc-thumbs' });
@@ -59,21 +74,38 @@ function mountScd(root) {
 
   root.append(h('div', { class: 'scd' },
     h('div', { class: 'scd-main' }, h('div', { class: 'scd-stage' }, canvas), note, thumbs, legend),
-    h('div', { class: 'scd-side' }, result,
+    h('div', { class: 'scd-side' }, h('div', { class: 'ctl' }, h('div', { class: 'ctl-row' }, h('span', {}, tr(UI_SCD.method))), seg), aiNote, result,
       h('div', { class: 'row' }, addBtn, addSel),
       h('p', { class: 'hint' }, tr(UI_SCD.edit)),
       sl('coreSens', UI_SCD.coreSens), sl('haloSens', UI_SCD.haloSens),
-      h('button', { class: 'btn-ghost', onclick: () => { const f = st.fields[st.sel]; if (f) { analyse(f); draw(); sync(); } } }, tr(UI_SCD.redetect)),
+      h('button', { class: 'btn-ghost', onclick: async () => { const f = st.fields[st.sel]; if (f) { await analyse(f); draw(); sync(); } } }, tr(UI_SCD.redetect)),
       drop, h('button', { class: 'btn-link', onclick: loadSample }, tr(UI_SCD.sample)), fileIn)));
 
-  function analyse(f) {
+  async function analyse(f) {
     const P = SCD.prepare(f.img);
-    f.res = SCD.detect(P, { coreSens: st.coreSens, haloSens: st.haloSens });
+    const classic = SCD.detect(P, { coreSens: st.coreSens, haloSens: st.haloSens });
+    if (st.method !== 'ai') { f.res = classic; f.ai = null; return; }
+    try {
+      if (!SCD_AI.ready()) { st.aiMsg = tr(UI_SCD.aiLoad) + '…'; sync(); }
+      const out = await SCD_AI.detect(f.canvas, { onProgress: (p) => { st.aiMsg = `${tr(UI_SCD.aiLoad)} · ${Math.round(p * 100)}%`; aiNote.textContent = st.aiMsg; } });
+      const cells = SCD_AI.merge(out.cells, classic.cells);
+      f.res = { ...classic, cells }; f.ai = { n: cells.length, agree: cells.filter((c) => c.agree).length, ms: out.ms };
+      st.aiMsg = '';
+    } catch (e) {
+      f.res = classic; f.ai = null;
+      st.aiMsg = String(e && e.message) === 'offline' ? tr(UI_SCD.aiOffline) : `${tr(UI_SCD.aiFail)}: ${e && e.message || e}`;
+    }
   }
-  function addField(canvasSrc, name, sample) {
+  async function setMethod(m) {
+    st.method = m; store.set('scdMethod', m); sync();
+    if (m === 'ai') { st.aiMsg = tr(UI_SCD.aiRun); sync(); }
+    for (const f of st.fields) { await analyse(f); if (!alive) return; }
+    draw(); sync();
+  }
+  async function addField(canvasSrc, name, sample) {
     const ctx = canvasSrc.getContext('2d');
-    const f = { name, sample, canvas: canvasSrc, img: ctx.getImageData(0, 0, canvasSrc.width, canvasSrc.height), res: null };
-    analyse(f); st.fields.push(f);
+    const f = { name, sample, canvas: canvasSrc, img: ctx.getImageData(0, 0, canvasSrc.width, canvasSrc.height), res: { cells: [] } };
+    st.fields.push(f); await analyse(f);
     const t = document.createElement('canvas'), s = 96 / Math.max(canvasSrc.width, canvasSrc.height);
     t.width = canvasSrc.width * s; t.height = canvasSrc.height * s; t.getContext('2d').drawImage(canvasSrc, 0, 0, t.width, t.height); f.thumb = t.toDataURL();
     return f;
@@ -82,21 +114,27 @@ function mountScd(root) {
     if (!files.length) return;
     st.fields = st.fields.filter((f) => !f.sample);
     result.textContent = tr(UI_SCD.busy);
-    for (const file of files) { try { const c = await fileToCanvasMax(file, SCD_MAX); addField(c, file.name, false); } catch {} await new Promise((r) => setTimeout(r)); }
+    if (st.method === 'ai') { st.aiMsg = tr(UI_SCD.aiRun); sync(); }
+    for (const file of files) { try { const c = await fileToCanvasMax(file, SCD_MAX); await addField(c, file.name, false); } catch {} await new Promise((r) => setTimeout(r)); }
     st.sel = Math.max(0, st.fields.length - files.length); draw(); sync();
   }
-  function loadSample() {
+  async function loadSample() {
     st.fields = st.fields.filter((f) => !f.sample);
     const { img } = SCD.synth({ seed: 7 });
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
     c.getContext('2d').putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
-    addField(c, 'scd-sample.png', true); st.sel = st.fields.length - 1; draw(); sync();
+    st.sel = st.fields.length; await addField(c, 'scd-sample.png', true); st.sel = st.fields.length - 1; draw(); sync();
   }
   function draw() {
     const f = st.fields[st.sel]; if (!f) return;
     canvas.width = f.canvas.width; canvas.height = f.canvas.height;
     const ctx = canvas.getContext('2d'); ctx.drawImage(f.canvas, 0, 0);
     const lw = Math.max(1.5, f.canvas.width / 700);
+    for (const c of f.res.cells) if (c.mask) {   // маска нейросети — полупрозрачная заливка
+      ctx.fillStyle = SCD_COL[c.cls]; ctx.globalAlpha = 0.22; const q = Math.max(1, f.canvas.width / 1024 * 4);
+      for (let i = 0; i < c.mask.length; i += 2) ctx.fillRect(c.mask[i] - q / 2, c.mask[i + 1] - q / 2, q, q);
+      ctx.globalAlpha = 1;
+    }
     for (const c of f.res.cells) {
       const col = SCD_COL[c.cls];
       ctx.save(); ctx.translate(c.x, c.y);
@@ -110,6 +148,8 @@ function mountScd(root) {
   function sync() {
     const f = st.fields[st.sel];
     addBtn.textContent = (st.addMode ? '− ' : '+ ') + tr(UI_SCD.add); addBtn.classList.toggle('on', st.addMode);
+    segBtns.forEach((b, i) => b.classList.toggle('on', ['classic', 'ai'][i] === st.method));
+    aiNote.textContent = st.method !== 'ai' ? '' : st.aiMsg || (f && f.ai ? `${tr(UI_SCD.aiDone)}: ${f.ai.n} · ${tr(UI_SCD.aiAgree)}: ${f.ai.agree} · ${(f.ai.ms / 1000).toFixed(1)} s` + '. ' + (f.sample && !f.ai.n ? tr(UI_SCD.aiSample) + ' ' : '') + tr(UI_SCD.aiAbout) : '');
     canvas.style.cursor = st.addMode ? 'crosshair' : 'pointer';
     note.textContent = f ? (f.sample ? tr(UI_SCD.sampleNote) : `${f.name} · ${f.canvas.width}×${f.canvas.height}`) : '';
     thumbs.replaceChildren(...(st.fields.length > 1 ? st.fields.map((x, i) => h('button', { class: 'thumb' + (i === st.sel ? ' on' : ''), title: x.name, onclick: () => { st.sel = i; draw(); sync(); } }, h('img', { src: x.thumb, alt: x.name }))) : []));
@@ -164,7 +204,7 @@ function mountScd(root) {
   });
 
   loadSample();
-  return { destroy() {} };
+  return { destroy() { alive = false; } };
 }
 
 function fileToCanvasMax(file, max) {

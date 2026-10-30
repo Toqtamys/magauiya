@@ -1261,6 +1261,132 @@ function mountRcpc(root) {
 }
 
 
+// ─── Нейросеть для SCD-теста: YOLOv8s-seg (сегментация клеток, 2 класса) ──────
+// Модель: «Sperm chromatin dispersion microscopy image dataset for instance segmentation»
+// (Ornelas Nande, Adel Domínguez, Mora Topete, Magdaleno Márquez, Aranguren, Valdivia-G, Sanchez; Zenodo, 2026, CC BY 4.0).
+// Обучена на 2000 снимках, классы: 0 — фрагментирована, 1 — не фрагментирована. Архитектура YOLOv8 (Ultralytics, AGPL-3.0).
+// Запуск в браузере через ONNX Runtime Web; файл модели и рантайм лежат рядом с сайтом (models/, ort/).
+const SCD_AI = (() => {
+  const SIZE = 1024, NC = 2, NM = 32, PROTO = 256;
+  let session = null, loading = null;
+  const base = () => (window.BOPASI_BASE || './');
+
+  function loadScript(src) {
+    return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('script ' + src)); document.head.append(s); });
+  }
+  // рантайм и модель грузятся один раз, по первому требованию
+  function load(onProgress) {
+    if (session) return Promise.resolve(session);
+    return (loading ||= (async () => {
+      if (location.protocol === 'file:') throw new Error('offline');
+      if (!window.ort) await loadScript(base() + 'ort/ort.wasm.min.js');
+      const ort = window.ort;
+      ort.env.wasm.wasmPaths = new URL(base() + 'ort/', location.href).href;
+      ort.env.wasm.numThreads = self.crossOriginIsolated ? Math.min(4, navigator.hardwareConcurrency || 2) : 1;
+      const r = await fetch(base() + 'models/scd-yolov8s-seg.onnx');
+      if (!r.ok) throw new Error('model ' + r.status);
+      const total = +r.headers.get('content-length') || 0, reader = r.body.getReader(), parts = []; let got = 0;
+      for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got += value.length; onProgress?.(total ? got / total : 0); }
+      const buf = new Uint8Array(got); let o = 0; for (const p of parts) { buf.set(p, o); o += p.length; }
+      session = await ort.InferenceSession.create(buf, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+      return session;
+    })().catch((e) => { loading = null; throw e; }));
+  }
+
+  // вписываем снимок в квадрат 1024 с серыми полями (как при обучении)
+  function letterbox(canvas) {
+    const W = canvas.width, H = canvas.height, k = Math.min(SIZE / W, SIZE / H);
+    const nw = Math.round(W * k), nh = Math.round(H * k), px = Math.floor((SIZE - nw) / 2), py = Math.floor((SIZE - nh) / 2);
+    const c = document.createElement('canvas'); c.width = c.height = SIZE;
+    const g = c.getContext('2d', { willReadFrequently: true }); g.fillStyle = 'rgb(114,114,114)'; g.fillRect(0, 0, SIZE, SIZE);
+    g.imageSmoothingQuality = 'high'; g.drawImage(canvas, px, py, nw, nh);
+    const d = g.getImageData(0, 0, SIZE, SIZE).data, n = SIZE * SIZE, x = new Float32Array(3 * n);
+    for (let i = 0; i < n; i++) { x[i] = d[i * 4] / 255; x[n + i] = d[i * 4 + 1] / 255; x[2 * n + i] = d[i * 4 + 2] / 255; }
+    return { x, k, px, py };
+  }
+  const iou = (a, b) => {
+    const w = Math.max(0, Math.min(a.x2, b.x2) - Math.max(a.x1, b.x1)), h = Math.max(0, Math.min(a.y2, b.y2) - Math.max(a.y1, b.y1));
+    const i = w * h; return i / ((a.x2 - a.x1) * (a.y2 - a.y1) + (b.x2 - b.x1) * (b.y2 - b.y1) - i + 1e-9);
+  };
+
+  // разбор выхода: рамки + классы + коэффициенты масок → клетки с маской, центром и эллипсом
+  function decode(out0, out1, lb, W, H, conf, iouThr) {
+    const N = out0.dims[2], P = out0.data, pr = out1.data, cand = [];
+    for (let j = 0; j < N; j++) {
+      let best = 0, cls = 0;
+      for (let c = 0; c < NC; c++) { const s = P[(4 + c) * N + j]; if (s > best) { best = s; cls = c; } }
+      if (best < conf) continue;
+      const cx = P[j], cy = P[N + j], w = P[2 * N + j], h = P[3 * N + j];
+      cand.push({ j, cls, score: best, x1: cx - w / 2, y1: cy - h / 2, x2: cx + w / 2, y2: cy + h / 2 });
+    }
+    cand.sort((a, b) => b.score - a.score);
+    const keep = [];
+    for (const c of cand) if (!keep.some((k) => k.cls === c.cls && iou(k, c) > iouThr)) { keep.push(c); if (keep.length >= 300) break; }
+    const s = PROTO / SIZE, cells = [];
+    for (const d of keep) {
+      const coef = new Float32Array(NM); for (let m = 0; m < NM; m++) coef[m] = P[(4 + NC + m) * N + d.j];
+      const bx1 = Math.max(0, Math.floor(d.x1 * s)), by1 = Math.max(0, Math.floor(d.y1 * s)), bx2 = Math.min(PROTO - 1, Math.ceil(d.x2 * s)), by2 = Math.min(PROTO - 1, Math.ceil(d.y2 * s));
+      let A = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0; const pts = [];
+      for (let y = by1; y <= by2; y++) for (let x = bx1; x <= bx2; x++) {
+        const px = x + 0.5, py = y + 0.5; if (px < d.x1 * s || px > d.x2 * s || py < d.y1 * s || py > d.y2 * s) continue;
+        let v = 0; const o = y * PROTO + x; for (let m = 0; m < NM; m++) v += coef[m] * pr[m * PROTO * PROTO + o];
+        if (v <= 0) continue;   // сигмоида > 0.5
+        // координаты пикселя маски → координаты исходного снимка
+        const ix = (px / s - lb.px) / lb.k, iy = (py / s - lb.py) / lb.k;
+        A++; sx += ix; sy += iy; sxx += ix * ix; syy += iy * iy; sxy += ix * iy; pts.push(ix, iy);
+      }
+      const cx = ((d.x1 + d.x2) / 2 - lb.px) / lb.k, cy = ((d.y1 + d.y2) / 2 - lb.py) / lb.k;
+      if (cx < 0 || cy < 0 || cx > W || cy > H) continue;
+      const cell = { x: cx, y: cy, ai: d.cls === 0 ? 'frag' : 'ok', conf: d.score,
+        box: [(d.x1 - lb.px) / lb.k, (d.y1 - lb.py) / lb.k, (d.x2 - lb.px) / lb.k, (d.y2 - lb.py) / lb.k] };
+      if (A >= 3) {
+        const mx = sx / A, my = sy / A, vxx = sxx / A - mx * mx, vyy = syy / A - my * my, vxy = sxy / A - mx * my;
+        const tr2 = (vxx + vyy) / 2, dd = Math.sqrt(Math.max(0, tr2 * tr2 - (vxx * vyy - vxy * vxy)));
+        Object.assign(cell, { x: mx, y: my, major: 4 * Math.sqrt(tr2 + dd), minor: 4 * Math.sqrt(Math.max(0, tr2 - dd)), angle: 0.5 * Math.atan2(2 * vxy, vxx - vyy), area: A / (s * s * lb.k * lb.k), mask: pts });
+      } else {
+        const bw = cell.box[2] - cell.box[0], bh = cell.box[3] - cell.box[1];
+        Object.assign(cell, { major: Math.max(bw, bh), minor: Math.min(bw, bh), angle: bw >= bh ? 0 : Math.PI / 2, area: bw * bh * 0.78 });
+      }
+      cells.push(cell);
+    }
+    return cells;
+  }
+
+  async function detect(canvas, opt = {}) {
+    const ses = await load(opt.onProgress);
+    const lb = letterbox(canvas);
+    const t0 = performance.now();
+    const res = await ses.run({ [ses.inputNames[0]]: new window.ort.Tensor('float32', lb.x, [1, 3, SIZE, SIZE]) });
+    const [o0, o1] = ses.outputNames.map((n) => res[n]);
+    const cells = decode(o0, o1, lb, canvas.width, canvas.height, opt.conf ?? 0.25, opt.iou ?? 0.7);
+    return { cells, ms: performance.now() - t0 };
+  }
+
+  // объединение с классическим разбором: нейросеть решает «фрагментирована или нет»,
+  // измерение гало (критерии Fernández) уточняет подкласс, если не противоречит нейросети
+  function merge(aiCells, classic) {
+    const used = new Set();
+    return aiCells.map((a) => {
+      let best = null, bd = Infinity;
+      for (const c of classic) {
+        if (used.has(c) || c.cls === 'excluded') continue;
+        const inBox = c.x >= a.box[0] && c.x <= a.box[2] && c.y >= a.box[1] && c.y <= a.box[3];
+        const dd = Math.hypot(c.x - a.x, c.y - a.y); if (inBox && dd < bd) { bd = dd; best = c; }
+      }
+      if (best) used.add(best);
+      const fragC = best && SCD.FRAG.has(best.cls);
+      let cls;
+      if (a.ai === 'frag') cls = best && fragC ? best.cls : 'small';
+      else cls = best && !fragC ? best.cls : 'medium';
+      return { ...a, id: 'ai' + Math.round(a.x) + '_' + Math.round(a.y), cls, halo: best && (fragC === (a.ai === 'frag')) ? best.halo : 0,
+        agree: best ? fragC === (a.ai === 'frag') : null, weak: false, overlap: false };
+    });
+  }
+
+  return { load, detect, merge, ready: () => !!session };
+})();
+
+
 // ─── Инструмент: SCD / Halo-тест — индекс фрагментации ДНК ───────────────────
 const SCD_COL = { large: '#0e8a5f', medium: '#17a2b8', small: '#e58a00', none: '#d1435b', degraded: '#7a1630', excluded: '#8a94ad' };
 const SCD_NAME = {
@@ -1295,11 +1421,26 @@ const UI_SCD = {
   copied: L('Скопировано', 'Көшірілді', 'Copied'),
   csv: L('Скачать CSV', 'CSV жүктеу', 'Download CSV'),
   busy: L('Анализ…', 'Талдау…', 'Analysing…'),
+  method: L('Метод', 'Әдіс', 'Method'),
+  classic: L('Классический', 'Классикалық', 'Classic'),
+  ai: L('Нейросеть', 'Нейрожелі', 'Neural net'),
+  aiLoad: L('Загрузка нейросети', 'Нейрожелі жүктелуде', 'Loading the neural net'),
+  aiRun: L('Нейросеть ищет клетки…', 'Нейрожелі жасушаларды іздеуде…', 'The neural net is finding cells…'),
+  aiDone: L('Нейросеть: найдено клеток', 'Нейрожелі: табылған жасушалар', 'Neural net: cells found'),
+  aiAgree: L('совпало с измерением гало', 'гало өлшемімен сәйкес', 'agree with the halo measurement'),
+  aiOffline: L('Нейросеть работает только на сайте BOPASI (в офлайн-файле её нет).', 'Нейрожелі тек BOPASI сайтында жұмыс істейді (офлайн файлда жоқ).', 'The neural net runs only on the BOPASI website (not in the offline file).'),
+  aiFail: L('Нейросеть не запустилась', 'Нейрожелі іске қосылмады', 'The neural net failed to start'),
+  aiSample: L('Нейросеть обучена на настоящих микроснимках; на синтетическом примере она клеток не находит. Загрузите свой снимок.', 'Нейрожелі нақты микросуреттерде оқытылған; синтетикалық мысалда жасуша таппайды. Өз суретіңізді жүктеңіз.', 'The neural net was trained on real micrographs and finds no cells in the synthetic sample. Load your own image.'),
+  aiAbout: L('Сегментация: YOLOv8s-seg, обучена на 2000 снимках SCD (Ornelas Nande и соавт., 2026, CC BY 4.0). Нейросеть решает «фрагментирована / нет», измерение гало по Fernández уточняет подкласс.', 'Сегментация: YOLOv8s-seg, 2000 SCD суретінде оқытылған (Ornelas Nande және бірл., 2026, CC BY 4.0). Нейрожелі «фрагменттелген / жоқ» шешеді, Fernández бойынша гало өлшемі ішкі класты нақтылайды.', 'Segmentation: YOLOv8s-seg trained on 2,000 SCD images (Ornelas Nande et al., 2026, CC BY 4.0). The net decides “fragmented / not”; the Fernández halo measurement refines the subclass.'),
 };
 const SCD_MAX = 1400;
 
 function mountScd(root) {
-  const st = { fields: [], sel: 0, addMode: false, addCls: 'none', coreSens: 1, haloSens: 1 };
+  const st = { fields: [], sel: 0, addMode: false, addCls: 'none', coreSens: 1, haloSens: 1, method: store.get('scdMethod') === 'ai' ? 'ai' : 'classic', aiMsg: '' };
+  let alive = true;
+  const aiNote = h('p', { class: 'hint scd-ai-note', 'aria-live': 'polite' });
+  const segBtns = ['classic', 'ai'].map((m) => h('button', { type: 'button', onclick: () => setMethod(m) }, tr(UI_SCD[m])));
+  const seg = h('div', { class: 'seg', role: 'group', 'aria-label': tr(UI_SCD.method) }, ...segBtns);
   const canvas = h('canvas', { class: 'scd-canvas', tabindex: 0 });
   const note = h('p', { class: 'rc-note' });
   const thumbs = h('div', { class: 'rc-thumbs' });
@@ -1322,21 +1463,38 @@ function mountScd(root) {
 
   root.append(h('div', { class: 'scd' },
     h('div', { class: 'scd-main' }, h('div', { class: 'scd-stage' }, canvas), note, thumbs, legend),
-    h('div', { class: 'scd-side' }, result,
+    h('div', { class: 'scd-side' }, h('div', { class: 'ctl' }, h('div', { class: 'ctl-row' }, h('span', {}, tr(UI_SCD.method))), seg), aiNote, result,
       h('div', { class: 'row' }, addBtn, addSel),
       h('p', { class: 'hint' }, tr(UI_SCD.edit)),
       sl('coreSens', UI_SCD.coreSens), sl('haloSens', UI_SCD.haloSens),
-      h('button', { class: 'btn-ghost', onclick: () => { const f = st.fields[st.sel]; if (f) { analyse(f); draw(); sync(); } } }, tr(UI_SCD.redetect)),
+      h('button', { class: 'btn-ghost', onclick: async () => { const f = st.fields[st.sel]; if (f) { await analyse(f); draw(); sync(); } } }, tr(UI_SCD.redetect)),
       drop, h('button', { class: 'btn-link', onclick: loadSample }, tr(UI_SCD.sample)), fileIn)));
 
-  function analyse(f) {
+  async function analyse(f) {
     const P = SCD.prepare(f.img);
-    f.res = SCD.detect(P, { coreSens: st.coreSens, haloSens: st.haloSens });
+    const classic = SCD.detect(P, { coreSens: st.coreSens, haloSens: st.haloSens });
+    if (st.method !== 'ai') { f.res = classic; f.ai = null; return; }
+    try {
+      if (!SCD_AI.ready()) { st.aiMsg = tr(UI_SCD.aiLoad) + '…'; sync(); }
+      const out = await SCD_AI.detect(f.canvas, { onProgress: (p) => { st.aiMsg = `${tr(UI_SCD.aiLoad)} · ${Math.round(p * 100)}%`; aiNote.textContent = st.aiMsg; } });
+      const cells = SCD_AI.merge(out.cells, classic.cells);
+      f.res = { ...classic, cells }; f.ai = { n: cells.length, agree: cells.filter((c) => c.agree).length, ms: out.ms };
+      st.aiMsg = '';
+    } catch (e) {
+      f.res = classic; f.ai = null;
+      st.aiMsg = String(e && e.message) === 'offline' ? tr(UI_SCD.aiOffline) : `${tr(UI_SCD.aiFail)}: ${e && e.message || e}`;
+    }
   }
-  function addField(canvasSrc, name, sample) {
+  async function setMethod(m) {
+    st.method = m; store.set('scdMethod', m); sync();
+    if (m === 'ai') { st.aiMsg = tr(UI_SCD.aiRun); sync(); }
+    for (const f of st.fields) { await analyse(f); if (!alive) return; }
+    draw(); sync();
+  }
+  async function addField(canvasSrc, name, sample) {
     const ctx = canvasSrc.getContext('2d');
-    const f = { name, sample, canvas: canvasSrc, img: ctx.getImageData(0, 0, canvasSrc.width, canvasSrc.height), res: null };
-    analyse(f); st.fields.push(f);
+    const f = { name, sample, canvas: canvasSrc, img: ctx.getImageData(0, 0, canvasSrc.width, canvasSrc.height), res: { cells: [] } };
+    st.fields.push(f); await analyse(f);
     const t = document.createElement('canvas'), s = 96 / Math.max(canvasSrc.width, canvasSrc.height);
     t.width = canvasSrc.width * s; t.height = canvasSrc.height * s; t.getContext('2d').drawImage(canvasSrc, 0, 0, t.width, t.height); f.thumb = t.toDataURL();
     return f;
@@ -1345,21 +1503,27 @@ function mountScd(root) {
     if (!files.length) return;
     st.fields = st.fields.filter((f) => !f.sample);
     result.textContent = tr(UI_SCD.busy);
-    for (const file of files) { try { const c = await fileToCanvasMax(file, SCD_MAX); addField(c, file.name, false); } catch {} await new Promise((r) => setTimeout(r)); }
+    if (st.method === 'ai') { st.aiMsg = tr(UI_SCD.aiRun); sync(); }
+    for (const file of files) { try { const c = await fileToCanvasMax(file, SCD_MAX); await addField(c, file.name, false); } catch {} await new Promise((r) => setTimeout(r)); }
     st.sel = Math.max(0, st.fields.length - files.length); draw(); sync();
   }
-  function loadSample() {
+  async function loadSample() {
     st.fields = st.fields.filter((f) => !f.sample);
     const { img } = SCD.synth({ seed: 7 });
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
     c.getContext('2d').putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
-    addField(c, 'scd-sample.png', true); st.sel = st.fields.length - 1; draw(); sync();
+    st.sel = st.fields.length; await addField(c, 'scd-sample.png', true); st.sel = st.fields.length - 1; draw(); sync();
   }
   function draw() {
     const f = st.fields[st.sel]; if (!f) return;
     canvas.width = f.canvas.width; canvas.height = f.canvas.height;
     const ctx = canvas.getContext('2d'); ctx.drawImage(f.canvas, 0, 0);
     const lw = Math.max(1.5, f.canvas.width / 700);
+    for (const c of f.res.cells) if (c.mask) {   // маска нейросети — полупрозрачная заливка
+      ctx.fillStyle = SCD_COL[c.cls]; ctx.globalAlpha = 0.22; const q = Math.max(1, f.canvas.width / 1024 * 4);
+      for (let i = 0; i < c.mask.length; i += 2) ctx.fillRect(c.mask[i] - q / 2, c.mask[i + 1] - q / 2, q, q);
+      ctx.globalAlpha = 1;
+    }
     for (const c of f.res.cells) {
       const col = SCD_COL[c.cls];
       ctx.save(); ctx.translate(c.x, c.y);
@@ -1373,6 +1537,8 @@ function mountScd(root) {
   function sync() {
     const f = st.fields[st.sel];
     addBtn.textContent = (st.addMode ? '− ' : '+ ') + tr(UI_SCD.add); addBtn.classList.toggle('on', st.addMode);
+    segBtns.forEach((b, i) => b.classList.toggle('on', ['classic', 'ai'][i] === st.method));
+    aiNote.textContent = st.method !== 'ai' ? '' : st.aiMsg || (f && f.ai ? `${tr(UI_SCD.aiDone)}: ${f.ai.n} · ${tr(UI_SCD.aiAgree)}: ${f.ai.agree} · ${(f.ai.ms / 1000).toFixed(1)} s` + '. ' + (f.sample && !f.ai.n ? tr(UI_SCD.aiSample) + ' ' : '') + tr(UI_SCD.aiAbout) : '');
     canvas.style.cursor = st.addMode ? 'crosshair' : 'pointer';
     note.textContent = f ? (f.sample ? tr(UI_SCD.sampleNote) : `${f.name} · ${f.canvas.width}×${f.canvas.height}`) : '';
     thumbs.replaceChildren(...(st.fields.length > 1 ? st.fields.map((x, i) => h('button', { class: 'thumb' + (i === st.sel ? ' on' : ''), title: x.name, onclick: () => { st.sel = i; draw(); sync(); } }, h('img', { src: x.thumb, alt: x.name }))) : []));
@@ -1427,7 +1593,7 @@ function mountScd(root) {
   });
 
   loadSample();
-  return { destroy() {} };
+  return { destroy() { alive = false; } };
 }
 
 function fileToCanvasMax(file, max) {
