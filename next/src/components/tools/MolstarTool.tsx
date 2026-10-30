@@ -62,7 +62,7 @@ export default function MolstarTool() {
       const v = await window.molstar.Viewer.create(host.current, {
         layoutIsExpanded: false, layoutShowControls: true, layoutShowRemoteState: false, layoutShowSequence: true,
         layoutShowLog: false, layoutShowLeftPanel: true, viewportShowExpand: true, viewportShowSelectionMode: false, viewportShowAnimation: false,
-        collapseLeftPanel: true, pdbProvider: "rcsb", emdbProvider: "rcsb",
+        collapseLeftPanel: true, allowMajorPerformanceCaveat: true, pdbProvider: "rcsb", emdbProvider: "rcsb",
       });
       if (!alive) { v.dispose?.(); return; }
       viewer.current = v;
