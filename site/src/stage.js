@@ -4,7 +4,7 @@
 // следующая вырастает из точки фокуса. Шкала масштаба и подпись — в углах кадра.
 const Stage = (() => {
   // светлая палитра: бумажный фон, синие оболочки, тёмно-синие ядра и головки
-  const C = { ground: '#eef3fc', deep: '#dfe8fa', mid: '#c9d8f6', soft: '#adc4f1', line: '#2b55e6', ice: '#0e2763', white: '#071740', cyan: '#1aa9dc', blue: '#1f4fff', brown: '#c06a24' };
+  const C = { ground: '#ffffff', deep: '#fff0ee', mid: '#ffdcd7', soft: '#ffb3aa', line: '#e1061b', ice: '#120709', white: '#120709', cyan: '#ff3b2f', blue: '#e1061b', brown: '#7a0410' };   // футуризм: белое поле, красные линии, чёрные ядра
   let cv, g, W = 0, H = 0, dpr = 1, U = 1;
   let pos = 0, target = 0, auto = false, running = true, visible = true, last = 0, time = 0, raf = 0;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
