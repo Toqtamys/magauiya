@@ -3,10 +3,10 @@
 // Скрипт с инструментами грузится один раз, затем window.BOPASI.mount(id, элемент, язык).
 import { useEffect, useRef, useState } from "react";
 import { BASE } from "@/lib/catalog";
-import type { Locale } from "@/lib/store";
+import { useDropped, type Locale } from "@/lib/store";
 
 type Mounted = { destroy?: () => void } | null;
-declare global { interface Window { BOPASI?: { mount: (id: string, el: HTMLElement, lang: string) => Mounted } } }
+declare global { interface Window { BOPASI?: { mount: (id: string, el: HTMLElement, lang: string) => Mounted; feed: (el: HTMLElement, files: File[]) => void } } }
 
 let loading: Promise<void> | null = null;
 function loadTools(): Promise<void> {
@@ -34,6 +34,9 @@ export function ToolMount({ id, locale, labels }: { id: string; locale: Locale; 
         if (!alive || !el || !window.BOPASI) return;
         mounted = window.BOPASI.mount(id, el, locale);
         setState("ready");
+        // файл, брошенный на главной, сразу уходит в инструмент
+        const files = useDropped.getState().take(id);
+        if (files.length) window.BOPASI.feed(el, files);
       })
       .catch((e) => { if (alive) { setError(String(e?.message || e)); setState("error"); } });
     return () => { alive = false; try { mounted?.destroy?.(); } catch {} el?.replaceChildren(); };

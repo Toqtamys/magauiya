@@ -97,6 +97,17 @@ const UI = {
   disclaimer: L('Результаты носят исследовательский характер и не являются медицинским заключением. Решения принимает врач. Конструктор препаратов — образовательный инструмент.',
     'Нәтижелер зерттеу сипатында және медициналық қорытынды болып табылмайды. Шешімді дәрігер қабылдайды. Дәрі конструкторы — білім беру құралы.',
     'Results are for research and are not a medical conclusion. Decisions are made by a clinician. The drug constructor is an educational tool.'),
+  dropTitle: L('Перетащите снимок или видео', 'Суретті немесе бейнені сүйреңіз', 'Drop an image or a video'),
+  dropHint: L('или нажмите, чтобы выбрать файл. Файл не загружается на сервер — подскажем, каким инструментом его открыть.', 'немесе файлды таңдау үшін басыңыз. Файл серверге жүктелмейді — оны қай құралмен ашу керегін ұсынамыз.', 'or click to choose a file. Nothing is uploaded — we suggest which tool to open it with.'),
+  dropActive: L('Отпустите файл', 'Файлды жіберіңіз', 'Release the file'),
+  dropPick: L('Открыть в инструменте', 'Құралда ашу', 'Open in a tool'),
+  dropNone: L('Для этого формата нет инструмента: нужны JPG, PNG, WebP или видео MP4/MOV.', 'Бұл формат үшін құрал жоқ: JPG, PNG, WebP немесе MP4/MOV бейнесі керек.', 'No tool takes this format: use JPG, PNG, WebP or an MP4/MOV video.'),
+  dropAgain: L('Другой файл', 'Басқа файл', 'Another file'),
+  menu: L('Меню', 'Мәзір', 'Menu'),
+  close: L('Закрыть', 'Жабу', 'Close'),
+  notFoundH: L('Страница не найдена', 'Бет табылмады', 'Page not found'),
+  notFoundP: L('Такого адреса нет. Все инструменты — на главной.', 'Мұндай мекенжай жоқ. Барлық құралдар — басты бетте.', 'This address does not exist. All tools are on the home page.'),
+  home: L('На главную', 'Басты бетке', 'Home'),
   toolLoading: L('Загрузка инструмента…', 'Құрал жүктелуде…', 'Loading the tool…'),
   toolFailed: L('Не удалось загрузить инструмент', 'Құралды жүктеу мүмкін болмады', 'The tool failed to load'),
   copy: L('Копировать', 'Көшіру', 'Copy'),
@@ -2456,7 +2467,19 @@ function bridgeMolmoda(root) {
     h('a', { class: 'btn-big', href: 'https://molmoda.org/', target: '_blank', rel: 'noopener' }, tr(L('Открыть MolModa', 'MolModa-ны ашу', 'Open MolModa')))));
   return { destroy() {} };
 }
+// передать файлы, брошенные на главной, в поле загрузки инструмента (в том числе внутри iframe)
+function bridgeFeed(el, files, tries = 40) {
+  const frame = el.querySelector('iframe');
+  const doc = frame ? frame.contentDocument : document;
+  const input = frame ? doc && doc.querySelector('input[type=file]') : el.querySelector('input[type=file]');
+  if (!input) { if (tries > 0) setTimeout(() => bridgeFeed(el, files, tries - 1), 150); return; }
+  const dt = new DataTransfer();
+  for (const f of (input.multiple ? files : files.slice(0, 1))) dt.items.add(f);
+  input.files = dt.files;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
 window.BOPASI = {
+  feed: (el, files) => bridgeFeed(el, [...files]),
   mount(id, el, lang) {
     LANG = lang || 'ru';
     el.replaceChildren();

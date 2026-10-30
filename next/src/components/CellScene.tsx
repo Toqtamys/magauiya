@@ -63,10 +63,10 @@ function Oocyte() {
   );
 }
 
-export default function CellScene() {
+export default function CellScene({ active = true }: { active?: boolean }) {
   const reduced = typeof window !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   return (
-    <Canvas camera={{ position: [0, 0.4, 7.2], fov: 42 }} dpr={[1, 2]} frameloop={reduced ? "demand" : "always"} gl={{ antialias: true, alpha: true }}>
+    <Canvas camera={{ position: [0, 0.4, 7.2], fov: 42 }} dpr={[1, 2]} frameloop={reduced || !active ? "demand" : "always"} gl={{ antialias: true, alpha: true }}>
       <ambientLight intensity={0.9} />
       <directionalLight position={[4, 5, 6]} intensity={1.6} />
       <directionalLight position={[-5, -2, -4]} intensity={0.6} color={RED} />
