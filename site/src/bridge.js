@@ -25,7 +25,19 @@ function bridgeMolmoda(root) {
     h('a', { class: 'btn-big', href: 'https://molmoda.org/', target: '_blank', rel: 'noopener' }, tr(L('Открыть MolModa', 'MolModa-ны ашу', 'Open MolModa')))));
   return { destroy() {} };
 }
+// передать файлы, брошенные на главной, в поле загрузки инструмента (в том числе внутри iframe)
+function bridgeFeed(el, files, tries = 40) {
+  const frame = el.querySelector('iframe');
+  const doc = frame ? frame.contentDocument : document;
+  const input = frame ? doc && doc.querySelector('input[type=file]') : el.querySelector('input[type=file]');
+  if (!input) { if (tries > 0) setTimeout(() => bridgeFeed(el, files, tries - 1), 150); return; }
+  const dt = new DataTransfer();
+  for (const f of (input.multiple ? files : files.slice(0, 1))) dt.items.add(f);
+  input.files = dt.files;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
 window.BOPASI = {
+  feed: (el, files) => bridgeFeed(el, [...files]),
   mount(id, el, lang) {
     LANG = lang || 'ru';
     el.replaceChildren();

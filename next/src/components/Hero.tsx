@@ -1,19 +1,22 @@
 "use client";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { ArrowRight, Microscope } from "lucide-react";
 import { buttonVariants } from "./ui/button";
 import { CHAPTERS, TOOLS } from "@/lib/catalog";
 
-const CellScene = dynamic(() => import("./CellScene"), { ssr: false, loading: () => <div className="size-full" /> });
+const CellScene = dynamic(() => import("./CellScene"), { ssr: false, loading: () => <div className="size-full" /> });   // 3D только в браузере
 
 const rise = { hidden: { opacity: 0, y: 28 }, show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.08 * i, duration: 0.8, ease: [0.2, 0.7, 0.2, 1] as const } }) };
 
 export function Hero() {
   const tr = useTranslations();
   const words = tr("title").split(" ");
+  const stageRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(stageRef);   // анимация 3D останавливается, когда сцена за экраном
   return (
     <header id="top" className="mx-auto grid min-h-[calc(100svh-64px)] max-w-[1320px] items-center gap-10 px-4 pb-16 pt-6 md:px-6 lg:grid-cols-[1fr_1.05fr]">
       <div>
@@ -41,12 +44,12 @@ export function Hero() {
           ))}
         </motion.dl>
       </div>
-      <motion.div className="relative order-first aspect-square w-full max-h-[calc(100svh-120px)] lg:order-none"
+      <motion.div ref={stageRef} className="relative order-first aspect-square w-full max-h-[calc(100svh-120px)] lg:order-none"
         initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, ease: [0.2, 0.7, 0.2, 1] }}>
         <div className="absolute inset-0 shadow-[inset_0_0_0_1px_rgba(225,6,27,.35)]" />
         <span className="absolute -left-px -top-px size-7 border-l-[3px] border-t-[3px] border-red" />
         <span className="absolute -bottom-px -right-px size-7 border-b-[3px] border-r-[3px] border-red" />
-        <CellScene />
+        <CellScene active={inView} />
       </motion.div>
     </header>
   );

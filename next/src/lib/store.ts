@@ -12,3 +12,11 @@ type UiState = { locale: Locale; setLocale: (l: Locale) => void };
 export const useUi = create<UiState>()(
   persist((set) => ({ locale: "ru", setLocale: (locale) => set({ locale }) }), { name: "bopasi-ui" }),
 );
+
+// файлы, брошенные на главной: ждут, пока откроется выбранный инструмент (не сохраняются)
+type DropState = { files: File[]; target: string | null; set: (files: File[], target: string | null) => void; take: (id: string) => File[] };
+export const useDropped = create<DropState>()((set, get) => ({
+  files: [], target: null,
+  set: (files, target) => set({ files, target }),
+  take: (id) => { const { files, target } = get(); if (target !== id || !files.length) return []; set({ files: [], target: null }); return files; },
+}));
