@@ -27,7 +27,8 @@ python spermcasa.py video.mp4            # HTML-отчёт, CSV, JSON и вид�
 | Путь | Что это |
 |---|---|
 | `web/Magauiya.html` | Готовое приложение одним файлом, работает без интернета |
-| `bopasi/`, `BOPASI.html` | Платформа BOPASI: 20 инструментов в браузере (сайт и один файл); исходники в `site/` |
+| `next/` | Сайт BOPASI на Next.js (React, Tailwind, framer-motion, three/fiber, next-intl); сборка: `cd next && npm install && npm run build` → `bopasi/` |
+| `bopasi/`, `BOPASI.html` | Готовый сайт для GitHub Pages и офлайн-версия одним файлом; исходники инструментов в `site/` |
 | `server/` | Сервер BOPASI: FastAPI + Celery + Redis для нейросетей на GPU — см. `server/README.md` |
 | `web/index.html` | Версия для сайта (GitHub Pages и т. п.) |
 | `web/*.js`, `app_body.html`, `model.json` | Исходники веб-версии; `python3 build.py` → `index.html`, `python3 build.py --offline` → `Magauiya.html` |

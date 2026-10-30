@@ -48,13 +48,14 @@ addEventListener('unhandledrejection', (e) => { const m = e.reason && (e.reason.
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Библиотеки: сначала локальная копия (на сайте), затем CDN (при открытии файла с диска)
+const BASE = (typeof window !== 'undefined' && window.BOPASI_BASE) || './';   // корень сайта для локальных копий
 const CDN = {
   three: 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js',
-  threeLocal: './vendor/three.module.js',
+  threeLocal: BASE + 'vendor/three.module.js',
   mol: 'https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js',
-  molLocal: './vendor/3Dmol-min.js',
+  molLocal: BASE + 'vendor/3Dmol-min.js',
   rdkit: 'https://cdn.jsdelivr.net/npm/@rdkit/rdkit@2026.9.1/dist/',
-  rdkitLocal: './rdkit/',
+  rdkitLocal: BASE + 'rdkit/',
 };
 const onFile = location.protocol === 'file:';
 

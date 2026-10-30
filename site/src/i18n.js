@@ -97,6 +97,8 @@ const UI = {
   disclaimer: L('Результаты носят исследовательский характер и не являются медицинским заключением. Решения принимает врач. Конструктор препаратов — образовательный инструмент.',
     'Нәтижелер зерттеу сипатында және медициналық қорытынды болып табылмайды. Шешімді дәрігер қабылдайды. Дәрі конструкторы — білім беру құралы.',
     'Results are for research and are not a medical conclusion. Decisions are made by a clinician. The drug constructor is an educational tool.'),
+  toolLoading: L('Загрузка инструмента…', 'Құрал жүктелуде…', 'Loading the tool…'),
+  toolFailed: L('Не удалось загрузить инструмент', 'Құралды жүктеу мүмкін болмады', 'The tool failed to load'),
   copy: L('Копировать', 'Көшіру', 'Copy'),
   copied: L('Скопировано', 'Көшірілді', 'Copied'),
 };

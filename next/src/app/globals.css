@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+/* Футуризм BOPASI: белое поле, красный сигнал, чёрные чернила */
+@theme {
+  --color-red: #e1061b;
+  --color-red-dark: #b10014;
+  --color-ink: #0d0b0e;
+  --color-soft: #5a5257;
+  --color-tone: #fff3f2;
+  --color-tone2: #ffe2df;
+  --font-display: "Geologica", "Onest", system-ui, sans-serif;
+  --font-body: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: #fff; color: var(--color-ink); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+::selection { background: var(--color-red); color: #fff; }
+
+/* сетка и сканирующая линия на фоне */
+.bg-grid {
+  background-image: linear-gradient(rgba(225, 6, 27, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(225, 6, 27, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.scanline {
+  position: fixed; left: 0; right: 0; top: -20vh; height: 20vh; z-index: 35; pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(225, 6, 27, 0.06), transparent);
+  animation: scan 7s linear infinite;
+}
+@keyframes scan { to { transform: translateY(140vh); } }
+
+/* срезанные углы — кнопки и карточки */
+.chamfer { clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); }
+.chamfer-lg { clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
+.shine::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg); animation: shine 3.2s 1.2s ease-in-out infinite;
+}
+@keyframes shine { 60%, 100% { left: 130%; } }
+.diamond { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.blink { animation: blink 2.4s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { opacity: 0.25; } }
+.ticker-row { animation: tick 48s linear infinite; }
+@keyframes tick { to { transform: translateX(-100%); } }
+.scan-lines { background: repeating-linear-gradient(0deg, rgba(225, 6, 27, 0.05) 0 2px, transparent 2px 5px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .scanline, .ticker-row, .shine::after, .blink { animation: none !important; }
+}
+@keyframes sweep { from { top: 0; } to { top: 100%; } }
