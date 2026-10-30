@@ -2,7 +2,7 @@
 // → ../bopasi/index.html (сайт) + ../bopasi/vendor, ../bopasi/rdkit (локальные копии библиотек)
 // → ../BOPASI.html (тот же файл для скачивания; без локальных копий берёт библиотеки с CDN)
 import { readFile, writeFile, rm, mkdir, cp } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -17,11 +17,16 @@ const apps = {
   bopasi: await readFile(path.join(repo, 'web', 'Magauiya.html'), 'utf8'),
   bluetol: await readFile(path.join(repo, 'bluetol', 'bluetol.html'), 'utf8'),
 };
+// превью карточек: site/previews/<id>.jpg (снимаются скриптом site/previews.mjs)
+const previews = {};
+const pdir = path.join(here, 'previews');
+if (existsSync(pdir)) for (const f of readdirSync(pdir)) if (f.endsWith('.jpg')) previews[f.slice(0, -4)] = 'data:image/jpeg;base64,' + (await readFile(path.join(pdir, f))).toString('base64');
 const js = [
   await src('i18n.js'),
   await src('core.js'),
   `const TOOLS_DATA = ${safeJSON(tools)};`,
   `const APPS = ${safeJSON(apps)};`,
+  `const PREVIEWS = ${safeJSON(previews)};`,
   await src('rcpc-engine.js'),
   await src('scd-engine.js'),
   await src('tool-calc.js'),

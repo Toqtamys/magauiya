@@ -9,6 +9,12 @@ const UI = {
     'Андрология, эмбриология, гистология және дәрі дизайнына арналған 20 тегін құрал. Олар браузерде жұмыс істейді: суреттер мен бейнелер компьютеріңізден шықпайды.',
     '20 free tools for andrology, embryology, histology and drug design. They run in your browser: images and videos never leave your computer.'),
   cta: L('Открыть спермограмму', 'Спермограмманы ашу', 'Open semen analysis'),
+  allTools: L('Все инструменты', 'Барлық құралдар', 'All tools'),
+  factBrowser: L('в браузере', 'браузерде', 'in the browser'),
+  factServer: L('на GPU-сервере', 'GPU-серверде', 'on a GPU server'),
+  factLangs: L('языка', 'тіл', 'languages'),
+  tagBrowser: L('В браузере', 'Браузерде', 'In browser'),
+  tagServer: L('Нужен GPU-сервер', 'GPU-сервер керек', 'Needs a GPU server'),
   nav: { tools: L('Инструменты', 'Құралдар', 'Tools'), norms: L('Нормы', 'Нормалар', 'Reference values'), server: L('Сервер', 'Сервер', 'Server'), about: L('О проекте', 'Жоба туралы', 'About') },
   introH: L('Без установки и загрузок', 'Орнатусыз және жүктеусіз', 'No installs, no uploads'),
   intro: [
@@ -96,17 +102,17 @@ const UI = {
 
 // Разделы меню инструментов и сцена «путешествия» для каждого
 const CHAPTERS = [
-  { id: 'andrology', scene: 0.6, name: L('Андрология', 'Андрология', 'Andrology'),
+  { id: 'andrology', lead: L('Спермограмма по видео, фрагментация ДНК, подсчёт в камере и морфология.', 'Бейне бойынша спермограмма, ДНҚ фрагментациясы, камерада санау және морфология.', 'Video semen analysis, DNA fragmentation, chamber counts and morphology.'), scene: 0.6, name: L('Андрология', 'Андрология', 'Andrology'),
     tools: ['bopasi', 'scd', 'bluetol', 'who6', 'chamber', 'lab-counter', 'tmsc', 'scd-dl', 'pycasa'] },
-  { id: 'embryology', scene: 2, name: L('Эмбриология', 'Эмбриология', 'Embryology'),
+  { id: 'embryology', lead: L('Снимки ооцитов и эмбрионов, грейдинг, морфокинетика и time-lapse.', 'Ооциттер мен эмбриондар суреттері, грейдинг, морфокинетика және time-lapse.', 'Oocyte and embryo images, grading, morphokinetics and time-lapse.'), scene: 2, name: L('Эмбриология', 'Эмбриология', 'Embryology'),
     tools: ['rc-phase', 'morphometry', 'cleavage', 'kinetics', 'gardner', 'bela', 'embryovision', 'emlife'] },
-  { id: 'reproduction', scene: 3, name: L('Репродуктология', 'Репродуктология', 'Reproductive medicine'),
+  { id: 'reproduction', lead: L('Овариальный резерв, сроки беременности, ХГЧ и фертильное окно.', 'Аналық без резерві, жүктілік мерзімі, ХГЧ және фертильді терезе.', 'Ovarian reserve, pregnancy dates, hCG and the fertile window.'), scene: 3, name: L('Репродуктология', 'Репродуктология', 'Reproductive medicine'),
     tools: ['poseidon', 'due-date', 'hcg-doubling', 'fertile-window'] },
-  { id: 'histology', scene: 4, name: L('Гистология', 'Гистология', 'Histology'),
+  { id: 'histology', lead: L('Ядра на срезах H&E: число, плотность, размер.', 'H&E кесінділеріндегі ядролар: саны, тығыздығы, өлшемі.', 'Nuclei on H&E sections: count, density, size.'), scene: 4, name: L('Гистология', 'Гистология', 'Histology'),
     tools: ['he-nuclei'] },
-  { id: 'oncology', scene: 5, name: L('Онкология', 'Онкология', 'Oncology'),
+  { id: 'oncology', lead: L('Пролиферация по Ki-67 и типы ядер опухоли.', 'Ki-67 бойынша пролиферация және ісік ядроларының түрлері.', 'Ki-67 proliferation and tumour nucleus types.'), scene: 5, name: L('Онкология', 'Онкология', 'Oncology'),
     tools: ['ki67', 'hovernet'] },
-  { id: 'drug', scene: 8, name: L('Препараты и белки', 'Препараттар мен ақуыздар', 'Drugs and proteins'),
+  { id: 'drug', lead: L('3D-конструктор, докинг в браузере и дизайн белков на сервере.', '3D конструктор, браузердегі докинг және сервердегі ақуыз дизайны.', '3D constructor, in-browser docking and protein design on the server.'), scene: 8, name: L('Препараты и белки', 'Препараттар мен ақуыздар', 'Drugs and proteins'),
     tools: ['constructor', 'molmoda', 'protein-design', 'pocketdock'] },
 ];
 

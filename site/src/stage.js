@@ -3,7 +3,8 @@
 // между соседними сценами камера «влетает» в следующую — текущая растёт и гаснет,
 // следующая вырастает из точки фокуса. Шкала масштаба и подпись — в углах кадра.
 const Stage = (() => {
-  const C = { ground: '#071740', deep: '#0b2160', mid: '#12307a', soft: '#1c3f96', line: '#7fa7ff', ice: '#dce8ff', white: '#ffffff', cyan: '#38c6f4', blue: '#1f4fff', brown: '#d38b45' };
+  // светлая палитра: бумажный фон, синие оболочки, тёмно-синие ядра и головки
+  const C = { ground: '#eef3fc', deep: '#dfe8fa', mid: '#c9d8f6', soft: '#adc4f1', line: '#2b55e6', ice: '#0e2763', white: '#071740', cyan: '#1aa9dc', blue: '#1f4fff', brown: '#c06a24' };
   let cv, g, W = 0, H = 0, dpr = 1, U = 1;
   let pos = 0, target = 0, auto = false, running = true, visible = true, last = 0, time = 0, raf = 0;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -249,6 +250,16 @@ const Stage = (() => {
     setAuto(on) { auto = on; kick(); },
     pause(on) { running = !on; if (!on) kick(); },
     redraw() { if (g) draw(); },
+    // один кадр сцены k в отдельный canvas — превью для карточек
+    snapshot(canvas, k, t = 3) {
+      const save = { cv, g, W, H, U, dpr };
+      const b = canvas.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+      W = Math.max(1, b.width || canvas.width); H = Math.max(1, b.height || canvas.height); canvas.width = Math.round(W * d); canvas.height = Math.round(H * d);
+      cv = canvas; g = canvas.getContext("2d"); U = Math.min(W, H) * 0.36; dpr = d;
+      g.setTransform(d, 0, 0, d, 0, 0); g.fillStyle = C.ground; g.fillRect(0, 0, W, H);
+      g.save(); g.translate(W / 2, H / 2); SCENE[k](t); g.restore();
+      ({ cv, g, W, H, U, dpr } = save);
+    },
     get count() { return SCENE.length; },
   };
 })();
