@@ -5,9 +5,9 @@ const L = (ru, kk, en) => ({ ru, kk, en });
 
 const UI = {
   title: L('Лаборатория репродукции', 'Репродукция зертханасы', 'The reproduction lab'),
-  lead: L('20 бесплатных инструментов для андрологии, эмбриологии, гистологии и дизайна препаратов. Они работают в браузере: снимки и видео не покидают ваш компьютер.',
-    'Андрология, эмбриология, гистология және дәрі дизайнына арналған 20 тегін құрал. Олар браузерде жұмыс істейді: суреттер мен бейнелер компьютеріңізден шықпайды.',
-    '20 free tools for andrology, embryology, histology and drug design. They run in your browser: images and videos never leave your computer.'),
+  lead: L('18 бесплатных инструментов для андрологии, эмбриологии, репродуктологии и гистологии. Они работают в браузере: снимки и видео не покидают ваш компьютер.',
+    'Андрология, эмбриология, репродуктология және гистологияға арналған 18 тегін құрал. Олар браузерде жұмыс істейді: суреттер мен бейнелер компьютеріңізден шықпайды.',
+    '18 free tools for andrology, embryology, reproductive medicine and histology. They run in your browser: images and videos never leave your computer.'),
   cta: L('Открыть спермограмму', 'Спермограмманы ашу', 'Open semen analysis'),
   allTools: L('Все инструменты', 'Барлық құралдар', 'All tools'),
   factBrowser: L('в браузере', 'браузерде', 'in the browser'),
@@ -94,9 +94,9 @@ const UI = {
   fullscreen: L('На весь экран', 'Толық экран', 'Full screen'),
   exitFullscreen: L('Свернуть', 'Кішірейту', 'Exit full screen'),
   newTab: L('Открыть в новой вкладке', 'Жаңа қойындыда ашу', 'Open in a new tab'),
-  disclaimer: L('Результаты носят исследовательский характер и не являются медицинским заключением. Решения принимает врач. Конструктор препаратов — образовательный инструмент.',
-    'Нәтижелер зерттеу сипатында және медициналық қорытынды болып табылмайды. Шешімді дәрігер қабылдайды. Дәрі конструкторы — білім беру құралы.',
-    'Results are for research and are not a medical conclusion. Decisions are made by a clinician. The drug constructor is an educational tool.'),
+  disclaimer: L('Результаты носят исследовательский характер и не являются медицинским заключением. Решения принимает врач.',
+    'Нәтижелер зерттеу сипатында және медициналық қорытынды болып табылмайды. Шешімді дәрігер қабылдайды.',
+    'Results are for research and are not a medical conclusion. Decisions are made by a clinician.'),
   dropTitle: L('Перетащите снимок или видео', 'Суретті немесе бейнені сүйреңіз', 'Drop an image or a video'),
   dropHint: L('или нажмите, чтобы выбрать файл. Файл не загружается на сервер — подскажем, каким инструментом его открыть.', 'немесе файлды таңдау үшін басыңыз. Файл серверге жүктелмейді — оны қай құралмен ашу керегін ұсынамыз.', 'or click to choose a file. Nothing is uploaded — we suggest which tool to open it with.'),
   dropActive: L('Отпустите файл', 'Файлды жіберіңіз', 'Release the file'),
@@ -126,8 +126,6 @@ const CHAPTERS = [
     tools: ['he-nuclei'] },
   { id: 'oncology', lead: L('Индекс пролиферации Ki-67 на иммуногистохимии.', 'Иммуногистохимиядағы Ki-67 пролиферация индексі.', 'The Ki-67 proliferation index on immunohistochemistry.'), scene: 5, name: L('Онкология', 'Онкология', 'Oncology'),
     tools: ['ki67'] },
-  { id: 'drug', lead: L('3D-конструктор препаратов и молекулярный докинг.', 'Дәрілердің 3D конструкторы және молекулалық докинг.', 'A 3D drug constructor and molecular docking.'), scene: 8, name: L('Препараты и белки', 'Препараттар мен ақуыздар', 'Drugs and proteins'),
-    tools: ['constructor', 'molmoda'] },
 ];
 
 // Короткие имена для меню

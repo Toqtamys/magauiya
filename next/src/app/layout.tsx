@@ -8,7 +8,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const metadata: Metadata = {
   title: "BOPASI — лаборатория репродукции",
   description:
-    "BOPASI: 20 бесплатных инструментов для андрологии, эмбриологии, гистологии и дизайна препаратов, которые работают в браузере. Снимки и видео не покидают ваш компьютер.",
+    "BOPASI: 18 бесплатных инструментов для андрологии, эмбриологии, репродуктологии и гистологии, которые работают в браузере. Снимки и видео не покидают ваш компьютер.",
   icons: { icon: `${BASE}/icon.svg` },
 };
 export const viewport: Viewport = { themeColor: "#e1061b", width: "device-width", initialScale: 1 };
