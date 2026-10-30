@@ -29,7 +29,6 @@ python spermcasa.py video.mp4            # HTML-отчёт, CSV, JSON и вид�
 | `web/Magauiya.html` | Готовое приложение одним файлом, работает без интернета |
 | `bopasi/`, `BOPASI.html` | Платформа BOPASI: 20 инструментов в браузере (сайт и один файл); исходники в `site/` |
 | `server/` | Сервер BOPASI: FastAPI + Celery + Redis для нейросетей на GPU — см. `server/README.md` |
-| `molmoda/` | Неизменённая сборка MolModa (Durrant Lab, GPL) для докинга в браузере |
 | `web/index.html` | Версия для сайта (GitHub Pages и т. п.) |
 | `web/*.js`, `app_body.html`, `model.json` | Исходники веб-версии; `python3 build.py` → `index.html`, `python3 build.py --offline` → `Magauiya.html` |
 | `python/spermcasa.py` | Конвейер анализа: компенсация сдвига столика, калибровка по сетке, детекция, трекинг, отсев дебриса, классы ВОЗ |

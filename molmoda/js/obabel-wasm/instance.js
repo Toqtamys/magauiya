@@ -1,1 +1,0 @@
-import Webobabel from "./obabel.js";
