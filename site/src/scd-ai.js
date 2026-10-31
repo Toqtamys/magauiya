@@ -41,9 +41,11 @@ const SCD_AI = (() => {
     for (let i = 0; i < n; i++) { x[i] = d[i * 4] / 255; x[n + i] = d[i * 4 + 1] / 255; x[2 * n + i] = d[i * 4 + 2] / 255; }
     return { x, k, px, py };
   }
-  const iou = (a, b) => {
+  // перекрытие рамок: IoU и доля меньшей рамки внутри большей (одна клетка, найденная дважды вдоль хвоста)
+  const overlap = (a, b) => {
     const w = Math.max(0, Math.min(a.x2, b.x2) - Math.max(a.x1, b.x1)), h = Math.max(0, Math.min(a.y2, b.y2) - Math.max(a.y1, b.y1));
-    const i = w * h; return i / ((a.x2 - a.x1) * (a.y2 - a.y1) + (b.x2 - b.x1) * (b.y2 - b.y1) - i + 1e-9);
+    const i = w * h, A = (a.x2 - a.x1) * (a.y2 - a.y1), B = (b.x2 - b.x1) * (b.y2 - b.y1);
+    return { iou: i / (A + B - i + 1e-9), ios: i / (Math.min(A, B) + 1e-9) };
   };
 
   // разбор выхода: рамки + классы + коэффициенты масок → клетки с маской, центром и эллипсом
@@ -58,7 +60,7 @@ const SCD_AI = (() => {
     }
     cand.sort((a, b) => b.score - a.score);
     const keep = [];
-    for (const c of cand) if (!keep.some((k) => k.cls === c.cls && iou(k, c) > iouThr)) { keep.push(c); if (keep.length >= 300) break; }
+    for (const c of cand) if (!keep.some((k) => { const o = overlap(k, c); return o.iou > iouThr || o.ios > 0.7; })) { keep.push(c); if (keep.length >= 300) break; }
     const s = PROTO / SIZE, cells = [];
     for (const d of keep) {
       const coef = new Float32Array(NM); for (let m = 0; m < NM; m++) coef[m] = P[(4 + NC + m) * N + d.j];
@@ -95,30 +97,16 @@ const SCD_AI = (() => {
     const t0 = performance.now();
     const res = await ses.run({ [ses.inputNames[0]]: new window.ort.Tensor('float32', lb.x, [1, 3, SIZE, SIZE]) });
     const [o0, o1] = ses.outputNames.map((n) => res[n]);
-    const cells = decode(o0, o1, lb, canvas.width, canvas.height, opt.conf ?? 0.25, opt.iou ?? 0.7);
+    const cells = decode(o0, o1, lb, canvas.width, canvas.height, opt.conf ?? 0.1, opt.iou ?? 0.5);
     return { cells, ms: performance.now() - t0 };
   }
 
-  // объединение с классическим разбором: нейросеть решает «фрагментирована или нет»,
-  // измерение гало (критерии Fernández) уточняет подкласс, если не противоречит нейросети
-  function merge(aiCells, classic) {
-    const used = new Set();
-    return aiCells.map((a) => {
-      let best = null, bd = Infinity;
-      for (const c of classic) {
-        if (used.has(c) || c.cls === 'excluded') continue;
-        const inBox = c.x >= a.box[0] && c.x <= a.box[2] && c.y >= a.box[1] && c.y <= a.box[3];
-        const dd = Math.hypot(c.x - a.x, c.y - a.y); if (inBox && dd < bd) { bd = dd; best = c; }
-      }
-      if (best) used.add(best);
-      const fragC = best && SCD.FRAG.has(best.cls);
-      let cls;
-      if (a.ai === 'frag') cls = best && fragC ? best.cls : 'small';
-      else cls = best && !fragC ? best.cls : 'medium';
-      return { ...a, id: 'ai' + Math.round(a.x) + '_' + Math.round(a.y), cls, halo: best && (fragC === (a.ai === 'frag')) ? best.halo : 0,
-        agree: best ? fragC === (a.ai === 'frag') : null, weak: false, overlap: false };
-    });
+  // клетки нейросети → классы инструмента: «не фрагментирована» / «фрагментирована»
+  function toCells(aiCells) {
+    return aiCells.map((a) => ({ ...a, id: 'ai' + Math.round(a.x) + '_' + Math.round(a.y), cls: a.ai === 'frag' ? 'frag' : 'ok', halo: 0, weak: false, overlap: false }));
   }
 
-  return { load, detect, merge, ready: () => !!session };
+  return { load, detect, toCells, ready: () => !!session };
 })();
+
+if (typeof window !== 'undefined') window.BOPASI_SCD_AI = SCD_AI;   // для проверки из консоли

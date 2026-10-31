@@ -8,7 +8,8 @@
 const SCD = (() => {
   const CLASSES = ['large', 'medium', 'small', 'none', 'degraded', 'excluded'];
   let FLAT = 0.5;
-  const FRAG = new Set(['small', 'none', 'degraded']);
+  const FRAG = new Set(['small', 'none', 'degraded', 'frag']);
+  const AI_CLASSES = ['ok', 'frag', 'excluded'];   // режим нейросети: два класса
 
   // ── подготовка: «окраска» относительно оценённого фона
   function prepare(img) {
@@ -236,10 +237,10 @@ const SCD = (() => {
   }
 
   function summary(cells) {
-    const n = Object.fromEntries(CLASSES.map((k) => [k, 0]));
+    const n = Object.fromEntries([...CLASSES, 'ok', 'frag'].map((k) => [k, 0]));
     for (const c of cells) n[c.cls]++;
-    const counted = n.large + n.medium + n.small + n.none + n.degraded;
-    const frag = n.small + n.none + n.degraded;
+    const counted = n.large + n.medium + n.small + n.none + n.degraded + n.ok + n.frag;
+    const frag = n.small + n.none + n.degraded + n.frag;
     return { n, counted, frag, dfi: counted ? (frag / counted) * 100 : 0 };
   }
 
@@ -290,5 +291,5 @@ const SCD = (() => {
     return { img: { width: W, height: H, data }, truth: cells.map((c) => ({ x: c.x, y: c.y, cls: c.cls, ratio: c.hw / c.m })) };
   }
 
-  return { CLASSES, FRAG, prepare, detect, classify, summary, synth, otsu3, setFlat(v) { FLAT = v; } };
+  return { CLASSES, AI_CLASSES, FRAG, prepare, detect, classify, summary, synth, otsu3, setFlat(v) { FLAT = v; } };
 })();
