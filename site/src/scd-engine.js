@@ -16,9 +16,21 @@ const SCD = (() => {
     const { width: w, height: h, data } = img, n = w * h;
     const c = new Float32Array(n), lum = new Float32Array(n);
     for (let i = 0, p = 0; i < n; i++, p += 4) { lum[i] = 0.3 * data[p] + 0.59 * data[p + 1] + 0.11 * data[p + 2]; c[i] = data[p + 1]; }
-    const med = quantile(lum, 0.5);
+    // снимок через окуляр (телефоном): круглое поле зрения в чёрной рамке — считаем только внутри круга
+    const field = findField(lum, w, h);
+    const inF = field ? (i) => { const x = i % w, y = (i / w) | 0; return Math.hypot(x - field.cx, y - field.cy) < field.r; } : null;
+    let med;
+    if (field) {
+      const inside = []; for (let i = 0; i < n; i += 7) if (inF(i)) inside.push(lum[i]);
+      med = quantile(Float32Array.from(inside), 0.5);
+    } else med = quantile(lum, 0.5);
     const bright = med > 100;                         // светлое поле или флуоресценция
     const src = bright ? c : lum;
+    if (field) {   // вне круга — значение фона поля, чтобы рамка не считалась окраской
+      const vals = []; for (let i = 0; i < n; i += 7) if (inF(i)) vals.push(src[i]);
+      const fill = quantile(Float32Array.from(vals), bright ? 0.88 : 0.12);
+      for (let i = 0; i < n; i++) if (!inF(i)) src[i] = fill;
+    }
     const B = Math.max(16, Math.round(Math.min(w, h) / 14));   // блок крупнее большого гало
     const gw = Math.ceil(w / B), gh = Math.ceil(h / B), grid = new Float32Array(gw * gh);
     const buf = [];
@@ -47,8 +59,26 @@ const SCD = (() => {
     }
     // подавление шума: два прохода бокс-фильтра 3×3
     const Sm = boxSmooth(boxSmooth(S, w, h), w, h);
-    return { w, h, S: Sm, bright };
+    if (field) for (let i = 0; i < n; i++) if (!inF(i)) Sm[i] = 0;
+    return { w, h, S: Sm, bright, field };
   }
+  // круг поля зрения: самая большая светлая область, если вокруг много почти чёрного
+  function findField(lum, w, h) {
+    const st = Math.max(1, Math.round(Math.min(w, h) / 300)), gw = Math.ceil(w / st), gh = Math.ceil(h / st), g = new Uint8Array(gw * gh);
+    let dark = 0, tot = 0;
+    for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) { const v = lum[Math.min(h - 1, gy * st) * w + Math.min(w - 1, gx * st)]; tot++; if (v < 45) dark++; else if (v > 80) g[gy * gw + gx] = 1; }
+    if (dark / tot < 0.12) return null;
+    const lab = new Int32Array(gw * gh); let best = null, id = 0; const q = [];
+    for (let i = 0; i < g.length; i++) {
+      if (!g[i] || lab[i]) continue; id++; lab[i] = id; q.length = 0; q.push(i); let A = 0, sx = 0, sy = 0;
+      while (q.length) { const j = q.pop(), x = j % gw, y = (j / gw) | 0; A++; sx += x; sy += y;
+        for (const k of [j - 1, j + 1, j - gw, j + gw]) if (k >= 0 && k < g.length && g[k] && !lab[k] && Math.abs((k % gw) - x) <= 1) { lab[k] = id; q.push(k); } }
+      if (!best || A > best.A) best = { A, sx, sy };
+    }
+    if (!best || best.A < 0.05 * tot) return null;
+    return { cx: (best.sx / best.A + 0.5) * st, cy: (best.sy / best.A + 0.5) * st, r: Math.sqrt(best.A / Math.PI) * st * 0.97 };
+  }
+
   function boxSmooth(a, w, h) {
     const o = new Float32Array(a.length);
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
@@ -137,7 +167,7 @@ const SCD = (() => {
     const geom = (c, labArr) => {
       const A = c.px.length;
       let sx = 0, sy = 0, ss = 0, edge = false;
-      for (const j of c.px) { const x = j % w, y = (j / w) | 0; sx += x; sy += y; ss += S[j]; if (x < 2 || y < 2 || x > w - 3 || y > h - 3) edge = true; }
+      for (const j of c.px) { const x = j % w, y = (j / w) | 0; sx += x; sy += y; ss += S[j]; if (x < 2 || y < 2 || x > w - 3 || y > h - 3 || (P.field && Math.hypot(x - P.field.cx, y - P.field.cy) > P.field.r - 3)) edge = true; }
       const cx = sx / A, cy = sy / A;
       let xx = 0, yy = 0, xy = 0; const bnd = [];
       for (const j of c.px) {
