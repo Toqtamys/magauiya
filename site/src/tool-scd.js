@@ -41,6 +41,7 @@ const UI_SCD = {
   aiRun: L('Нейросеть ищет клетки…', 'Нейрожелі жасушаларды іздеуде…', 'The neural net is finding cells…'),
   aiDone: L('Нейросеть: найдено клеток', 'Нейрожелі: табылған жасушалар', 'Neural net: cells found'),
   aiConf: L('Порог уверенности нейросети', 'Нейрожелі сенімділік табалдырығы', 'Neural-net confidence threshold'),
+  aiNone: L('Клеток не найдено: нейросеть обучена на снимках при большом увеличении (одна-три клетки в кадре). Для полей с малым увеличением и снимков через окуляр используйте классический режим.', 'Жасуша табылмады: нейрожелі жоғары үлкейтілген суреттерде оқытылған (кадрда бір-үш жасуша). Аз үлкейтілген өрістер мен окуляр арқылы түсірілген суреттер үшін классикалық режимді қолданыңыз.', 'No cells found: the net was trained on high-magnification images (one to three cells per frame). For low-magnification fields and photos through the eyepiece, use classic mode.'),
   aiOffline: L('Нейросеть работает только на сайте BOPASI (в офлайн-файле её нет).', 'Нейрожелі тек BOPASI сайтында жұмыс істейді (офлайн файлда жоқ).', 'The neural net runs only on the BOPASI website (not in the offline file).'),
   aiFail: L('Нейросеть не запустилась', 'Нейрожелі іске қосылмады', 'The neural net failed to start'),
   aiSample: L('Нейросеть обучена на настоящих микроснимках; на синтетическом примере она клеток не находит. Загрузите свой снимок.', 'Нейрожелі нақты микросуреттерде оқытылған; синтетикалық мысалда жасуша таппайды. Өз суретіңізді жүктеңіз.', 'The neural net was trained on real micrographs and finds no cells in the synthetic sample. Load your own image.'),
@@ -162,7 +163,7 @@ function mountScd(root) {
     classicCtl.hidden = st.method === 'ai'; aiCtl.hidden = st.method !== 'ai';
     if (!kinds().includes(st.addCls)) st.addCls = st.method === 'ai' ? 'frag' : 'none';
     addSel.replaceChildren(...kinds().map((k) => h('option', { value: k, selected: k === st.addCls }, tr(SCD_NAME[k]))));
-    aiNote.textContent = st.method !== 'ai' ? '' : st.aiMsg || (f && f.ai ? `${tr(UI_SCD.aiDone)}: ${f.ai.n} · ${(f.ai.ms / 1000).toFixed(1)} s` + '. ' + (f.sample && !f.ai.n ? tr(UI_SCD.aiSample) + ' ' : '') + tr(UI_SCD.aiAbout) : '');
+    aiNote.textContent = st.method !== 'ai' ? '' : st.aiMsg || (f && f.ai ? `${tr(UI_SCD.aiDone)}: ${f.ai.n} · ${(f.ai.ms / 1000).toFixed(1)} s` + '. ' + (f.sample && !f.ai.n ? tr(UI_SCD.aiSample) + ' ' : !f.ai.n ? tr(UI_SCD.aiNone) + ' ' : '') + tr(UI_SCD.aiAbout) : '');
     canvas.style.cursor = st.addMode ? 'crosshair' : 'pointer';
     note.textContent = f ? (f.sample ? tr(UI_SCD.sampleNote) : `${f.name} · ${f.canvas.width}×${f.canvas.height}`) : '';
     thumbs.replaceChildren(...(st.fields.length > 1 ? st.fields.map((x, i) => h('button', { class: 'thumb' + (i === st.sel ? ' on' : ''), title: x.name, onclick: () => { st.sel = i; draw(); sync(); } }, h('img', { src: x.thumb, alt: x.name }))) : []));
