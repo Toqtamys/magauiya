@@ -11,7 +11,8 @@ const SCD_NAME = {
   frag: L('Фрагментирована', 'Фрагменттелген', 'Fragmented'),
 };
 const UI_SCD = {
-  drop: L('Перетащите снимки SCD-препарата — можно несколько полей', 'SCD препаратының суреттерін сүйреңіз — бірнеше өріс болады', 'Drop SCD slide images — several fields at once'),
+  drop: L('Перетащите снимки SCD-препарата (×40 или ×100) — можно несколько полей', 'SCD препаратының суреттерін сүйреңіз (×40 немесе ×100) — бірнеше өріс болады', 'Drop SCD slide images (×40 or ×100) — several fields at once'),
+  empty: L('Загрузите снимки препарата, снятые с объективом ×40 или ×100', '×40 немесе ×100 объективпен түсірілген препарат суреттерін жүктеңіз', 'Load slide images taken with a ×40 or ×100 objective'),
   sample: L('Открыть пример', 'Мысалды ашу', 'Load sample'),
   sampleNote: L('Пример: синтетическое поле SCD с известными классами', 'Мысал: белгілі кластары бар синтетикалық SCD өрісі', 'Sample: a synthetic SCD field with known classes'),
   edit: L('Клик по ядру — сменить класс', 'Ядроны басу — класты ауыстыру', 'Click a nucleus to change its class'),
@@ -76,6 +77,7 @@ function mountScd(root) {
   const aiCtl = h('label', { class: 'ctl' }, h('div', { class: 'ctl-row' }, h('span', {}, tr(UI_SCD.aiConf)), confOut),
     h('input', { type: 'range', min: 0.05, max: 0.6, step: 0.05, value: st.aiConf, oninput: (e) => { st.aiConf = +e.target.value; confOut.textContent = st.aiConf.toFixed(2); },
       onchange: async () => { const f = st.fields[st.sel]; if (f && st.method === 'ai') { await analyse(f); draw(); sync(); } } }));
+  const emptyBox = h('button', { type: 'button', class: 'scd-empty', onclick: () => fileIn.click() }, h('strong', {}, tr(UI_SCD.empty)), h('span', {}, 'JPG · PNG'));
   const drop = h('div', { class: 'drop', tabindex: 0, onclick: () => fileIn.click(), onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') fileIn.click(); } },
     h('strong', {}, tr(UI_SCD.drop)), h('span', {}, 'JPG · PNG · WebP'));
   ['dragover', 'dragenter'].forEach((ev) => root.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
@@ -83,13 +85,13 @@ function mountScd(root) {
   root.addEventListener('drop', (e) => addFiles([...e.dataTransfer.files].filter((f) => f.type.startsWith('image/'))));
 
   root.append(h('div', { class: 'scd' },
-    h('div', { class: 'scd-main' }, h('div', { class: 'scd-stage' }, canvas), note, thumbs, legend),
+    h('div', { class: 'scd-main' }, h('div', { class: 'scd-stage' }, canvas, emptyBox), note, thumbs, legend),
     h('div', { class: 'scd-side' }, h('div', { class: 'ctl' }, h('div', { class: 'ctl-row' }, h('span', {}, tr(UI_SCD.method))), seg), aiNote, result,
       h('div', { class: 'row' }, addBtn, addSel),
       h('p', { class: 'hint' }, tr(UI_SCD.edit)),
       classicCtl, aiCtl,
       h('button', { class: 'btn-ghost', onclick: async () => { const f = st.fields[st.sel]; if (f) { await analyse(f); draw(); sync(); } } }, tr(UI_SCD.redetect)),
-      drop, h('button', { class: 'btn-link', onclick: loadSample }, tr(UI_SCD.sample)), fileIn)));
+      drop, fileIn)));
 
   async function analyse(f) {
     const classicOf = () => SCD.detect(SCD.prepare(f.img), { coreSens: st.coreSens, haloSens: st.haloSens });
@@ -129,13 +131,6 @@ function mountScd(root) {
     for (const file of files) { try { const c = await fileToCanvasMax(file, SCD_MAX); await addField(c, file.name, false); } catch {} await new Promise((r) => setTimeout(r)); }
     st.sel = Math.max(0, st.fields.length - files.length); draw(); sync();
   }
-  async function loadSample() {
-    st.fields = st.fields.filter((f) => !f.sample);
-    const { img } = SCD.synth({ seed: 7 });
-    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
-    c.getContext('2d').putImageData(new ImageData(img.data, img.width, img.height), 0, 0);
-    st.sel = st.fields.length; await addField(c, 'scd-sample.png', true); st.sel = st.fields.length - 1; draw(); sync();
-  }
   function draw() {
     const f = st.fields[st.sel]; if (!f) return;
     canvas.width = f.canvas.width; canvas.height = f.canvas.height;
@@ -158,6 +153,7 @@ function mountScd(root) {
   }
   function sync() {
     const f = st.fields[st.sel];
+    canvas.hidden = !f; emptyBox.hidden = !!f;
     addBtn.textContent = (st.addMode ? '− ' : '+ ') + tr(UI_SCD.add); addBtn.classList.toggle('on', st.addMode);
     segBtns.forEach((b, i) => b.classList.toggle('on', ['classic', 'ai'][i] === st.method));
     classicCtl.hidden = st.method === 'ai'; aiCtl.hidden = st.method !== 'ai';
@@ -217,7 +213,7 @@ function mountScd(root) {
     draw(); sync();
   });
 
-  loadSample();
+  sync();
   return { destroy() { alive = false; } };
 }
 

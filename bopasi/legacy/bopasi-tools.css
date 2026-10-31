@@ -160,6 +160,10 @@ body.embed-fs .p-head { display: none; }
 .scd { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 26px; }
 .scd-stage { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #eee; }
 .scd-canvas { display: block; width: 100%; height: auto; }
+.scd-empty { width: 100%; min-height: 360px; display: grid; place-content: center; gap: 8px; text-align: center; padding: 32px; border: 2px dashed var(--line); border-radius: 12px; background: var(--tone); color: var(--ink); font: inherit; cursor: pointer; }
+.scd-empty strong { font-size: 18px; max-width: 32ch; }
+.scd-empty span { color: var(--soft); font-size: 14px; }
+.scd-empty:hover { border-color: var(--blue); }
 .scd-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .scd-result { display: grid; gap: 10px; }
 .scd-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
