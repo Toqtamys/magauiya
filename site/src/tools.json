@@ -786,7 +786,7 @@
   "section": "andrology",
   "interactive": "scd",
   "action": "analyze",
-  "authors": "BOPASI · Fernández et al. (2003, 2005) — критерии SCD",
+  "authors": "BOPASI · Fernández et al. (2003, 2005) — критерии SCD · нейросеть: YOLOv8s-seg, набор Ornelas Nande et al. (2026, CC BY 4.0), Ultralytics (AGPL-3.0)",
   "name": "SCD / Halo · DFI",
   "tagline": {
    "ru": "Индекс фрагментации ДНК по тесту дисперсии хроматина: находит ядра и гало, считает DFI.",
@@ -799,6 +799,11 @@
    "en": "After acid denaturation and lysis, intact DNA forms a large halo of chromatin loops around the nucleus, while fragmented DNA forms a small halo or none. The tool estimates the background, segments nuclei (including weakly stained, degraded ones), measures halo width along 48 rays while respecting neighbouring cells, and classifies each nucleus by the Fernández criteria: large halo — width at least the core minor diameter; small — at most one third of it; medium — in between. DFI = (small + no halo + degraded) / all counted × 100%. Every cell can be corrected with a click."
   },
   "features": [
+   {
+    "ru": "Режим «Нейросеть»: YOLOv8s-seg находит сперматозоиды и делит их на «фрагментирована / нет» прямо в браузере",
+    "kk": "«Нейрожелі» режимі: YOLOv8s-seg сперматозоидтарды тауып, «фрагменттелген / жоқ» деп бөледі — тікелей браузерде",
+    "en": "Neural-net mode: YOLOv8s-seg finds sperm and labels them fragmented / not, right in the browser"
+   },
    {
     "ru": "Пять классов: большое, среднее, малое гало, без гало, дегенеративные",
     "kk": "Бес класс: үлкен, орташа, кіші гало, галосыз, дегенеративті",
