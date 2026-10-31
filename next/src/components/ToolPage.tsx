@@ -45,6 +45,7 @@ export function ToolPage({ id }: { id: string }) {
         <h1 className="mt-3 font-display text-[clamp(40px,6vw,92px)] font-bold uppercase leading-[0.92]">{t(tool.name, locale)}</h1>
         <p className="mt-5 max-w-[780px] text-lg text-white/75">{t(tool.tagline, locale)}</p>
         <p className="mt-6 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-x text-white/60"><ShieldCheck className="size-4" strokeWidth={1.5} />{tr("localNote")}</p>
+        {id === "scd" && <Link href="/scd-method/" className={buttonVariants({ variant: "outline", size: "sm", className: "ml-0 mt-6 flex w-fit md:ml-6 md:inline-flex" })}>{locale === "en" ? "How DFI is calculated" : locale === "kk" ? "DFI қалай есептеледі" : "Как считается DFI"}<ArrowRight className="size-4" /></Link>}
       </motion.div>
       <motion.div data-tool-panel className="mt-10 rounded-[4px] bg-white p-4 text-[#0a1240] md:p-8"
         initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, type: "spring", stiffness: 100, damping: 18 }}>
