@@ -152,7 +152,7 @@ const UI = {
 // Разделы меню инструментов и сцена «путешествия» для каждого
 const CHAPTERS = [
   { id: 'andrology', lead: L('Спермограмма по видео, фрагментация ДНК, подсчёт в камере и морфология.', 'Бейне бойынша спермограмма, ДНҚ фрагментациясы, камерада санау және морфология.', 'Video semen analysis, DNA fragmentation, chamber counts and morphology.'), scene: 0.6, name: L('Андрология', 'Андрология', 'Andrology'),
-    tools: ['bopasi', 'scd', 'bluetol', 'who6', 'chamber', 'lab-counter', 'tmsc'] },
+    tools: ['bopasi', 'visem', 'scd', 'bluetol', 'who6', 'chamber', 'lab-counter', 'tmsc'] },
   { id: 'embryology', lead: L('Снимки ооцитов и эмбрионов, грейдинг, морфокинетика и time-lapse.', 'Ооциттер мен эмбриондар суреттері, грейдинг, морфокинетика және time-lapse.', 'Oocyte and embryo images, grading, morphokinetics and time-lapse.'), scene: 2, name: L('Эмбриология', 'Эмбриология', 'Embryology'),
     tools: ['rc-phase', 'morphometry', 'cleavage', 'kinetics', 'gardner'] },
   { id: 'reproduction', lead: L('Овариальный резерв, сроки беременности, ХГЧ и фертильное окно.', 'Аналық без резерві, жүктілік мерзімі, ХГЧ және фертильді терезе.', 'Ovarian reserve, pregnancy dates, hCG and the fertile window.'), scene: 3, name: L('Репродуктология', 'Репродуктология', 'Reproductive medicine'),
@@ -168,6 +168,7 @@ const CHAPTERS = [
 // Короткие имена для меню
 const SHORT = {
   'bopasi': L('BOPASI · спермограмма по видео', 'BOPASI · бейне бойынша спермограмма', 'BOPASI · video semen analysis'),
+  'visem': L('VISEM · нейросеть', 'VISEM · нейрожелі', 'VISEM · neural net'),
   'scd': L('SCD / Halo · DFI', 'SCD / Halo · DFI', 'SCD / Halo · DFI'),
   'bluetol': L('Блютол · DFI', 'Блютол · DFI', 'Bluetol · DFI'),
   'who6': L('Заключение ВОЗ-6', 'ДДҰ-6 қорытындысы', 'WHO-6 report'),
@@ -202,7 +203,7 @@ const SHORT = {
 
 // Что инструмент принимает или делает — правый край строки меню
 const KIND = {
-  bopasi: L('видео', 'бейне', 'video'), scd: L('снимки', 'суреттер', 'images'), bluetol: L('снимки', 'суреттер', 'images'),
+  bopasi: L('видео', 'бейне', 'video'), visem: L('видео · ИИ', 'бейне · ЖИ', 'video · AI'), scd: L('снимки', 'суреттер', 'images'), bluetol: L('снимки', 'суреттер', 'images'),
   who6: L('отчёт', 'есеп', 'report'), chamber: L('расчёт', 'есептеу', 'calculator'), 'lab-counter': L('подсчёт', 'санау', 'counting'),
   tmsc: L('расчёт', 'есептеу', 'calculator'), 'rc-phase': L('снимки', 'суреттер', 'images'), morphometry: L('снимки', 'суреттер', 'images'),
   cleavage: L('грейд', 'грейд', 'grade'), kinetics: L('время', 'уақыт', 'timings'), gardner: L('грейд', 'грейд', 'grade'),

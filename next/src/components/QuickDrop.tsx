@@ -13,7 +13,7 @@ import { useLocale } from "./Providers";
 import { cn } from "@/lib/cn";
 
 const FOR_IMAGES = ["scd", "bluetol", "he-nuclei", "ki67", "rc-phase", "morphometry"];
-const FOR_VIDEO = ["bopasi"];
+const FOR_VIDEO = ["bopasi", "visem"];
 const BY_EXT: [RegExp, string[]][] = [
   [/\.(nii|nii\.gz|nrrd|nhdr|mgh|mgz|mha|mhd)$/i, ["niivue"]],
   [/\.(pdb|ent|cif|mmcif|bcif|sdf|mol|mol2)$/i, ["molstar"]],
