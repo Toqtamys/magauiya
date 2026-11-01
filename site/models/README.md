@@ -12,3 +12,13 @@
   Сайт BOPASI открыт целиком (этот репозиторий), что согласуется с AGPL-3.0.
 - Преобразование: экспорт в ONNX (opset 17, вход 1×3×1024×1024), веса сохранены в float16
   с приведением к float32 при загрузке (24 МБ вместо 45 МБ; расхождение выходов < 0.1%).
+
+## visem-yolov5n.onnx — детектор сперматозоидов для спермограммы по видео
+
+- Источник: VISEM-Tracking, SimulaMet (Thambawita V., Hicks S. A., Storås A. M. и др.
+  «VISEM-Tracking, a human spermatozoa tracking dataset», Scientific Data, 2023).
+  Веса: `best_checkpoints/yolov5n/weights/best.pt`, https://huggingface.co/datasets/SimulaMet-HOST/VISEM-Tracking — лицензия CC BY 4.0.
+- Архитектура YOLOv5n (Ultralytics, AGPL-3.0). Классы: 0 — сперматозоид, 1 — скопление, 2 — мелкая головка.
+- Преобразование: экспорт в ONNX (opset 17, вход 1×3×H×W, H и W кратны 32), веса в float16 (3,8 МБ).
+- Обучена на видео с тёмным фоном (светлые головки). Видео со светлым фоном BOPASI переводит в негатив,
+  но точность на них ниже — поэтому для режима нейросети просим загружать видео на тёмном фоне.
