@@ -133,6 +133,9 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .note p{margin:0 0 8px}
 .empty{padding:28px 20px;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.nn-hint { color: #b45309; font-weight: 600; }
+#detector { width: 100%; }
+.form label:has(#detector) { grid-column: 1 / -1; }
 </style>
 
 <div class="wrap">
@@ -199,8 +202,10 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
           <label><span data-i18n="pitch"></span><input type="number" id="pitch" value="100" min="1" step="1"></label>
           <label><span data-i18n="dilution"></span><input type="number" id="dilution" value="1" min="1" step="0.5"></label>
           <label><span data-i18n="umpx"></span><input type="text" id="umpx" data-i18n-ph="umpxPh" inputmode="decimal"></label>
+          <label><span data-i18n="detector"></span><select id="detector"><option value="classic" data-i18n="detClassic"></option><option value="nn" data-i18n="detNN"></option></select></label>
         </div>
         <p class="hint" data-i18n="chamberHint"></p>
+        <p class="hint nn-hint" id="nnHint" data-i18n="nnHint" hidden></p>
       </section>
 
       <section class="panel">
@@ -653,7 +658,7 @@ C.Analyzer.prototype.add = function (fr, R, shift) {
   const pts = R.dets.map(d => [d[0] - cum[0], d[1] - cum[1]]);
   const ids = this.tracker.step(fr, pts);
   const still = mag < o.stillShiftPx;
-  this.frames.push({ fr, mag, cum, dets: R.dets, ids, still });
+  this.frames.push({ fr, mag, cum, dets: R.dets, ids, still, nn: !!R.nn });
   if (R.patches) this.patchFrames.set(fr, R.patches);
   if (still && R.patches) this.counting.push({ fr, free: R.free });
 };
@@ -675,7 +680,8 @@ C.Analyzer.prototype.finish = function (model) {
   // вероятность «головка» для неподвижных треков и детекций кадров подсчёта
   const tmap = new Map(tracks.map(t => [t.id, t]));
   const probCache = new Map();
-  const probOf = (fr, j) => { const key = fr * 100000 + j; if (probCache.has(key)) return probCache.get(key);
+  const probOf = (fr, j) => { const NF = byFr.get(fr); if (NF && NF.nn) return NF.dets[j][4];   // нейросеть: вероятность «сперматозоид»
+    const key = fr * 100000 + j; if (probCache.has(key)) return probCache.get(key);
     const P = this.patchFrames.get(fr); const p = P ? C.predictProba(model, C.features(P, j * 1728)) : 0.5; probCache.set(key, p); return p; };
   for (const [id, k] of kin) {
     if (k.cls === 'a' || k.cls === 'b') { k.p = 1; k.sperm = true; continue; }
@@ -760,6 +766,11 @@ const I18N = {
     tagline: 'Концентрация и подвижность сперматозоидов по ВОЗ-5 и ВОЗ-6 из видео в счётной камере. Видео обрабатывается на вашем компьютере и никуда не загружается.',
     stepVideo: '1 · Видео', dropTitle: 'Перетащите видео сюда', dropSub: 'или нажмите, чтобы выбрать. MP4/MOV, можно несколько',
     stepChamber: '2 · Камера и препарат', depth: 'Глубина камеры, мкм', pitch: 'Шаг сетки, мкм', dilution: 'Разведение, раз', umpx: 'Масштаб, мкм/px', umpxPh: 'авто по сетке',
+    detector: 'Детектор головок', detClassic: 'Классический', detNN: 'Нейросеть VISEM',
+    nnHint: 'Нейросеть VISEM (YOLOv5n) обучена на видео с ТЁМНЫМ фоном: светлые головки на тёмном поле (тёмное поле или фазовый контраст). Загружайте такие видео. Анализируются первые 8 секунд; работает только на сайте BOPASI.',
+    nnLoad: 'Загрузка нейросети', nnLight: 'ВНИМАНИЕ: видео со светлым фоном — нейросеть обучена на тёмном фоне и здесь недосчитывает клетки и подвижность; для такого видео используйте классический детектор',
+    nnOff: 'Нейросеть доступна только на сайте BOPASI — анализ выполнен классическим детектором', detUsed: 'Детектор',
+    detUsedNN: 'нейросеть VISEM (YOLOv5n, SimulaMet, CC BY 4.0), первые {s} с', detUsedClassic: 'классический',
     chamberHint: 'Маклер: 10 мкм и 100 мкм. Объём эякулята можно указать у каждого файла — тогда появятся общее количество и его процентиль.',
     vol: 'V, мл', volAria: 'Объём эякулята, мл', remove: 'Убрать',
     analyze: 'Анализировать', analyzing: 'Идёт анализ…', addVideos: 'Добавьте одно или несколько видео.', ready: 'Готово к анализу.', allDone: 'Все видео обработаны.',
@@ -805,6 +816,11 @@ const I18N = {
     tagline: 'Санау камерасындағы бейне бойынша сперматозоидтардың концентрациясы мен қозғалғыштығы, ДДҰ-5 және ДДҰ-6 бойынша. Бейне сіздің компьютеріңізде өңделеді және ешқайда жүктелмейді.',
     stepVideo: '1 · Бейне', dropTitle: 'Бейнені осында сүйреңіз', dropSub: 'немесе таңдау үшін басыңыз. MP4/MOV, бірнешеуі болады',
     stepChamber: '2 · Камера және препарат', depth: 'Камера тереңдігі, мкм', pitch: 'Тор қадамы, мкм', dilution: 'Сұйылту, есе', umpx: 'Масштаб, мкм/px', umpxPh: 'тор бойынша авто',
+    detector: 'Бас детекторы', detClassic: 'Классикалық', detNN: 'VISEM нейрожелісі',
+    nnHint: 'VISEM нейрожелісі (YOLOv5n) ҚАРАҢҒЫ фондағы бейнелерде оқытылған: қараңғы өрісте ашық бастар (қараңғы өріс немесе фазалық контраст). Осындай бейнелерді жүктеңіз. Алғашқы 8 секунд талданады; тек BOPASI сайтында жұмыс істейді.',
+    nnLoad: 'Нейрожелі жүктелуде', nnLight: 'НАЗАР АУДАРЫҢЫЗ: ашық фонды бейне — нейрожелі қараңғы фонда оқытылған, мұнда жасушалар мен қозғалғыштықты кем санайды; мұндай бейне үшін классикалық детекторды қолданыңыз',
+    nnOff: 'Нейрожелі тек BOPASI сайтында қолжетімді — талдау классикалық детектормен жасалды', detUsed: 'Детектор',
+    detUsedNN: 'VISEM нейрожелісі (YOLOv5n, SimulaMet, CC BY 4.0), алғашқы {s} с', detUsedClassic: 'классикалық',
     chamberHint: 'Маклер: 10 мкм және 100 мкм. Әр файлға эякулят көлемін көрсетсеңіз, жалпы саны мен оның перцентилі шығады.',
     vol: 'V, мл', volAria: 'Эякулят көлемі, мл', remove: 'Алып тастау',
     analyze: 'Талдау', analyzing: 'Талдау жүріп жатыр…', addVideos: 'Бір немесе бірнеше бейне қосыңыз.', ready: 'Талдауға дайын.', allDone: 'Барлық бейне өңделді.',
@@ -850,6 +866,11 @@ const I18N = {
     tagline: 'Sperm concentration and motility per WHO 5th and 6th editions from video in a counting chamber. Video is processed on your computer and never uploaded.',
     stepVideo: '1 · Video', dropTitle: 'Drop videos here', dropSub: 'or click to choose. MP4/MOV, several at once',
     stepChamber: '2 · Chamber and sample', depth: 'Chamber depth, µm', pitch: 'Grid pitch, µm', dilution: 'Dilution, ×', umpx: 'Scale, µm/px', umpxPh: 'auto from grid',
+    detector: 'Head detector', detClassic: 'Classic', detNN: 'VISEM neural net',
+    nnHint: 'The VISEM neural net (YOLOv5n) was trained on videos with a DARK background: bright heads on a dark field (dark-field or phase contrast). Upload such videos. The first 8 seconds are analysed; it runs only on the BOPASI website.',
+    nnLoad: 'Loading the neural net', nnLight: 'WARNING: light-background video — the net was trained on dark backgrounds and undercounts cells and motility here; use the classic detector for such videos',
+    nnOff: 'The neural net is available only on the BOPASI website — the classic detector was used', detUsed: 'Detector',
+    detUsedNN: 'VISEM neural net (YOLOv5n, SimulaMet, CC BY 4.0), first {s} s', detUsedClassic: 'classic',
     chamberHint: 'Makler: 10 µm and 100 µm. Enter the ejaculate volume for a file to get the total count and its percentile.',
     vol: 'V, mL', volAria: 'Ejaculate volume, mL', remove: 'Remove',
     analyze: 'Analyze', analyzing: 'Analyzing…', addVideos: 'Add one or more videos.', ready: 'Ready to analyze.', allDone: 'All videos processed.',
@@ -1027,6 +1048,70 @@ async function decodeBySeeking(file, fps, onFrame, onTotal) {
 }
 
 // ------------------------------------------------------------------ анализ одного видео
+
+// ------------------------------------------------------------------ нейросеть VISEM (YOLOv5n) — второй детектор головок
+// Модель: VISEM-Tracking (Thambawita et al., SimulaMet, 2023; CC BY 4.0), YOLOv5 (Ultralytics, AGPL-3.0).
+// Классы: 0 — сперматозоид, 1 — скопление, 2 — мелкая головка; файл модели и ONNX Runtime лежат на сайте BOPASI.
+const NN_SECONDS = 8;
+const NN = (() => {
+  let ses = null, loading = null, chain = Promise.resolve();
+  const base = () => { try { if (window.parent && window.parent !== window && window.parent.BOPASI_BASE) return window.parent.BOPASI_BASE; } catch (_) {} return window.BOPASI_BASE || null; };
+  const script = (src) => new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => rej(new Error('script')); document.head.appendChild(el); });
+  function load(onProgress) {
+    if (ses) return Promise.resolve(ses);
+    return loading || (loading = (async () => {
+      const b = base(); if (!b || location.protocol === 'file:' && !/^https?:/.test(b)) throw new Error('offline');
+      const root = new URL(b, document.baseURI).href;
+      if (!window.ort) await script(root + 'ort/ort.wasm.min.js');
+      window.ort.env.wasm.wasmPaths = root + 'ort/';
+      window.ort.env.wasm.numThreads = self.crossOriginIsolated ? Math.min(4, navigator.hardwareConcurrency || 2) : 1;
+      const r = await fetch(root + 'models/visem-yolov5n.onnx'); if (!r.ok) throw new Error('model ' + r.status);
+      const buf = new Uint8Array(await r.arrayBuffer()); onProgress && onProgress(1);
+      ses = await window.ort.InferenceSession.create(buf, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+      return ses;
+    })().catch(e => { loading = null; throw e; }));
+  }
+  // кадр → тензор: длинная сторона 1280 (640 для малых видео), кратно 32, поля справа и снизу серые
+  function prep(img, W, H, invert) {
+    const L = Math.max(W, H) > 900 ? 1280 : 640, k = L / Math.max(W, H);
+    const nw = Math.round(W * k), nh = Math.round(H * k), Pw = Math.ceil(nw / 32) * 32, Ph = Math.ceil(nh / 32) * 32;
+    const c = new OffscreenCanvas(Pw, Ph), x = c.getContext('2d', { willReadFrequently: true });
+    x.fillStyle = 'rgb(114,114,114)'; x.fillRect(0, 0, Pw, Ph); x.drawImage(img, 0, 0, nw, nh);
+    const d = x.getImageData(0, 0, Pw, Ph).data, n = Pw * Ph, t = new Float32Array(3 * n);
+    for (let i = 0; i < n; i++) for (let ch = 0; ch < 3; ch++) { const v = d[i * 4 + ch] / 255; t[ch * n + i] = invert ? 1 - v : v; }
+    return { t, Pw, Ph, k };
+  }
+  function decode(out, k, conf = 0.25, iou = 0.45) {
+    const N = out.dims[1], C = out.dims[2], P = out.data, cand = [];
+    for (let i = 0; i < N; i++) {
+      const o = i * C, obj = P[o + 4]; if (obj < conf) continue;
+      let best = 0, cls = 0; for (let c = 0; c < C - 5; c++) { const v = obj * P[o + 5 + c]; if (v > best) { best = v; cls = c; } }
+      if (best < conf) continue;
+      const cx = P[o], cy = P[o + 1], w = P[o + 2], h = P[o + 3];
+      cand.push({ x1: cx - w / 2, y1: cy - h / 2, x2: cx + w / 2, y2: cy + h / 2, s: best, cls });
+    }
+    cand.sort((a, b) => b.s - a.s);
+    const keep = [];
+    for (const c of cand) {
+      if (keep.some(q => { const w = Math.max(0, Math.min(q.x2, c.x2) - Math.max(q.x1, c.x1)), h = Math.max(0, Math.min(q.y2, c.y2) - Math.max(q.y1, c.y1)), I = w * h;
+        return I / ((q.x2 - q.x1) * (q.y2 - q.y1) + (c.x2 - c.x1) * (c.y2 - c.y1) - I + 1e-9) > iou; })) continue;
+      keep.push(c); if (keep.length >= 1500) break;
+    }
+    // в координатах исходного кадра: [x, y, площадь, уверенность, вероятность «сперматозоид»]
+    return keep.map(c => [(c.x1 + c.x2) / 2 / k, (c.y1 + c.y2) / 2 / k, (c.x2 - c.x1) * (c.y2 - c.y1) / (k * k), c.s, c.cls === 1 ? 0 : c.s]);
+  }
+  function detect(img, W, H, invert) {
+    const p = prep(img, W, H, invert);   // рисуем кадр сразу, до передачи его воркеру
+    const run = chain.then(async () => {
+      const r = await ses.run({ [ses.inputNames[0]]: new window.ort.Tensor('float32', p.t, [1, 3, p.Ph, p.Pw]) });
+      return decode(r[ses.outputNames[0]], p.k);
+    });
+    chain = run.catch(() => {});
+    return run;
+  }
+  return { load, detect, ready: () => !!ses };
+})();
+
 async function analyzeItem(item, settings, onProgress) {
   const nWorkers = Math.max(2, Math.min(6, (navigator.hardwareConcurrency || 4) - 1));
   const pool = new Pool(nWorkers);
@@ -1042,10 +1127,13 @@ async function analyzeItem(item, settings, onProgress) {
   const specs = new Map(), dets = new Map(), shifts = new Map([[0, [0, 0]]]), corrStarted = new Set();
   let next = 0, submitted = 0, waiters = [], failed = null;
   const opt = { chamberDepthUm: settings.depth, gridPitchUm: settings.pitch, dilution: settings.dilution, umPerPx: null };
+  let useNN = settings.detector === 'nn', nnErr = null, invert = false, nnMax = Infinity;
+  if (useNN) { try { await NN.load(); nnMax = Math.round(fps * NN_SECONDS); if (total) total = Math.min(total, nnMax); } catch (e) { useNN = false; nnErr = e.message; } }
 
   const probe = (img) => { // масштаб по сетке на первом кадре
     const c = new OffscreenCanvas(nativeW, nativeH), x = c.getContext('2d', { willReadFrequently: true });
     x.drawImage(img, 0, 0); const d = x.getImageData(0, 0, nativeW, nativeH).data;
+    if (useNN) { let sL = 0, nL = 0; for (let i = 0; i < d.length; i += 4 * 97) { sL += 0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]; nL++; } invert = sL / nL > 100; }   // светлый фон → негатив
     if (userUm > 0) scale = userUm / 0.327;
     else { const R = Core.processFrameJS(d, nativeW, nativeH, { wantPitch: true }); if (R.pitch) scale = NOMINAL_PITCH_PX / R.pitch; }
     if (Math.abs(scale - 1) < 0.08) scale = 1;
@@ -1058,7 +1146,7 @@ async function analyzeItem(item, settings, onProgress) {
   const flush = () => {
     while (dets.has(next) && shifts.has(next)) {
       const R = dets.get(next); dets.delete(next);
-      const msg = { type: 'add', fr: next, R: R.error ? null : { dets: R.dets, free: R.free, pitch: R.pitch, patches: R.patches }, shift: shifts.get(next) };
+      const msg = { type: 'add', fr: next, R: R.error ? null : { dets: R.dets, free: R.free, pitch: R.pitch, patches: R.patches, nn: !!R.nn }, shift: shifts.get(next) };
       an.postMessage(msg, R.patches ? [R.patches.buffer] : []);
       shifts.delete(next); next++;
     }
@@ -1075,9 +1163,12 @@ async function analyzeItem(item, settings, onProgress) {
   const onFrame = async (img, fr) => {
     if (failed) { try { img.close(); } catch (_) {} return; }
     if (!started) { nativeW = nativeW || img.displayWidth || img.width; nativeH = nativeH || img.displayHeight || img.height; probe(img); }
+    if (fr >= nnMax) { try { img.close(); } catch (_) {} return; }   // нейросеть: только первые секунды
+    const nnP = useNN ? NN.detect(img, nativeW, nativeH, invert) : null;
     submitted++;
     const o = { wantPatches: fr % 6 === 0, wantPitch: fr < 3 || fr % 60 === 0 };
-    pool.run({ type: 'frame', img, fr, W: Wp, H: Hp, opt: o }, [img]).then(R => {
+    pool.run({ type: 'frame', img, fr, W: Wp, H: Hp, opt: o }, [img]).then(async R => {
+      if (nnP) { const k = Wp / nativeW; R.dets = (await nnP).map(q => [q[0] * k, q[1] * k, q[2] * k * k, q[3], q[4]]); R.nn = true; }
       W4 = R.W4; H4 = R.H4; specs.set(fr, { re: R.re, im: R.im }); delete R.re; delete R.im;
       dets.set(fr, R); tryCorr(fr); tryCorr(fr + 1);
       // спектры старше двух кадров больше не нужны
@@ -1092,6 +1183,7 @@ async function analyzeItem(item, settings, onProgress) {
     total = submitted;
     while (next < total) await new Promise(r => waiters.push(r));
     const out = await new Promise((res, rej) => { an.onmessage = e => e.data.error ? rej(new Error(e.data.error)) : res(e.data); an.postMessage({ type: 'finish', model: MODEL }); });
+    out.res.detector = useNN ? 'nn' : 'classic'; out.res.nnSeconds = useNN ? Math.min(NN_SECONDS, total / fps) : 0; out.res.nnLight = useNN && invert; out.res.nnErr = nnErr;
     out.res.scale = scale; out.res.nativeW = nativeW; out.res.nativeH = nativeH; out.res.decoder = useWC ? 'WebCodecs' : 'seek';
     if (!meta) out.res.fpsWarning = true;
     return out;
@@ -1165,11 +1257,17 @@ inp.onchange = () => { addFiles(inp.files); inp.value = ''; };
 drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
 drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } });
 
+// детектор: подсказка про тёмный фон и запоминание выбора
+const detSel = $('#detector'), nnHintEl = $('#nnHint');
+try { const v = localStorage.getItem('magauiya-detector'); if (v === 'nn' || v === 'classic') detSel.value = v; } catch (_) {}
+const syncDet = () => { nnHintEl.hidden = detSel.value !== 'nn'; try { localStorage.setItem('magauiya-detector', detSel.value); } catch (_) {} };
+detSel.onchange = syncDet; syncDet();
+
 runBtn.onclick = async () => {
   if (running) return;
   if (typeof OffscreenCanvas === 'undefined' || typeof Worker === 'undefined') { statusEl.textContent = t('noBrowser'); statusEl.className = 'status err'; return; }
   running = true; statusEl.className = 'status'; renderFiles(); updateRun();
-  const settings = { depth: +$('#depth').value || 10, pitch: +$('#pitch').value || 100, dilution: +$('#dilution').value || 1, umPerPx: $('#umpx').value.trim() };
+  const settings = { depth: +$('#depth').value || 10, pitch: +$('#pitch').value || 100, dilution: +$('#dilution').value || 1, umPerPx: $('#umpx').value.trim(), detector: $('#detector').value };
   for (const it of items.filter(i => i.state !== 'done')) {
     it.state = 'run'; renderFiles();
     const t0 = performance.now();
@@ -1256,6 +1354,7 @@ function cardHTML(it, forReport) {
     <div class="concl${M.low.length ? ' warn' : ''}"><b>${esc(t('concl'))}</b>${esc(M.low.length ? t('conclLow', M.low.map(m => m.label.replace(/,.*$/, '')).join('; ')) : t('conclOk'))}<small>${esc(t('conclNote'))}</small></div>
     <details${forReport ? ' open' : ''}><summary>${esc(t('kinTitle'))}</summary><div class="tablewrap"><table class="kv"><tbody>
       <tr><th>${esc(t('kinMotile'))}</th><td>VCL ${fmt(km.vcl)} · VSL ${fmt(km.vsl)} · VAP ${fmt(km.vap)} µm/s · LIN ${fmt(km.lin, 2)} · STR ${fmt(km.str, 2)} · WOB ${fmt(km.wob, 2)} · ALH ${fmt(km.alh)} µm · BCF ${fmt(km.bcf)} Hz</td></tr>
+      <tr><th>${esc(t('detUsed'))}</th><td>${esc(r.detector === 'nn' ? t('detUsedNN').replace('{s}', fmt(r.nnSeconds, 1)) + (r.nnLight ? ' · ' + t('nnLight') : '') : t('detUsedClassic') + (r.nnErr ? ' · ' + t('nnOff') : ''))}</td></tr>
       <tr><th>${esc(t('calib'))}</th><td>${esc(calib)} → ${fmt(r.um * (r.scale || 1), 3)} ${esc(t('umSrc'))}</td></tr>
       <tr><th>${esc(t('video'))}</th><td>${esc(t('videoLine', fmt(r.fps, 1), fmt(r.duration), r.framesTracked, r.framesCounted, r.fields))}</td></tr>
       <tr><th>${esc(t('tracks'))}</th><td>${esc(t('tracksLine', r.sperm, r.tracksByClass.a, r.tracksByClass.b, r.tracksByClass.c, r.tracksByClass.d, r.debris))}</td></tr>
