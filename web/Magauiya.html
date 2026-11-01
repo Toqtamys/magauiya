@@ -134,8 +134,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
 .empty{padding:28px 20px;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .nn-hint { color: #b45309; font-weight: 600; }
-#detector { width: 100%; }
-.form label:has(#detector) { grid-column: 1 / -1; }
 </style>
 
 <div class="wrap">
@@ -202,7 +200,6 @@ details summary{cursor:pointer;color:var(--muted);font-size:13.5px}
           <label><span data-i18n="pitch"></span><input type="number" id="pitch" value="100" min="1" step="1"></label>
           <label><span data-i18n="dilution"></span><input type="number" id="dilution" value="1" min="1" step="0.5"></label>
           <label><span data-i18n="umpx"></span><input type="text" id="umpx" data-i18n-ph="umpxPh" inputmode="decimal"></label>
-          <label><span data-i18n="detector"></span><select id="detector"><option value="classic" data-i18n="detClassic"></option><option value="nn" data-i18n="detNN"></option></select></label>
         </div>
         <p class="hint" data-i18n="chamberHint"></p>
         <p class="hint nn-hint" id="nnHint" data-i18n="nnHint" hidden></p>
@@ -1191,7 +1188,7 @@ async function analyzeItem(item, settings, onProgress) {
 }
 
 // ------------------------------------------------------------------ интерфейс
-const APP_NAME = 'Magauiya', APP_VER = 'ver. inner peace 1.1 C';
+const APP_NAME = window.CASA_MODE === 'nn' ? 'BOPASI · VISEM' : 'Magauiya', APP_VER = window.CASA_MODE === 'nn' ? 'YOLOv5n · VISEM-Tracking' : 'ver. inner peace 1.1 C';
 const CONTACT = { name: 'Alikhan Magauiya', email: 'orda.ezhenid@gmail.com' };
 const items = []; let running = false, uid = 0;
 const filesEl = $('#files'), runBtn = $('#run'), statusEl = $('#status');
@@ -1257,17 +1254,15 @@ inp.onchange = () => { addFiles(inp.files); inp.value = ''; };
 drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
 drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); } });
 
-// детектор: подсказка про тёмный фон и запоминание выбора
-const detSel = $('#detector'), nnHintEl = $('#nnHint');
-try { const v = localStorage.getItem('magauiya-detector'); if (v === 'nn' || v === 'classic') detSel.value = v; } catch (_) {}
-const syncDet = () => { nnHintEl.hidden = detSel.value !== 'nn'; try { localStorage.setItem('magauiya-detector', detSel.value); } catch (_) {} };
-detSel.onchange = syncDet; syncDet();
+// режим «нейросеть VISEM» включается снаружи (отдельный инструмент BOPASI): window.CASA_MODE = 'nn'
+const NN_MODE = window.CASA_MODE === 'nn';
+$('#nnHint').hidden = !NN_MODE;
 
 runBtn.onclick = async () => {
   if (running) return;
   if (typeof OffscreenCanvas === 'undefined' || typeof Worker === 'undefined') { statusEl.textContent = t('noBrowser'); statusEl.className = 'status err'; return; }
   running = true; statusEl.className = 'status'; renderFiles(); updateRun();
-  const settings = { depth: +$('#depth').value || 10, pitch: +$('#pitch').value || 100, dilution: +$('#dilution').value || 1, umPerPx: $('#umpx').value.trim(), detector: $('#detector').value };
+  const settings = { depth: +$('#depth').value || 10, pitch: +$('#pitch').value || 100, dilution: +$('#dilution').value || 1, umPerPx: $('#umpx').value.trim(), detector: NN_MODE ? 'nn' : 'classic' };
   for (const it of items.filter(i => i.state !== 'done')) {
     it.state = 'run'; renderFiles();
     const t0 = performance.now();

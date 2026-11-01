@@ -1,13 +1,13 @@
 // ─── Мост для сайта на Next.js: инструменты BOPASI монтируются в React-страницу ─
 const BRIDGE_MOUNT = {
-  bopasi: (r) => bridgeEmbed(r, 'bopasi'), bluetol: (r) => bridgeEmbed(r, 'bluetol'), scd: mountScd, who6: mountWho, chamber: mountChamber,
+  bopasi: (r) => bridgeEmbed(r, 'bopasi'), visem: (r) => bridgeEmbed(r, 'visem'), bluetol: (r) => bridgeEmbed(r, 'bluetol'), scd: mountScd, who6: mountWho, chamber: mountChamber,
   'lab-counter': mountCounter, tmsc: mountTmsc, 'rc-phase': mountRcpc, morphometry: mountMorphometry, cleavage: mountCleavage,
   kinetics: mountKinetics, gardner: mountGardner, poseidon: mountPoseidon, 'due-date': mountDueDate, 'hcg-doubling': mountHcg,
   'fertile-window': mountFertile, constructor: mountConstructor, 'he-nuclei': (r) => mountHisto(r, 'he'), ki67: (r) => mountHisto(r, 'dab'),
   molmoda: bridgeMolmoda,
 };
 function bridgeEmbed(root, key) {
-  const frame = h('iframe', { class: 'embed-frame', title: key === 'bopasi' ? 'BOPASI · Magauiya CASA' : 'Bluetol · DFI', allow: 'clipboard-write; fullscreen' });
+  const frame = h('iframe', { class: 'embed-frame', title: key === 'bopasi' ? 'BOPASI · Magauiya CASA' : key === 'visem' ? 'BOPASI · VISEM' : 'Bluetol · DFI', allow: 'clipboard-write; fullscreen' });
   frame.srcdoc = APPS[key];
   const fsBtn = h('button', { class: 'btn-ghost sm', onclick: () => {
     const on = !wrapEl.classList.contains('fs'); wrapEl.classList.toggle('fs', on);

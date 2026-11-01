@@ -1,12 +1,13 @@
 // ─── Приложение: страница, путешествие сквозь клетку, панели инструментов ───
-const VCH = CHAPTERS;   // все разделы, включая открытые проекты (библиотеки встроены в файл)
+const WEB_ONLY = new Set(['visem']);   // нейросеть VISEM работает только на сайте
+const VCH = CHAPTERS.map((c) => ({ ...c, tools: c.tools.filter((id) => !WEB_ONLY.has(id)) }));   // все разделы, включая открытые проекты
 const ORDER = VCH.flatMap((c) => c.tools);
 const toolById = (id) => TOOLS_DATA.find((t) => t.id === id);
 const chapterOf = (id) => VCH.find((c) => c.tools.includes(id));
 const isServer = (id) => !!toolById(id)?.server;
 const MOLMODA_URL = 'https://molmoda.org/';
 const MOUNT = {
-  bopasi: (r) => mountEmbed(r, 'bopasi'), bluetol: (r) => mountEmbed(r, 'bluetol'), scd: mountScd, who6: mountWho, chamber: mountChamber,
+  bopasi: (r) => mountEmbed(r, 'bopasi'), visem: (r) => mountEmbed(r, 'visem'), bluetol: (r) => mountEmbed(r, 'bluetol'), scd: mountScd, who6: mountWho, chamber: mountChamber,
   'lab-counter': mountCounter, tmsc: mountTmsc, 'rc-phase': mountRcpc, morphometry: mountMorphometry, cleavage: mountCleavage,
   kinetics: mountKinetics, gardner: mountGardner, poseidon: mountPoseidon, 'due-date': mountDueDate, 'hcg-doubling': mountHcg,
   'fertile-window': mountFertile, constructor: mountConstructor, 'he-nuclei': (r) => mountHisto(r, 'he'), ki67: (r) => mountHisto(r, 'dab'),
@@ -50,11 +51,11 @@ const App = {
     this.prepareReveal();
     Stage.redraw();
     this.sky?.setLabels(ORDER.map((id) => tr(SHORT[id])));
-    if (this.hud) { const n = TOOLS_DATA.filter((t) => !t.server).length; this.hud.replaceChildren(h('i', { class: 'dot' }), h('b', {}, String(n)), h('span', {}, ` ${tr(this.word(n))} · ${tr(UI.stickerTop)}`)); }
+    if (this.hud) { const n = ORDER.length; this.hud.replaceChildren(h('i', { class: 'dot' }), h('b', {}, String(n)), h('span', {}, ` ${tr(this.word(n))} · ${tr(UI.stickerTop)}`)); }
   },
 
   hero() {
-    const n = TOOLS_DATA.filter((t) => !t.server).length;
+    const n = ORDER.length;
     this.planetCv = h('canvas', { class: 'planet', 'aria-hidden': 'true' });
     return h('header', { class: 'hero', id: 'top' }, this.planetCv,
       h('div', { class: 'hero-text' },
@@ -215,7 +216,7 @@ const App = {
 
 // ── встроенные приложения BOPASI (Magauiya) и Блютол
 function mountEmbed(root, key) {
-  const frame = h('iframe', { class: 'embed-frame', title: key === 'bopasi' ? 'BOPASI · Magauiya CASA' : 'Bluetol · DFI', allow: 'clipboard-write; fullscreen' });
+  const frame = h('iframe', { class: 'embed-frame', title: key === 'bopasi' ? 'BOPASI · Magauiya CASA' : key === 'visem' ? 'BOPASI · VISEM' : 'Bluetol · DFI', allow: 'clipboard-write; fullscreen' });
   frame.srcdoc = APPS[key];
   return embedShell(root, frame);
 }

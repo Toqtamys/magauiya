@@ -5,7 +5,7 @@
   "interactive": "bopasi",
   "name": "BOPASI · Magauiya CASA",
   "action": "analyze",
-  "authors": "Әлихан Мағауия, Аян Ізбаев · нейродетектор: VISEM-Tracking (SimulaMet, CC BY 4.0), YOLOv5n (Ultralytics, AGPL-3.0)",
+  "authors": "Әлихан Мағауия, Аян Ізбаев",
   "tagline": {
    "ru": "Компьютерная спермограмма по видео из камеры Маклера: концентрация, подвижность a/b/c/d, кинематика, процентили ВОЗ.",
    "kk": "Маклер камерасының бейнесі бойынша компьютерлік спермограмма: концентрация, a/b/c/d қозғалғыштығы, кинематика, ДДҰ процентильдері.",
@@ -63,11 +63,6 @@
     "ru": "Образец при 37 °C, нативный (не разведённый) или с известным разведением",
     "kk": "Үлгі 37 °C-та, нативті (сұйылтылмаған) немесе белгілі сұйылтумен",
     "en": "Sample at 37 °C, neat (undiluted) or with a known dilution"
-   },
-   {
-    "ru": "Режим «Нейросеть VISEM»: видео на ТЁМНОМ фоне (светлые головки — тёмное поле или фазовый контраст); анализируются первые 8 секунд, работает только на сайте",
-    "kk": "«VISEM нейрожелісі» режимі: ҚАРАҢҒЫ фондағы бейне (ашық бастар — қараңғы өріс немесе фазалық контраст); алғашқы 8 секунд талданады, тек сайтта жұмыс істейді",
-    "en": "VISEM neural-net mode: video on a DARK background (bright heads — dark-field or phase contrast); the first 8 seconds are analysed, website only"
    }
   ],
   "steps": [
@@ -112,11 +107,6 @@
     "ru": "Не валидирован против ручного подсчёта — исследовательский инструмент.",
     "kk": "Қолмен санаумен валидацияланбаған — зерттеу құралы.",
     "en": "Not validated against manual counting — research tool."
-   },
-   {
-    "ru": "Нейросеть VISEM обучена на чужих видео с тёмным фоном. На видео со светлым фоном (обычное светлое поле) она находит заметно меньше клеток: на тестовом видео — 30 млн/мл и 26% PR против 85 млн/мл и 81% PR у классического детектора. Для светлого фона используйте классический детектор.",
-    "kk": "VISEM нейрожелісі қараңғы фондағы бөтен бейнелерде оқытылған. Ашық фондағы бейнелерде ол әлдеқайда аз жасуша табады: сынақ бейнесінде — 30 млн/мл және 26% PR, классикалық детекторда 85 млн/мл және 81% PR. Ашық фон үшін классикалық детекторды қолданыңыз.",
-    "en": "The VISEM net was trained on other labs’ dark-background videos. On light-background (ordinary bright-field) videos it finds far fewer cells: on the test video 30 M/mL and 26% PR versus 85 M/mL and 81% PR with the classic detector. Use the classic detector for light backgrounds."
    }
   ],
   "output": [
@@ -136,6 +126,101 @@
     "en": "Video with track overlay, CSV table, JSON"
    }
   ]
+ },
+ {
+  "id": "visem",
+  "name": {
+   "ru": "VISEM · нейросеть для видео спермы",
+   "kk": "VISEM · сперма бейнесіне арналған нейрожелі",
+   "en": "VISEM · neural net for semen video"
+  },
+  "tagline": {
+   "ru": "Спермограмма по видео с нейросетью YOLOv5n из открытого набора VISEM-Tracking: находит сперматозоиды на каждом кадре. Для видео на тёмном фоне.",
+   "kk": "VISEM-Tracking ашық жиынындағы YOLOv5n нейрожелісімен бейне бойынша спермограмма: әр кадрда сперматозоидтарды табады. Қараңғы фондағы бейнелер үшін.",
+   "en": "Video semen analysis with the YOLOv5n neural net from the open VISEM-Tracking dataset: it finds sperm in every frame. For dark-background videos."
+  },
+  "full": {
+   "ru": "Нейросеть YOLOv5n обучена норвежской группой SimulaMet на 20 видео набора VISEM-Tracking (фазовый контраст, ×400, тёмный фон). Она находит на каждом кадре сперматозоиды, скопления и мелкие головки. Дальше работает код BOPASI: компенсация сдвига столика, калибровка по сетке Маклера, слежение за клетками, скорости VCL/VSL/VAP и классы ВОЗ. Всё считается в браузере, видео никуда не отправляется.",
+   "kk": "YOLOv5n нейрожелісін норвегиялық SimulaMet тобы VISEM-Tracking жиынының 20 бейнесінде оқытқан (фазалық контраст, ×400, қараңғы фон). Ол әр кадрда сперматозоидтарды, шоғырларды және ұсақ бастарды табады. Әрі қарай BOPASI коды жұмыс істейді: үстел жылжуын өтеу, Маклер торы бойынша калибрлеу, жасушаларды қадағалау, VCL/VSL/VAP жылдамдықтары және ДДҰ кластары. Бәрі браузерде есептеледі, бейне ешқайда жіберілмейді.",
+   "en": "The YOLOv5n net was trained by the SimulaMet group (Norway) on 20 videos of the VISEM-Tracking dataset (phase contrast, ×400, dark background). It finds sperm, clusters and small heads in every frame. BOPASI code does the rest: stage-drift compensation, Makler-grid calibration, cell tracking, VCL/VSL/VAP and WHO classes. Everything runs in the browser; the video is never uploaded."
+  },
+  "features": [
+   {
+    "ru": "Нейросеть YOLOv5n (3,8 МБ) прямо в браузере",
+    "kk": "Браузердегі YOLOv5n нейрожелісі (3,8 МБ)",
+    "en": "YOLOv5n neural net (3.8 MB) right in the browser"
+   },
+   {
+    "ru": "Слежение, скорости и классы ВОЗ-5 / ВОЗ-6 — как в BOPASI",
+    "kk": "Қадағалау, жылдамдықтар және ДДҰ-5 / ДДҰ-6 кластары — BOPASI-дегідей",
+    "en": "Tracking, speeds and WHO-5 / WHO-6 classes — as in BOPASI"
+   },
+   {
+    "ru": "Светлый фон определяется автоматически и отмечается в отчёте",
+    "kk": "Ашық фон автоматты түрде анықталып, есепте белгіленеді",
+    "en": "A light background is detected automatically and flagged in the report"
+   }
+  ],
+  "input": [
+   {
+    "ru": "Видео камеры Маклера на ТЁМНОМ фоне: светлые головки на тёмном поле (тёмное поле или фазовый контраст), MP4",
+    "kk": "ҚАРАҢҒЫ фондағы Маклер камерасының бейнесі: қараңғы өрісте ашық бастар (қараңғы өріс немесе фазалық контраст), MP4",
+    "en": "Makler-chamber video on a DARK background: bright heads on a dark field (dark-field or phase contrast), MP4"
+   },
+   {
+    "ru": "Анализируются первые 8 секунд; объектив ×20–×40, сетка камеры в кадре",
+    "kk": "Алғашқы 8 секунд талданады; объектив ×20–×40, камера торы кадрда",
+    "en": "The first 8 seconds are analysed; ×20–×40 objective with the chamber grid in view"
+   },
+   {
+    "ru": "Работает только на сайте BOPASI (в офлайн-файле нейросети нет)",
+    "kk": "Тек BOPASI сайтында жұмыс істейді (офлайн файлда нейрожелі жоқ)",
+    "en": "Works only on the BOPASI website (the offline file has no neural net)"
+   }
+  ],
+  "steps": [
+   {
+    "ru": "Загрузите видео на тёмном фоне и при необходимости укажите глубину камеры и разведение.",
+    "kk": "Қараңғы фондағы бейнені жүктеп, қажет болса камера тереңдігі мен сұйылтуды көрсетіңіз.",
+    "en": "Load a dark-background video and set the chamber depth and dilution if needed."
+   },
+   {
+    "ru": "Нажмите «Анализ»: первый раз скачается нейросеть (около 4 МБ), затем кадры разбираются по одному.",
+    "kk": "«Талдау» батырмасын басыңыз: алғашқы рет нейрожелі жүктеледі (шамамен 4 МБ), содан кейін кадрлар бір-бірлеп талданады.",
+    "en": "Press Analyse: the net downloads once (about 4 MB), then frames are processed one by one."
+   },
+   {
+    "ru": "Проверьте строку «Детектор» в отчёте: если там предупреждение о светлом фоне, используйте инструмент BOPASI · спермограмма по видео.",
+    "kk": "Есептегі «Детектор» жолын тексеріңіз: онда ашық фон туралы ескерту болса, BOPASI · бейне бойынша спермограмма құралын қолданыңыз.",
+    "en": "Check the Detector row in the report: if it warns about a light background, use BOPASI · video semen analysis instead."
+   }
+  ],
+  "limits": [
+   {
+    "ru": "Нейросеть обучена на чужих видео с тёмным фоном. На видео со светлым фоном она находит заметно меньше клеток: на тестовом видео — 30 млн/мл и 26% PR против 85 млн/мл и 81% PR у классического детектора BOPASI.",
+    "kk": "Нейрожелі қараңғы фондағы бөтен бейнелерде оқытылған. Ашық фондағы бейнелерде ол әлдеқайда аз жасуша табады: сынақ бейнесінде — 30 млн/мл және 26% PR, BOPASI классикалық детекторында 85 млн/мл және 81% PR.",
+    "en": "The net was trained on other labs’ dark-background videos. On light-background videos it finds far fewer cells: on the test video 30 M/mL and 26% PR versus 85 M/mL and 81% PR with the classic BOPASI detector."
+   },
+   {
+    "ru": "Каждый кадр проходит через нейросеть: 8 секунд видео обрабатываются 1–3 минуты.",
+    "kk": "Әр кадр нейрожеліден өтеді: 8 секунд бейне 1–3 минутта өңделеді.",
+    "en": "Every frame goes through the net: 8 seconds of video take 1–3 minutes."
+   },
+   {
+    "ru": "Результат исследовательский и не заменяет заключение врача.",
+    "kk": "Нәтиже зерттеу сипатында, дәрігер қорытындысын алмастырмайды.",
+    "en": "The result is for research and does not replace a clinician’s conclusion."
+   }
+  ],
+  "output": [
+   {
+    "ru": "Концентрация, классы a/b/c/d (ВОЗ-6) и PR/NP/IM (ВОЗ-5), кинематика",
+    "kk": "Концентрация, a/b/c/d (ДДҰ-6) және PR/NP/IM (ДДҰ-5) кластары, кинематика",
+    "en": "Concentration, a/b/c/d (WHO-6) and PR/NP/IM (WHO-5) classes, kinematics"
+   }
+  ],
+  "authors": "VISEM-Tracking: Thambawita V., Hicks S. A., Storås A. M. et al., SimulaMet (Scientific Data, 2023; CC BY 4.0) · YOLOv5 (Ultralytics, AGPL-3.0) · трекинг и отчёт — BOPASI",
+  "license": "CC BY 4.0 / AGPL-3.0"
  },
  {
   "id": "bluetol",

@@ -20,6 +20,8 @@ const SITE_IDS = new Set(ctx0.__ids);
 const tools = JSON.parse(await src('tools.json')).filter((t) => !t.server && SITE_IDS.has(t.id));
 const apps = {
   bopasi: await readFile(path.join(repo, 'web', 'Magauiya.html'), 'utf8'),
+  // VISEM — то же приложение CASA с нейросетью вместо классического детектора
+  visem: (await readFile(path.join(repo, 'web', 'Magauiya.html'), 'utf8')).replace('<head>', '<head><script>window.CASA_MODE = \'nn\';</script>').replace(/<h1>Magauiya<span class="ver">[^<]*<\/span><\/h1>/, '<h1>VISEM<span class="ver">YOLOv5n · VISEM-Tracking</span></h1>'),
   bluetol: await readFile(path.join(repo, 'bluetol', 'bluetol.html'), 'utf8'),
 };
 // превью карточек: site/previews/<id>.jpg (снимаются скриптом site/previews.mjs)
@@ -44,7 +46,7 @@ const js = [
   await src('i18n.js'),
   await src('core.js'),
   `const TOOLS_DATA = ${safeJSON(tools)};`,
-  `const APPS = ${safeJSON(apps)};`,
+  `const APPS = ${safeJSON({ bopasi: apps.bopasi, bluetol: apps.bluetol })};`,   // VISEM — только на сайте
   `const PREVIEWS = ${safeJSON(previews)};`,
   await src('rcpc-engine.js'),
   await src('scd-engine.js'),
