@@ -25,13 +25,13 @@ const S = {
   back: T("SCD-тест", "SCD-тест", "SCD test"),
   kicker: T("SCD / Halo · индекс фрагментации ДНК", "SCD / Halo · ДНҚ фрагментация индексі", "SCD / Halo · DNA fragmentation index"),
   h1: T("Как считается DFI", "DFI қалай есептеледі", "How DFI is calculated"),
-  lead: T("После кислотной денатурации и лизиса целая ДНК расплетается в широкое гало вокруг ядра, а фрагментированная — нет. BOPASI считает такие клетки двумя способами: измеряет гало по критериям Fernández или доверяет нейросети, обученной на 2000 размеченных снимках.",
-    "Қышқылдық денатурация мен лизистен кейін бүтін ДНҚ ядро айналасында кең гало түзеді, ал фрагменттелген ДНҚ — түзбейді. BOPASI мұндай жасушаларды екі тәсілмен санайды: галоны Fernández критерийлері бойынша өлшейді немесе 2000 белгіленген суретте оқытылған нейрожеліге сүйенеді.",
-    "After acid denaturation and lysis, intact DNA unwinds into a wide halo around the nucleus, while fragmented DNA does not. BOPASI counts these cells in two ways: it measures the halo by the Fernández criteria, or it relies on a neural net trained on 2,000 annotated images."),
+  lead: T("После кислотной денатурации и лизиса целая ДНК расплетается в широкое гало вокруг ядра, а фрагментированная — нет. BOPASI считает такие клетки тремя способами: измеряет гало по критериям Fernández или доверяет одной из двух нейросетей — для снимков ×100 и для полей ×20.",
+    "Қышқылдық денатурация мен лизистен кейін бүтін ДНҚ ядро айналасында кең гало түзеді, ал фрагменттелген ДНҚ — түзбейді. BOPASI мұндай жасушаларды үш тәсілмен санайды: галоны Fernández критерийлері бойынша өлшейді немесе екі нейрожеленің біріне сүйенеді — ×100 суреттер үшін және ×20 өрістер үшін.",
+    "After acid denaturation and lysis, intact DNA unwinds into a wide halo around the nucleus, while fragmented DNA does not. BOPASI counts these cells in three ways: it measures the halo by the Fernández criteria, or it relies on one of two neural nets — for ×100 images and for ×20 fields."),
   formulaK: T("Формула", "Формула", "Formula"),
   frag: T("фрагментированные", "фрагменттелгендер", "fragmented"),
   counted: T("все учтённые клетки", "барлық есепке алынған жасушалар", "all counted cells"),
-  formulaNote: T("Одна формула для обоих методов. Клетки у края кадра и слипшиеся не учитываются.", "Екі әдіске бір формула. Кадр шетіндегі және жабысқан жасушалар есепке алынбайды.", "One formula for both methods. Cells at the edge of the frame and clumped cells are not counted."),
+  formulaNote: T("Одна формула для всех трёх методов. Клетки у края кадра и слипшиеся не учитываются.", "Үш әдіске бір формула. Кадр шетіндегі және жабысқан жасушалар есепке алынбайды.", "One formula for all three methods. Cells at the edge of the frame and clumped cells are not counted."),
   m1k: T("Метод 01 · классический", "01 әдіс · классикалық", "Method 01 · classic"),
   m1h: T("Измерение гало по Fernández", "Fernández бойынша гало өлшемі", "Halo measurement by Fernández"),
   demoK: T("Живая схема", "Тірі сызба", "Live diagram"),
@@ -54,8 +54,11 @@ const S = {
     degraded: T("гало нет, ядро бледное (< 62% типичного) или неровное", "гало жоқ, ядро бозғылт (< 62%) немесе тегіс емес", "no halo, nucleus pale (< 62% of typical) or irregular"),
   } as Record<Exclude<Cls, "excluded">, L>,
   classicF: T("DFI = (малое + без гало + дегенеративные) / все учтённые × 100%", "DFI = (кіші + галосыз + дегенеративті) / барлық есепке алынған × 100%", "DFI = (small + no halo + degraded) / all counted × 100%"),
-  m2k: T("Метод 02 · нейросеть", "02 әдіс · нейрожелі", "Method 02 · neural net"),
-  m2h: T("YOLOv8s-seg прямо в браузере", "Браузердегі YOLOv8s-seg", "YOLOv8s-seg right in the browser"),
+  reqK: T("Требования к снимкам", "Суреттерге талаптар", "Image requirements"),
+  req1: T("×40 (допустимо ×20–×100): светлое поле, ядра не слипаются, гало целиком в кадре.", "×40 (×20–×100 болады): ашық өріс, ядролар жабыспаған, гало кадрда толық.", "×40 (×20–×100 acceptable): bright field, nuclei not clumped, halos fully in frame."),
+  m2k: T("Метод 02 · нейросеть ×100", "02 әдіс · нейрожелі ×100", "Method 02 · neural net ×100"),
+  m2h: T("Сегментация клеток при ×100", "×100 кезінде жасушаларды сегментациялау", "Cell segmentation at ×100"),
+  req2: T("Только иммерсионный объектив ×100: одна-три клетки в кадре, гало целиком в кадре. На полях ×20–×40 эта нейросеть клеток не находит.", "Тек ×100 иммерсиялық объектив: кадрда бір-үш жасуша, гало кадрда толық. ×20–×40 өрістерде бұл нейрожелі жасуша таппайды.", "Only a ×100 oil-immersion objective: one to three cells per frame, halos fully in frame. On ×20–×40 fields this net finds no cells."),
   pipe: [
     [T("Снимок", "Сурет", "Image"), T("вписываем в квадрат 1024 × 1024", "1024 × 1024 шаршыға сыйғызамыз", "fitted into 1024 × 1024")],
     [T("Нейросеть", "Нейрожелі", "Neural net"), T("11,8 млн параметров, ONNX Runtime Web", "11,8 млн параметр, ONNX Runtime Web", "11.8 M parameters, ONNX Runtime Web")],
@@ -72,10 +75,25 @@ const S = {
     ["0,82", T("полнота", "толықтық", "recall")],
     ["24 / 24", T("находок совпали в браузере и в оригинале на 18 снимках", "табылым браузер мен түпнұсқада 18 суретте сәйкес келді", "detections matched between the browser and the original on 18 images")],
   ] as [string, L][],
+  m3k: T("Метод 03 · нейросеть ×20", "03 әдіс · нейрожелі ×20", "Method 03 · neural net ×20"),
+  m3h: T("Целое поле при ×20", "×20 кезіндегі толық өріс", "A whole field at ×20"),
+  req3: T("Объектив ×20: целое поле с десятками клеток, окраска Райт-Гимза или Diff-Quik; можно снимать через окуляр.", "×20 объективі: ондаған жасушасы бар толық өріс, Райт-Гимза немесе Diff-Quik бояуы; окуляр арқылы түсіруге болады.", "A ×20 objective: a whole field with dozens of cells, Wright-Giemsa or Diff-Quik stain; shooting through the eyepiece is fine."),
+  pipe3: [
+    [T("Поле", "Өріс", "Field"), T("масштаб к кадру 3072 пикс., плитки 512 с перекрытием 64", "3072 пикс. кадрға масштаб, 64 қабаттасатын 512 плиткалар", "scaled to a 3072 px frame, 512 tiles with 64 px overlap")],
+    [T("Нейросеть", "Нейрожелі", "Neural net"), T("ResNet-18 + CenterNet, ONNX Runtime Web", "ResNet-18 + CenterNet, ONNX Runtime Web", "ResNet-18 + CenterNet, ONNX Runtime Web")],
+    [T("Центр + размеры", "Орталық + өлшемдер", "Centre + sizes"), T("малая ось головки и поперечник с гало", "басшықтың кіші осі және гало қоса көлденеңі", "head minor axis and width including the halo")],
+    [T("Класс", "Класс", "Class"), T("гало / малая ось → пороги Fernández 1/3 и 1", "гало / кіші ось → Fernández табалдырықтары 1/3 және 1", "halo / minor axis → Fernández cut-offs 1/3 and 1")],
+  ] as [L, L][],
+  nn3Text: T("Эта нейросеть не решает «да / нет» сама: она измеряет каждую головку и её гало, а класс определяется той же формулой Fernández, что и в классическом методе. Поэтому она даёт все четыре класса гало.",
+    "Бұл нейрожелі «иә / жоқ» деп өзі шешпейді: ол әр басшық пен оның галосын өлшейді, ал класс классикалық әдістегідей Fernández формуласымен анықталады. Сондықтан ол гало төрт класын береді.",
+    "This net does not decide yes / no by itself: it measures every head and its halo, and the class comes from the same Fernández formula as in the classic method. That is why it gives all four halo classes."),
+  limit3: T("Обучена на 130 полях одной лаборатории. На снимках через окуляр и с другой окраской часть клеток пропускает — проверьте поле и добавьте пропущенные вручную.",
+    "Бір зертхананың 130 өрісінде оқытылған. Окуляр арқылы түсірілген және басқа бояудағы суреттерде жасушалардың бір бөлігін өткізіп алады — өрісті тексеріп, өткізілгендерді қолмен қосыңыз.",
+    "Trained on 130 fields from one lab. On eyepiece photos and other stains it misses some cells — check the field and add the missed ones by hand."),
   limitK: T("Ограничение", "Шектеу", "Limitation"),
-  limit: T("Клетки с крупным гало у края кадра нейросеть иногда пропускает — тогда DFI выходит завышенным. Проверьте поле и добавьте пропущенные клетки вручную. Подклассы гало по Fernández есть только в классическом режиме.",
-    "Кадр шетіндегі үлкен гало жасушаларын нейрожелі кейде өткізіп алады — сонда DFI жоғары шығады. Өрісті тексеріп, өткізілген жасушаларды қолмен қосыңыз. Fernández бойынша гало ішкі кластары тек классикалық режимде.",
-    "The net sometimes misses large-halo cells at the edge of the frame, which inflates the DFI. Check the field and add missed cells by hand. Fernández halo subclasses exist only in classic mode."),
+  limit: T("Клетки с крупным гало у края кадра нейросеть иногда пропускает — тогда DFI выходит завышенным. Проверьте поле и добавьте пропущенные клетки вручную. Подклассы гало по Fernández дают классический метод и нейросеть ×20.",
+    "Кадр шетіндегі үлкен гало жасушаларын нейрожелі кейде өткізіп алады — сонда DFI жоғары шығады. Өрісті тексеріп, өткізілген жасушаларды қолмен қосыңыз. Fernández бойынша гало ішкі кластарын классикалық әдіс пен ×20 нейрожелісі береді.",
+    "The net sometimes misses large-halo cells at the edge of the frame, which inflates the DFI. Check the field and add missed cells by hand. Fernández halo subclasses come from the classic method and the ×20 net."),
   scaleK: T("Интерпретация", "Түсіндіру", "Interpretation"),
   scaleH: T("Что значит результат", "Нәтиже нені білдіреді", "What the result means"),
   zones: [T("низкий", "төмен", "low"), T("пограничный", "шекаралық", "borderline"), T("высокий", "жоғары", "high")],
@@ -148,6 +166,7 @@ export function ScdMethod() {
       {/* метод 1 */}
       <section className="mt-28">
         <motion.div {...fade}><p className={kick}>{t(S.m1k)}</p><h2 className="mt-3 font-display text-[clamp(36px,5.4vw,80px)] font-bold uppercase leading-[0.95]">{t(S.m1h)}</h2></motion.div>
+        <motion.div {...fade} className="mt-8 max-w-[70ch] border-l-2 border-white pl-6"><p className={kick}>{t(S.reqK)}</p><p className="mt-3 text-white/85">{t(S.req1)}</p></motion.div>
         <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1.1fr]">
           <motion.div {...fade} className="border border-white/15 bg-black p-6 md:p-8">
             <p className={kick}>{t(S.demoK)}</p>
@@ -210,6 +229,7 @@ export function ScdMethod() {
       {/* метод 2 */}
       <section className="mt-32">
         <motion.div {...fade}><p className={kick}>{t(S.m2k)}</p><h2 className="mt-3 font-display text-[clamp(36px,5.4vw,80px)] font-bold uppercase leading-[0.95]">{t(S.m2h)}</h2></motion.div>
+        <motion.div {...fade} className="mt-8 max-w-[70ch] border-l-2 border-white pl-6"><p className={kick}>{t(S.reqK)}</p><p className="mt-3 text-white/85">{t(S.req2)}</p></motion.div>
         <div className="mt-12 grid gap-px bg-white/15 md:grid-cols-4">
           {S.pipe.map(([h, p], i) => (
             <motion.div key={i} {...fade} transition={{ ...fade.transition, delay: i * 0.08 }} className="relative bg-black p-6">
@@ -238,6 +258,27 @@ export function ScdMethod() {
         </motion.div>
       </section>
 
+      {/* метод 3 */}
+      <section className="mt-32">
+        <motion.div {...fade}><p className={kick}>{t(S.m3k)}</p><h2 className="mt-3 font-display text-[clamp(36px,5.4vw,80px)] font-bold uppercase leading-[0.95]">{t(S.m3h)}</h2></motion.div>
+        <motion.div {...fade} className="mt-8 max-w-[70ch] border-l-2 border-white pl-6"><p className={kick}>{t(S.reqK)}</p><p className="mt-3 text-white/85">{t(S.req3)}</p></motion.div>
+        <div className="mt-12 grid gap-px bg-white/15 md:grid-cols-4">
+          {S.pipe3.map(([h, p], i) => (
+            <motion.div key={i} {...fade} transition={{ ...fade.transition, delay: i * 0.08 }} className="relative bg-black p-6">
+              <span className="font-mono text-sm font-semibold text-white/45">{String(i + 1).padStart(2, "0")}</span>
+              <h3 className="mt-6 font-display text-2xl font-bold uppercase">{t(h)}</h3>
+              <p className="mt-2 text-white/65">{t(p)}</p>
+              {i < 3 && <ArrowRight className="absolute right-5 top-6 hidden size-5 text-white/40 md:block" />}
+            </motion.div>
+          ))}
+        </div>
+        <motion.p {...fade} className="mt-10 max-w-[70ch] text-lg leading-relaxed text-white/75">{t(S.nn3Text)}</motion.p>
+        <motion.div {...fade} className="mt-12 border-l-2 pl-6" style={{ borderColor: COL.small }}>
+          <p className={kick}>{t(S.limitK)}</p>
+          <p className="mt-3 max-w-[70ch] text-white/80">{t(S.limit3)}</p>
+        </motion.div>
+      </section>
+
       {/* шкала DFI */}
       <section className="mt-32">
         <motion.div {...fade}><p className={kick}>{t(S.scaleK)}</p><h2 className="mt-3 font-display text-[clamp(36px,5.4vw,80px)] font-bold uppercase leading-[0.95]">{t(S.scaleH)}</h2></motion.div>
@@ -261,8 +302,9 @@ export function ScdMethod() {
         <ul className="mt-6 grid gap-3 text-white/70">
           <li>Fernández J. L. et al. The sperm chromatin dispersion test: a simple method for the determination of sperm DNA fragmentation. J Androl. 2003;24(1):59–66.</li>
           <li>Fernández J. L. et al. Simple determination of human sperm DNA fragmentation with an improved sperm chromatin dispersion test. Fertil Steril. 2005;84(4):833–842.</li>
-          <li>Ornelas Nande E. J., Adel Domínguez M. A., Mora Topete A., Magdaleno Márquez L. E., Aranguren I., Valdivia-G A., Sanchez O. D. Sperm chromatin dispersion microscopy image dataset for instance segmentation. Zenodo, 2026. CC BY 4.0.</li>
-          <li>Ultralytics YOLOv8 (AGPL-3.0) · ONNX Runtime Web (MIT).</li>
+          <li>Sperm chromatin dispersion microscopy image dataset for instance segmentation. Zenodo, 2026. CC BY 4.0.</li>
+          <li>Sperm chromatin dispersion bright field images. Mendeley Data, 2023. doi:10.17632/p3ntt2z294.1. CC BY 4.0.</li>
+          <li>Ultralytics YOLOv8 (AGPL-3.0) · CenterNet / ResNet-18 (BSD-3) · ONNX Runtime Web (MIT).</li>
         </ul>
         <Link href="/t/scd/" className={buttonVariants({ className: "mt-12" })}>{t(S.open)}<ArrowRight className="size-4" /></Link>
       </motion.section>
