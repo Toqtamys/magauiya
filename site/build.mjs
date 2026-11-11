@@ -52,7 +52,7 @@ const js = [
   await src('scd-engine.js'),
   await src('tool-calc.js'),
   await src('tool-rcpc.js'),
-  await src('scd-ai.js'),
+  await src('scd-ai.js'), await src('scd-ai20.js'),
   await src('tool-scd.js'),
   await src('tool-lab.js'),
   await src('tool-morph.js'),
@@ -95,7 +95,7 @@ const legacyJs = [
   await src('i18n.js'), await src('core.js'),
   `const TOOLS_DATA = ${safeJSON(tools)};`, `const APPS = ${safeJSON(apps)};`, 'const PREVIEWS = {};',
   await src('rcpc-engine.js'), await src('scd-engine.js'), await src('tool-calc.js'), await src('tool-rcpc.js'),
-  await src('scd-ai.js'), await src('tool-scd.js'), await src('tool-lab.js'), await src('tool-morph.js'), await src('tool-constructor.js'),
+  await src('scd-ai.js'), await src('scd-ai20.js'), await src('tool-scd.js'), await src('tool-lab.js'), await src('tool-morph.js'), await src('tool-constructor.js'),
   await src('ihc-engine.js'), await src('tool-histo.js'), await src('bridge.js'),
 ].join('\n\n');
 await writeFile(path.join(pub, 'legacy', 'bopasi-tools.js'), legacyJs);
