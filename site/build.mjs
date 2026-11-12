@@ -182,4 +182,55 @@ await pick('three/build/three.module.min.js', path.join(pub, 'vendor', 'three.mo
 await pick('3dmol/build/3Dmol-min.js', path.join(pub, 'vendor', '3Dmol-min.js'));
 await pick('@rdkit/rdkit/dist/RDKit_minimal.js', path.join(pub, 'rdkit', 'RDKit_minimal.js'));
 await pick('@rdkit/rdkit/dist/RDKit_minimal.wasm', path.join(pub, 'rdkit', 'RDKit_minimal.wasm'));
+
+// ── отдельный файл: только SCD-тест с обеими нейросетями внутри (BOPASI-SCD.html, не в git)
+{
+  const { gzipSync } = await import('node:zlib');
+  const ortSrc = path.join(repo, 'next', 'node_modules', 'onnxruntime-web', 'dist');
+  const blobs = [
+    ['ort.wasm.min.js', path.join(ortSrc, 'ort.wasm.min.js')],
+    ['ort-wasm-simd-threaded.mjs', path.join(ortSrc, 'ort-wasm-simd-threaded.mjs')],
+    ['ort-wasm-simd-threaded.wasm', path.join(ortSrc, 'ort-wasm-simd-threaded.wasm')],
+    ['scd-yolov8s-seg.onnx', path.join(here, 'models', 'scd-yolov8s-seg.onnx')],
+    ['scd-centernet-r18.onnx', path.join(here, 'models', 'scd-centernet-r18.onnx')],
+  ];
+  const data = [];
+  for (const [name, file] of blobs) data.push(`<script type="application/x-gzip-base64" data-nn="${name}">${gzipSync(await readFile(file), { level: 9 }).toString('base64')}</script>`);
+  const scdTools = tools.filter((x) => x.id === 'scd');
+  const sjs = [
+    await src('i18n.js'), await src('core.js'), `const TOOLS_DATA = ${safeJSON(scdTools)};`,
+    await src('scd-engine.js'), await src('tool-calc.js'), await src('nn-load.js'), await src('scd-ai.js'), await src('scd-ai20.js'), await src('tool-scd.js'),
+    await src('scd-standalone.js'),
+  ].join('\n\n');
+  if (/<\/script/i.test(sjs)) throw new Error('</script внутри SCD JS');
+  const shell = `
+body { margin: 0; background: #fff; color: #0b0d12; font-family: 'IBM Plex Sans', system-ui, sans-serif; }
+.sa-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #dcdfe4; position: sticky; top: 0; background: #fff; z-index: 5; }
+.sa-brand { font: 700 18px/1 'IBM Plex Sans', sans-serif; letter-spacing: .32em; }
+.sa-lang { display: flex; gap: 4px; }
+.sa-lang button { border: 0; background: none; font: 700 12px/1 'IBM Plex Mono', monospace; letter-spacing: .12em; text-transform: uppercase; padding: 8px 10px; color: #8b93a1; cursor: pointer; }
+.sa-lang button.on { color: #0b0d12; }
+.sa-main { max-width: 1320px; margin: 0 auto; padding: 32px 24px 64px; }
+.sa-kicker { font: 600 12px/1 'IBM Plex Mono', monospace; letter-spacing: .18em; text-transform: uppercase; color: #555b66; margin: 0; }
+.sa-main h1 { font: 700 clamp(34px, 5vw, 64px)/1 'IBM Plex Sans', sans-serif; letter-spacing: -.02em; margin: 14px 0 12px; }
+.sa-lead { font-size: 18px; line-height: 1.5; color: #333; max-width: 70ch; margin: 0 0 8px; }
+.sa-note { font: 600 12px/1.4 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; color: #555b66; margin: 0 0 28px; }
+.sa-tool { border: 1px solid #dcdfe4; padding: 24px; }
+.sa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; margin-top: 40px; }
+.sa-info h3 { font: 700 14px/1.2 'IBM Plex Mono', monospace; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 12px; }
+.sa-info li { margin-bottom: 8px; line-height: 1.5; color: #333; }
+.sa-foot { margin-top: 48px; padding-top: 20px; border-top: 1px solid #dcdfe4; color: #555b66; font-size: 13px; line-height: 1.5; }
+@media (max-width: 640px) { .sa-main { padding: 24px 16px 48px; } .sa-tool { padding: 12px; } }`;
+  const shtml = `<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCD / DFI · BOPASI</title>
+<style>${fontCss.join('\n')}</style>
+<style>${await src('tool-theme.css')}\n${toolCss}\n${shell}</style>
+</head><body><div id="app"></div>
+<script>${sjs}</script>
+${data.join('\n')}
+</body></html>`;
+  await writeFile(path.join(repo, 'BOPASI-SCD.html'), shtml);
+  console.log(`OK: BOPASI-SCD.html ${(shtml.length / 1048576).toFixed(1)} MB`);
+}
 console.log(`OK: BOPASI.html ${(html.length / 1024).toFixed(0)} KB и материалы для next/, инструментов: ${tools.length}`);
