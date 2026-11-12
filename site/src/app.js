@@ -1,5 +1,5 @@
 // ─── Приложение: страница, путешествие сквозь клетку, панели инструментов ───
-const WEB_ONLY = new Set(['visem']);   // нейросеть VISEM работает только на сайте
+const WEB_ONLY = new Set(window.BOPASI_FULL ? [] : ['visem']);   // VISEM — на сайте и в полной офлайн-версии
 const VCH = CHAPTERS.map((c) => ({ ...c, tools: c.tools.filter((id) => !WEB_ONLY.has(id)) }));   // все разделы, включая открытые проекты
 const ORDER = VCH.flatMap((c) => c.tools);
 const toolById = (id) => TOOLS_DATA.find((t) => t.id === id);

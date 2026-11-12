@@ -52,7 +52,7 @@ const js = [
   await src('scd-engine.js'),
   await src('tool-calc.js'),
   await src('tool-rcpc.js'),
-  await src('scd-ai.js'), await src('scd-ai20.js'),
+  await src('nn-load.js'), await src('scd-ai.js'), await src('scd-ai20.js'),
   await src('tool-scd.js'),
   await src('tool-lab.js'),
   await src('tool-morph.js'),
@@ -87,6 +87,28 @@ if (/<\/script/i.test(molJs + sciLib)) throw new Error('</script внутри б
 
 await writeFile(path.join(repo, 'BOPASI.html'), html);   // офлайн-версия одним файлом
 
+// ── полная офлайн-версия: + VISEM, рантайм нейросетей и модели внутри файла (BOPASI-full.html, не в git)
+{
+  const { gzipSync } = await import('node:zlib');
+  const ortSrc = path.join(repo, 'next', 'node_modules', 'onnxruntime-web', 'dist');
+  const blobs = [
+    ['ort.wasm.min.js', path.join(ortSrc, 'ort.wasm.min.js')],
+    ['ort-wasm-simd-threaded.mjs', path.join(ortSrc, 'ort-wasm-simd-threaded.mjs')],
+    ['ort-wasm-simd-threaded.wasm', path.join(ortSrc, 'ort-wasm-simd-threaded.wasm')],
+    ...['scd-yolov8s-seg.onnx', 'scd-centernet-r18.onnx', 'visem-yolov5n.onnx'].map((m) => [m, path.join(here, 'models', m)]),
+  ];
+  const data = [];
+  for (const [name, file] of blobs) data.push(`<script type="application/x-gzip-base64" data-nn="${name}">${gzipSync(await readFile(file), { level: 9 }).toString('base64')}</script>`);
+  const appsLine = `const APPS = ${safeJSON({ bopasi: apps.bopasi, bluetol: apps.bluetol })};`;
+  if (!html.includes(appsLine)) throw new Error('APPS не найден');
+  let full = html.split(appsLine).join(`const APPS = ${safeJSON({ bopasi: apps.bopasi, bluetol: apps.bluetol, visem: apps.visem })};`);
+  full = full.replace('<head>', '<head><script>window.BOPASI_FULL = true;</script>');
+  const endBody = full.lastIndexOf('</body>');
+  full = full.slice(0, endBody) + data.join('\n') + '\n' + full.slice(endBody);
+  await writeFile(path.join(repo, 'BOPASI-full.html'), full);
+  console.log(`OK: BOPASI-full.html ${(full.length / 1048576).toFixed(1)} MB`);
+}
+
 // ── материалы для сайта на Next.js (next/): инструменты, стили, данные, библиотеки
 const nx = path.join(repo, 'next');
 const pub = path.join(nx, 'public');
@@ -95,7 +117,7 @@ const legacyJs = [
   await src('i18n.js'), await src('core.js'),
   `const TOOLS_DATA = ${safeJSON(tools)};`, `const APPS = ${safeJSON(apps)};`, 'const PREVIEWS = {};',
   await src('rcpc-engine.js'), await src('scd-engine.js'), await src('tool-calc.js'), await src('tool-rcpc.js'),
-  await src('scd-ai.js'), await src('scd-ai20.js'), await src('tool-scd.js'), await src('tool-lab.js'), await src('tool-morph.js'), await src('tool-constructor.js'),
+  await src('nn-load.js'), await src('scd-ai.js'), await src('scd-ai20.js'), await src('tool-scd.js'), await src('tool-lab.js'), await src('tool-morph.js'), await src('tool-constructor.js'),
   await src('ihc-engine.js'), await src('tool-histo.js'), await src('bridge.js'),
 ].join('\n\n');
 await writeFile(path.join(pub, 'legacy', 'bopasi-tools.js'), legacyJs);
