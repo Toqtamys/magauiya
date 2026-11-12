@@ -231,6 +231,11 @@ body { margin: 0; background: #fff; color: #0b0d12; font-family: 'IBM Plex Sans'
 ${data.join('\n')}
 </body></html>`;
   await writeFile(path.join(repo, 'BOPASI-SCD.html'), shtml);
+  // лёгкая версия для встраивания на другие сайты (iframe): нейросети грузятся с BOPASI по запросу
+  const lite = shtml.replace(data.join('\n'), '').replace('<head>', `<head><script>window.BOPASI_BASE = '../';</script>`);
+  await mkdir(path.join(pub, 'embed'), { recursive: true });
+  await writeFile(path.join(pub, 'embed', 'scd.html'), lite);
+  console.log(`OK: embed/scd.html ${(lite.length / 1048576).toFixed(1)} MB`);
   // копии для скачивания с сайта: …/bopasi/download/
   await mkdir(path.join(pub, 'download'), { recursive: true });
   await cp(path.join(repo, 'BOPASI-SCD.html'), path.join(pub, 'download', 'BOPASI-SCD.html'));
