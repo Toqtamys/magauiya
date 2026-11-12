@@ -12,5 +12,5 @@ __pycache__/
 *.pyc
 .venv/
 .taste-skill/
-BOPASI-full.html
-BOPASI-SCD.html
+/BOPASI-full.html
+/BOPASI-SCD.html
