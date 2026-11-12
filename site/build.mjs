@@ -231,6 +231,10 @@ body { margin: 0; background: #fff; color: #0b0d12; font-family: 'IBM Plex Sans'
 ${data.join('\n')}
 </body></html>`;
   await writeFile(path.join(repo, 'BOPASI-SCD.html'), shtml);
+  // копии для скачивания с сайта: …/bopasi/download/
+  await mkdir(path.join(pub, 'download'), { recursive: true });
+  await cp(path.join(repo, 'BOPASI-SCD.html'), path.join(pub, 'download', 'BOPASI-SCD.html'));
+  await cp(path.join(repo, 'BOPASI-full.html'), path.join(pub, 'download', 'BOPASI-full.html'));
   console.log(`OK: BOPASI-SCD.html ${(shtml.length / 1048576).toFixed(1)} MB`);
 }
 console.log(`OK: BOPASI.html ${(html.length / 1024).toFixed(0)} KB и материалы для next/, инструментов: ${tools.length}`);

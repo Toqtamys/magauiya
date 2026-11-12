@@ -54,3 +54,4 @@ src/lib/sky.gen.js
 src/lib/stage.gen.js
 public/models/
 public/ort/
+/public/download/
