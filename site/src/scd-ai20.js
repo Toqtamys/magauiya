@@ -98,8 +98,9 @@ const SCD_AI20 = (() => {
     const keep = [];
     for (const dd of dets) if (!keep.some((q) => Math.hypot(q.px - dd.px, q.py - dd.py) < Math.max(4, Math.min(q.minl, dd.minl) * 0.8))) keep.push(dd);
     const cells = keep.map((q) => {
-      const minor = q.minl / k, x = q.px / k + ox, y = q.py / k + oy;
-      return { id: 'n20_' + Math.round(x) + '_' + Math.round(y), x, y, major: Math.max(minor, q.maj / k), minor, angle: q.ang,
+      // выходы модели — полуоси (малая и большая), поэтому диаметры = ×2
+      const minor = (2 * q.minl) / k, x = q.px / k + ox, y = q.py / k + oy;
+      return { id: 'n20_' + Math.round(x) + '_' + Math.round(y), x, y, major: Math.max(minor, (2 * q.maj) / k), minor, angle: q.ang,
         halo: Math.max(0, q.rhr) * minor, rhr: q.rhr, conf: q.sc, cls: classOf(q.rhr), weak: false, overlap: false, area: Math.PI * minor * minor * 0.375 };
     });
     return { cells, ms: performance.now() - t0, tiles: ch * cv, k };
