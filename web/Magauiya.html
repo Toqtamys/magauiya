@@ -764,9 +764,9 @@ const I18N = {
     stepVideo: '1 · Видео', dropTitle: 'Перетащите видео сюда', dropSub: 'или нажмите, чтобы выбрать. MP4/MOV, можно несколько',
     stepChamber: '2 · Камера и препарат', depth: 'Глубина камеры, мкм', pitch: 'Шаг сетки, мкм', dilution: 'Разведение, раз', umpx: 'Масштаб, мкм/px', umpxPh: 'авто по сетке',
     detector: 'Детектор головок', detClassic: 'Классический', detNN: 'Нейросеть VISEM',
-    nnHint: 'Нейросеть VISEM (YOLOv5n) обучена на видео с ТЁМНЫМ фоном: светлые головки на тёмном поле (тёмное поле или фазовый контраст). Загружайте такие видео. Анализируются первые 8 секунд; работает только на сайте BOPASI.',
+    nnHint: 'Нейросеть VISEM (YOLOv5n) обучена на видео с ТЁМНЫМ фоном: светлые головки на тёмном поле (тёмное поле или фазовый контраст). Загружайте такие видео. Анализируются первые 8 секунд; работает на сайте BOPASI и в полной версии BOPASI-full.html.',
     nnLoad: 'Загрузка нейросети', nnLight: 'ВНИМАНИЕ: видео со светлым фоном — нейросеть обучена на тёмном фоне и здесь недосчитывает клетки и подвижность; для такого видео используйте классический детектор',
-    nnOff: 'Нейросеть доступна только на сайте BOPASI — анализ выполнен классическим детектором', detUsed: 'Детектор',
+    nnOff: 'Нейросеть доступна на сайте BOPASI и в BOPASI-full.html — анализ выполнен классическим детектором', detUsed: 'Детектор',
     detUsedNN: 'нейросеть VISEM (YOLOv5n, SimulaMet, CC BY 4.0), первые {s} с', detUsedClassic: 'классический',
     chamberHint: 'Маклер: 10 мкм и 100 мкм. Объём эякулята можно указать у каждого файла — тогда появятся общее количество и его процентиль.',
     vol: 'V, мл', volAria: 'Объём эякулята, мл', remove: 'Убрать',
@@ -814,9 +814,9 @@ const I18N = {
     stepVideo: '1 · Бейне', dropTitle: 'Бейнені осында сүйреңіз', dropSub: 'немесе таңдау үшін басыңыз. MP4/MOV, бірнешеуі болады',
     stepChamber: '2 · Камера және препарат', depth: 'Камера тереңдігі, мкм', pitch: 'Тор қадамы, мкм', dilution: 'Сұйылту, есе', umpx: 'Масштаб, мкм/px', umpxPh: 'тор бойынша авто',
     detector: 'Бас детекторы', detClassic: 'Классикалық', detNN: 'VISEM нейрожелісі',
-    nnHint: 'VISEM нейрожелісі (YOLOv5n) ҚАРАҢҒЫ фондағы бейнелерде оқытылған: қараңғы өрісте ашық бастар (қараңғы өріс немесе фазалық контраст). Осындай бейнелерді жүктеңіз. Алғашқы 8 секунд талданады; тек BOPASI сайтында жұмыс істейді.',
+    nnHint: 'VISEM нейрожелісі (YOLOv5n) ҚАРАҢҒЫ фондағы бейнелерде оқытылған: қараңғы өрісте ашық бастар (қараңғы өріс немесе фазалық контраст). Осындай бейнелерді жүктеңіз. Алғашқы 8 секунд талданады; BOPASI сайтында және BOPASI-full.html нұсқасында жұмыс істейді.',
     nnLoad: 'Нейрожелі жүктелуде', nnLight: 'НАЗАР АУДАРЫҢЫЗ: ашық фонды бейне — нейрожелі қараңғы фонда оқытылған, мұнда жасушалар мен қозғалғыштықты кем санайды; мұндай бейне үшін классикалық детекторды қолданыңыз',
-    nnOff: 'Нейрожелі тек BOPASI сайтында қолжетімді — талдау классикалық детектормен жасалды', detUsed: 'Детектор',
+    nnOff: 'Нейрожелі BOPASI сайтында және BOPASI-full.html нұсқасында қолжетімді — талдау классикалық детектормен жасалды', detUsed: 'Детектор',
     detUsedNN: 'VISEM нейрожелісі (YOLOv5n, SimulaMet, CC BY 4.0), алғашқы {s} с', detUsedClassic: 'классикалық',
     chamberHint: 'Маклер: 10 мкм және 100 мкм. Әр файлға эякулят көлемін көрсетсеңіз, жалпы саны мен оның перцентилі шығады.',
     vol: 'V, мл', volAria: 'Эякулят көлемі, мл', remove: 'Алып тастау',
@@ -864,9 +864,9 @@ const I18N = {
     stepVideo: '1 · Video', dropTitle: 'Drop videos here', dropSub: 'or click to choose. MP4/MOV, several at once',
     stepChamber: '2 · Chamber and sample', depth: 'Chamber depth, µm', pitch: 'Grid pitch, µm', dilution: 'Dilution, ×', umpx: 'Scale, µm/px', umpxPh: 'auto from grid',
     detector: 'Head detector', detClassic: 'Classic', detNN: 'VISEM neural net',
-    nnHint: 'The VISEM neural net (YOLOv5n) was trained on videos with a DARK background: bright heads on a dark field (dark-field or phase contrast). Upload such videos. The first 8 seconds are analysed; it runs only on the BOPASI website.',
+    nnHint: 'The VISEM neural net (YOLOv5n) was trained on videos with a DARK background: bright heads on a dark field (dark-field or phase contrast). Upload such videos. The first 8 seconds are analysed; it runs on the BOPASI website and in BOPASI-full.html.',
     nnLoad: 'Loading the neural net', nnLight: 'WARNING: light-background video — the net was trained on dark backgrounds and undercounts cells and motility here; use the classic detector for such videos',
-    nnOff: 'The neural net is available only on the BOPASI website — the classic detector was used', detUsed: 'Detector',
+    nnOff: 'The neural net is available on the BOPASI website and in BOPASI-full.html — the classic detector was used', detUsed: 'Detector',
     detUsedNN: 'VISEM neural net (YOLOv5n, SimulaMet, CC BY 4.0), first {s} s', detUsedClassic: 'classic',
     chamberHint: 'Makler: 10 µm and 100 µm. Enter the ejaculate volume for a file to get the total count and its percentile.',
     vol: 'V, mL', volAria: 'Ejaculate volume, mL', remove: 'Remove',
@@ -1057,6 +1057,9 @@ const NN = (() => {
   function load(onProgress) {
     if (ses) return Promise.resolve(ses);
     return loading || (loading = (async () => {
+      // внутри BOPASI: рантайм и модель отдаёт родительская страница (сайт или полный офлайн-файл)
+      let P = null; try { if (window.parent !== window) P = window.parent.BOPASI_NN; } catch (_) {}
+      if (P) { await P.setup(window); const buf = new Uint8Array(await P.bytes('visem-yolov5n.onnx', onProgress)); ses = await window.ort.InferenceSession.create(buf, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' }); return ses; }
       const b = base(); if (!b || location.protocol === 'file:' && !/^https?:/.test(b)) throw new Error('offline');
       const root = new URL(b, document.baseURI).href;
       if (!window.ort) await script(root + 'ort/ort.wasm.min.js');

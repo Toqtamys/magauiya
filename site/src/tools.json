@@ -173,9 +173,9 @@
     "en": "The first 8 seconds are analysed; ×20–×40 objective with the chamber grid in view"
    },
    {
-    "ru": "Работает только на сайте BOPASI (в офлайн-файле нейросети нет)",
-    "kk": "Тек BOPASI сайтында жұмыс істейді (офлайн файлда нейрожелі жоқ)",
-    "en": "Works only on the BOPASI website (the offline file has no neural net)"
+    "ru": "Нейросеть работает на сайте BOPASI и в полной офлайн-версии BOPASI-full.html",
+    "kk": "Нейрожелі BOPASI сайтында және толық BOPASI-full.html нұсқасында жұмыс істейді",
+    "en": "The neural net runs on the BOPASI website and in the full offline BOPASI-full.html"
    }
   ],
   "steps": [

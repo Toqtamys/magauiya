@@ -6,23 +6,11 @@
 const SCD_AI20 = (() => {
   const IN = 512, PAD = 64, ST = IN - 2 * PAD, DOWN = 4, THR = 0.3, REF = 3072;
   let session = null, loading = null;
-  const base = () => (window.BOPASI_BASE || './');
-  function loadScript(src) {
-    return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('script ' + src)); document.head.append(s); });
-  }
   function load(onProgress) {
     if (session) return Promise.resolve(session);
     return (loading ||= (async () => {
-      if (location.protocol === 'file:') throw new Error('offline');
-      if (!window.ort) await loadScript(base() + 'ort/ort.wasm.min.js');
-      const ort = window.ort;
-      ort.env.wasm.wasmPaths = new URL(base() + 'ort/', location.href).href;
-      ort.env.wasm.numThreads = self.crossOriginIsolated ? Math.min(4, navigator.hardwareConcurrency || 2) : 1;
-      const r = await fetch(base() + 'models/scd-centernet-r18.onnx');
-      if (!r.ok) throw new Error('model ' + r.status);
-      const total = +r.headers.get('content-length') || 0, reader = r.body.getReader(), parts = []; let got = 0;
-      for (;;) { const { done, value } = await reader.read(); if (done) break; parts.push(value); got += value.length; onProgress?.(total ? got / total : 0); }
-      const buf = new Uint8Array(got); let o = 0; for (const p of parts) { buf.set(p, o); o += p.length; }
+      const ort = await BOPASI_NN.setup(window);
+      const buf = await BOPASI_NN.bytes('scd-centernet-r18.onnx', onProgress);
       session = await ort.InferenceSession.create(buf, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
       return session;
     })().catch((e) => { loading = null; throw e; }));
