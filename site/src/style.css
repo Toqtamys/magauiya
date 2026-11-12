@@ -318,6 +318,7 @@ body.embed-fs .p-head { display: none; }
 .scd-bars .track i { display: block; height: 100%; border-radius: 10px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
 .scd-bars b { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
 .scd-side select { width: auto; flex: 1; }
+.scd-empty[hidden], .scd-canvas[hidden] { display: none !important; }
 .scd .seg-3 { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
 .scd .seg-3 button { padding: 9px 6px; white-space: normal; line-height: 1.2; font-size: 13px; }
 .scd .seg-3 button:disabled { opacity: .55; cursor: progress; }

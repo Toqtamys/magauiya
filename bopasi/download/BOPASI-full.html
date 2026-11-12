@@ -485,6 +485,7 @@ body.embed-fs .p-head { display: none; }
 .scd-bars .track i { display: block; height: 100%; border-radius: 10px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
 .scd-bars b { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
 .scd-side select { width: auto; flex: 1; }
+.scd-empty[hidden], .scd-canvas[hidden] { display: none !important; }
 .scd .seg-3 { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
 .scd .seg-3 button { padding: 9px 6px; white-space: normal; line-height: 1.2; font-size: 13px; }
 .scd .seg-3 button:disabled { opacity: .55; cursor: progress; }
@@ -13583,7 +13584,7 @@ function mountScd(root) {
     // сравнение методов по текущему образцу и сводка по всем образцам
     const cell = (fields, m) => (done(fields, m) ? (() => { const t = sumOf(fields, m); return `${num(t.dfi)}% · ${t.counted}`; })() : '—');
     const multi = st.samples.filter((x) => x.fields.length).length > 1;
-    compare.replaceChildren(
+    compare.replaceChildren(...[
       h('span', { class: 'k' }, `${tr(UI_SCD.compare)} · ${sName(s, st.cur)}`),
       h('table', { class: 'scd-table' },
         h('thead', {}, h('tr', {}, h('th', {}, tr(UI_SCD.method)), h('th', {}, tr(L('Увел.', 'Үлкейту', 'Mag.'))), h('th', {}, `DFI · ${tr(UI_SCD.cells)}`))),
@@ -13592,7 +13593,7 @@ function mountScd(root) {
       multi ? h('table', { class: 'scd-table' },
         h('thead', {}, h('tr', {}, h('th', {}, tr(UI_SCD.sample)), ...SCD_METHODS.map((m) => h('th', {}, SCD_M[m].mag)))),
         h('tbody', {}, ...st.samples.map((x, i) => (x.fields.length ? h('tr', { class: i === st.cur ? 'on' : '' }, h('td', {}, sName(x, i)), ...SCD_METHODS.map((m) => h('td', {}, done(x.fields, m) ? `${num(sumOf(x.fields, m).dfi)}%` : '—'))) : null)))) : null,
-      s.fields.length ? runAllBtn : null);
+      s.fields.length ? runAllBtn : null].filter(Boolean));
   }
   function report() {
     const out = [];

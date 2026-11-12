@@ -1835,7 +1835,7 @@ function mountScd(root) {
     // сравнение методов по текущему образцу и сводка по всем образцам
     const cell = (fields, m) => (done(fields, m) ? (() => { const t = sumOf(fields, m); return `${num(t.dfi)}% · ${t.counted}`; })() : '—');
     const multi = st.samples.filter((x) => x.fields.length).length > 1;
-    compare.replaceChildren(
+    compare.replaceChildren(...[
       h('span', { class: 'k' }, `${tr(UI_SCD.compare)} · ${sName(s, st.cur)}`),
       h('table', { class: 'scd-table' },
         h('thead', {}, h('tr', {}, h('th', {}, tr(UI_SCD.method)), h('th', {}, tr(L('Увел.', 'Үлкейту', 'Mag.'))), h('th', {}, `DFI · ${tr(UI_SCD.cells)}`))),
@@ -1844,7 +1844,7 @@ function mountScd(root) {
       multi ? h('table', { class: 'scd-table' },
         h('thead', {}, h('tr', {}, h('th', {}, tr(UI_SCD.sample)), ...SCD_METHODS.map((m) => h('th', {}, SCD_M[m].mag)))),
         h('tbody', {}, ...st.samples.map((x, i) => (x.fields.length ? h('tr', { class: i === st.cur ? 'on' : '' }, h('td', {}, sName(x, i)), ...SCD_METHODS.map((m) => h('td', {}, done(x.fields, m) ? `${num(sumOf(x.fields, m).dfi)}%` : '—'))) : null)))) : null,
-      s.fields.length ? runAllBtn : null);
+      s.fields.length ? runAllBtn : null].filter(Boolean));
   }
   function report() {
     const out = [];
